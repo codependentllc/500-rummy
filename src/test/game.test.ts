@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { makeDeck, hasDuplicateCards } from "../game/deck";
 import { immediatelyUsable } from "../game/discard";
-import { isRun, isSet } from "../game/melds";
+import { groupHandByMelds, isRun, isSet } from "../game/melds";
 import { cardValue } from "../game/scoring";
 import { createPlayers, moveCardById, newGame } from "../game/state";
 import type { Card } from "../game/types";
@@ -68,5 +68,22 @@ describe("500 Rummy rules", () => {
     expect(players[0].name).toBe("Ava");
     expect(players[0].avatar).toBe("/avatars/ava.png");
     expect(players[0].fallback).toBe("👩🏾");
+  });
+
+  it("groups completed melds together before loose cards", () => {
+    const grouped = groupHandByMelds([
+      c("9♣"),
+      c("7♥"),
+      c("4♠"),
+      c("7♦"),
+      c("5♠"),
+      c("7♠"),
+      c("3♠")
+    ]);
+
+    const ids = grouped.map((card) => card.id);
+    expect(ids.slice(0, 3)).toEqual(["7♠", "7♥", "7♦"]);
+    expect(ids.slice(3, 6)).toEqual(["3♠", "4♠", "5♠"]);
+    expect(ids[6]).toBe("9♣");
   });
 });

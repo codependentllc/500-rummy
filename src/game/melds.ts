@@ -48,7 +48,7 @@ export function isRun(cards: Card[]): boolean {
   const aceCount = cards.filter((card) => card.rank === "A").length;
   if (aceCount > 1) return false;
 
-  return (aceCount ? [1, 14] : [rankValue(cards.find((card) => card.rank !== "A")?.rank || "A")]).some((aceValue) => {
+  return (aceCount ? [1, 14] : [0]).some((aceValue) => {
     const values = cards
       .map((card) => (card.rank === "A" ? aceValue : rankValue(card.rank)))
       .sort((a, b) => a - b);
@@ -138,9 +138,29 @@ export function cardHints(hand: Card[]): Record<string, "ready" | "near" | "loos
 }
 
 export function groupHandByMelds(hand: Card[]): Card[] {
-  const hints = cardHints(hand);
-  const ready = hand.filter((card) => hints[card.id] === "ready");
-  const near = hand.filter((card) => hints[card.id] === "near");
-  const loose = hand.filter((card) => hints[card.id] === "loose");
-  return [...sortCards(ready), ...sortCards(near), ...loose];
+  const used = new Set<string>();
+  const grouped: Card[] = [];
+
+  for (const meld of possibleMelds(hand)) {
+    if (meld.some((card) => used.has(card.id))) continue;
+
+    const ordered = meldType(meld) === "run" ? sortCards(meld) : [...meld].sort((a, b) => SUITS.indexOf(a.suit) - SUITS.indexOf(b.suit));
+    ordered.forEach((card) => {
+      used.add(card.id);
+      grouped.push(card);
+    });
+  }
+
+  for (const near of nearMelds(hand)) {
+    const available = near.filter((card) => !used.has(card.id));
+    if (available.length < 2) continue;
+
+    sortCards(available).forEach((card) => {
+      used.add(card.id);
+      grouped.push(card);
+    });
+  }
+
+  const loose = hand.filter((card) => !used.has(card.id));
+  return [...grouped, ...sortCards(loose)];
 }
