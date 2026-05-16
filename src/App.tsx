@@ -10,6 +10,7 @@ import type { Card, GameState, PlayerConfig } from "./game/types";
 import { ActionButton } from "./components/ActionButton";
 import { AvatarPhoto } from "./components/AvatarPhoto";
 import { CardView } from "./components/CardView";
+import { DealSequence } from "./components/DealSequence";
 import { EndHandModal } from "./components/EndHandModal";
 import { FlyingCards } from "./components/FlyingCards";
 import { HandCardRow } from "./components/HandCardRow";
@@ -34,6 +35,8 @@ export default function App() {
   const [state, setState] = useState<GameState>(() => newGame(2, null, defaultConfigs));
   const [flyingCards, setFlyingCards] = useState<Card[]>([]);
   const [isAnimatingMeld, setIsAnimatingMeld] = useState(false);
+  const [isDealing, setIsDealing] = useState(false);
+  const [dealKey, setDealKey] = useState(0);
 
   const human = state.players[0];
   const current = state.players[state.turn];
@@ -42,10 +45,10 @@ export default function App() {
   const handHints = useMemo(() => cardHints(human.hand), [human.hand]);
 
   useEffect(() => {
-    if (!started || !current?.isAI || state.handOver || isAnimatingMeld) return;
+    if (!started || !current?.isAI || state.handOver || isAnimatingMeld || isDealing) return;
     const timer = window.setTimeout(() => setState((prev) => aiTurn(prev)), 650);
     return () => window.clearTimeout(timer);
-  }, [started, state.turn, state.handOver, current?.isAI, isAnimatingMeld]);
+  }, [started, state.turn, state.handOver, current?.isAI, isAnimatingMeld, isDealing]);
 
   function setMessage(message: string) {
     setState((prev) => ({ ...prev, message }));
@@ -56,17 +59,31 @@ export default function App() {
     setIsAnimatingMeld(false);
     setState(newGame(count, null, configs));
     setStarted(true);
+    setIsDealing(true);
+    setDealKey((key) => key + 1);
   }
 
   function resetGame(players: Player[] | null = null) {
     setFlyingCards([]);
     setIsAnimatingMeld(false);
     setState(newGame(count, players, configs));
+    setIsDealing(true);
+    setDealKey((key) => key + 1);
+  }
+
+  function changePlayerCount(number: number) {
+    setCount(number);
+    setFlyingCards([]);
+    setIsAnimatingMeld(false);
+    setState(newGame(number, null, configs));
+    setIsDealing(true);
+    setDealKey((key) => key + 1);
   }
 
   function returnToSetup() {
     setFlyingCards([]);
     setIsAnimatingMeld(false);
+    setIsDealing(false);
     setStarted(false);
   }
 
@@ -75,12 +92,12 @@ export default function App() {
   }
 
   function selectCards(ids: string[]) {
-    if (state.turn !== 0 || state.handOver || isAnimatingMeld) return;
+    if (state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing) return;
     setState((prev) => ({ ...prev, selected: ids }));
   }
 
   function toggleCard(id: string) {
-    if (state.turn !== 0 || state.handOver || isAnimatingMeld) return;
+    if (state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing) return;
     setState((prev) => ({
       ...prev,
       selected: prev.selected.includes(id) ? prev.selected.filter((cardId) => cardId !== id) : [...prev.selected, id]
@@ -88,7 +105,7 @@ export default function App() {
   }
 
   function drawStock() {
-    if (state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld) return;
+    if (state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld || isDealing) return;
     if (!state.stock.length) {
       setMessage("Stock is empty.");
       return;
@@ -107,7 +124,7 @@ export default function App() {
   }
 
   function drawDiscard(index: number) {
-    if (state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld) return;
+    if (state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld || isDealing) return;
 
     const card = state.discard[index];
     const pickupPreview = discardPickup(state.discard, index);
@@ -150,7 +167,7 @@ export default function App() {
   }
 
   function playMeld() {
-    if (isAnimatingMeld) return;
+    if (isAnimatingMeld || isDealing) return;
     if (!state.drawn) {
       setMessage("Draw first.");
       return;
@@ -187,7 +204,7 @@ export default function App() {
   }
 
   function layoff(meldId: string) {
-    if (isAnimatingMeld) return;
+    if (isAnimatingMeld || isDealing) return;
     if (!state.drawn || selectedCards.length !== 1) {
       setMessage("Select one card to lay off.");
       return;
@@ -208,7 +225,7 @@ export default function App() {
   }
 
   function discardSelected() {
-    if (isAnimatingMeld) return;
+    if (isAnimatingMeld || isDealing) return;
     if (!state.drawn || selectedCards.length !== 1) {
       setMessage("Select one card to discard.");
       return;
@@ -228,14 +245,14 @@ export default function App() {
   }
 
   function dragCard(event: React.DragEvent<HTMLButtonElement>, cardId: string) {
-    if (isAnimatingMeld) return;
+    if (isAnimatingMeld || isDealing) return;
     selectCards([cardId]);
     event.dataTransfer.setData("text/plain", `hand:${cardId}`);
   }
 
   function dropOnHandCard(event: React.DragEvent<HTMLButtonElement>, targetId: string) {
     event.preventDefault();
-    if (isAnimatingMeld) return;
+    if (isAnimatingMeld || isDealing) return;
 
     const data = event.dataTransfer.getData("text/plain");
     if (!data.startsWith("hand:")) return;
@@ -250,7 +267,7 @@ export default function App() {
   }
 
   function sortHandByMelds() {
-    if (isAnimatingMeld) return;
+    if (isAnimatingMeld || isDealing) return;
     setState((prev) => {
       const players = [...prev.players];
       players[0] = { ...players[0], hand: groupHandByMelds(players[0].hand) };
@@ -259,7 +276,7 @@ export default function App() {
   }
 
   function sortHandBySuit() {
-    if (isAnimatingMeld) return;
+    if (isAnimatingMeld || isDealing) return;
     setState((prev) => {
       const players = [...prev.players];
       players[0] = { ...players[0], hand: sortCards(players[0].hand) };
@@ -268,7 +285,7 @@ export default function App() {
   }
 
   function dropDiscard(event: React.DragEvent<HTMLDivElement>) {
-    if (isAnimatingMeld) return;
+    if (isAnimatingMeld || isDealing) return;
     const data = event.dataTransfer.getData("text/plain");
     if (data.startsWith("discard:")) drawDiscard(Number(data.split(":")[1]));
   }
@@ -283,12 +300,12 @@ export default function App() {
         <div className="title">🃏 500 Rummy</div>
         <div className="top-actions">
           {[2, 3, 4].map((number) => (
-            <ActionButton key={number} disabled={isAnimatingMeld} onClick={() => { setCount(number); setState(newGame(number, null, configs)); }} style={{ background: count === number ? "#ffe082" : "rgba(255,255,255,0.92)", color: "#1a472a", padding: "6px 10px" }}>
+            <ActionButton key={number} disabled={isAnimatingMeld || isDealing} onClick={() => changePlayerCount(number)} style={{ background: count === number ? "#ffe082" : "rgba(255,255,255,0.92)", color: "#1a472a", padding: "6px 10px" }}>
               {number}P
             </ActionButton>
           ))}
-          <ActionButton disabled={isAnimatingMeld} onClick={() => resetGame(null)} style={{ background: "#ffe082", color: "#1a472a", padding: "6px 10px" }}>New</ActionButton>
-          <ActionButton disabled={isAnimatingMeld} onClick={returnToSetup} style={{ background: "#fff", color: "#1a472a", padding: "6px 10px" }}>Names</ActionButton>
+          <ActionButton disabled={isAnimatingMeld || isDealing} onClick={() => resetGame(null)} style={{ background: "#ffe082", color: "#1a472a", padding: "6px 10px" }}>New</ActionButton>
+          <ActionButton disabled={isAnimatingMeld || isDealing} onClick={returnToSetup} style={{ background: "#fff", color: "#1a472a", padding: "6px 10px" }}>Names</ActionButton>
         </div>
       </div>
 
@@ -305,7 +322,7 @@ export default function App() {
         onPlayMeld={playMeld}
         onDropDiscard={dropDiscard}
         allowDrop={allowDrop}
-        disabled={isAnimatingMeld}
+        disabled={isAnimatingMeld || isDealing}
       />
 
       <FlyingCards cards={flyingCards} />
@@ -322,7 +339,7 @@ export default function App() {
                 canLayoffCard={selectedCards.length === 1 && state.turn === 0 && state.drawn && canLay(selectedCards[0], meld)}
                 onLayoff={layoff}
                 allowDrop={allowDrop}
-                disabled={isAnimatingMeld}
+                disabled={isAnimatingMeld || isDealing}
               />
             ))}
           </div>
@@ -349,8 +366,8 @@ export default function App() {
           </div>
           <div className="hand-actions">
             <span>{human.hand.length} cards · {selectedCards.length} selected · {points(selectedCards)} pts</span>
-            <ActionButton disabled={state.turn !== 0 || state.handOver || isAnimatingMeld} onClick={sortHandByMelds} style={{ background: "#2d6a4f", color: "#fff", padding: "6px 10px", fontSize: 12 }}>Group Melds</ActionButton>
-            <ActionButton disabled={state.turn !== 0 || state.handOver || isAnimatingMeld} onClick={sortHandBySuit} style={{ background: "#fff", color: "#1a472a", padding: "6px 10px", fontSize: 12 }}>Sort Suit</ActionButton>
+            <ActionButton disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandByMelds} style={{ background: "#2d6a4f", color: "#fff", padding: "6px 10px", fontSize: 12 }}>Group Melds</ActionButton>
+            <ActionButton disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandBySuit} style={{ background: "#fff", color: "#1a472a", padding: "6px 10px", fontSize: 12 }}>Sort Suit</ActionButton>
           </div>
         </div>
 
@@ -359,7 +376,7 @@ export default function App() {
             cards={human.hand}
             hints={handHints}
             selectedIds={state.selected}
-            disabled={state.turn !== 0 || state.handOver || isAnimatingMeld}
+            disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing}
             onSelect={selectCards}
             onCardClick={toggleCard}
             onCardDrag={dragCard}
@@ -370,11 +387,13 @@ export default function App() {
 
         {state.turn === 0 && state.drawn ? (
           <div className="turn-actions">
-            <ActionButton disabled={isAnimatingMeld} onClick={playMeld} style={{ background: "#2d6a4f", color: "#fff" }}>♣ Meld Selected ({selectedCards.length})</ActionButton>
-            <ActionButton disabled={isAnimatingMeld} onClick={discardSelected} style={{ background: "#8B0000", color: "#fff" }}>✕ Discard Selected</ActionButton>
+            <ActionButton disabled={isAnimatingMeld || isDealing} onClick={playMeld} style={{ background: "#2d6a4f", color: "#fff" }}>♣ Meld Selected ({selectedCards.length})</ActionButton>
+            <ActionButton disabled={isAnimatingMeld || isDealing} onClick={discardSelected} style={{ background: "#8B0000", color: "#fff" }}>✕ Discard Selected</ActionButton>
           </div>
         ) : null}
       </div>
+
+      {isDealing ? <DealSequence key={dealKey} playerCount={state.players.length} onComplete={() => setIsDealing(false)} /> : null}
 
       <EndHandModal
         state={state}
