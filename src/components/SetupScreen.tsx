@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { AVATARS } from "../data/avatars";
 import type { PlayerConfig } from "../game/types";
 import { ActionButton } from "./ActionButton";
 import { AvatarPhoto } from "./AvatarPhoto";
+import { CinematicTrailer } from "./CinematicTrailer";
 
 type Props = {
   count: number;
@@ -12,6 +14,8 @@ type Props = {
 };
 
 export function SetupScreen({ count, setCount, configs, setConfigs, onStart }: Props) {
+  const [showTrailer, setShowTrailer] = useState(false);
+
   function updatePlayer(index: number, patch: Partial<PlayerConfig>) {
     setConfigs((prev) => prev.map((player, i) => (i === index ? { ...player, ...patch } : player)));
   }
@@ -22,6 +26,9 @@ export function SetupScreen({ count, setCount, configs, setConfigs, onStart }: P
         <div className="setup-logo">🃏</div>
         <h1>500 Rummy</h1>
         <p>Choose names and fictional photo avatars, then deal.</p>
+        <button type="button" className="trailer-launch" onClick={() => setShowTrailer(true)}>
+          Watch Trailer
+        </button>
 
         <div className="setup-section">
           <b>Players</b>
@@ -77,6 +84,8 @@ export function SetupScreen({ count, setCount, configs, setConfigs, onStart }: P
           Deal Cards ♠
         </ActionButton>
       </div>
+
+      {showTrailer ? <CinematicTrailer onClose={() => setShowTrailer(false)} /> : null}
     </div>
   );
 }
