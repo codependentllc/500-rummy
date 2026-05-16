@@ -37,6 +37,7 @@ export default function App() {
   const [started, setStarted] = useState(false);
   const [state, setState] = useState<GameState>(() => newGame(2, null, defaultConfigs));
   const [flyingCards, setFlyingCards] = useState<Card[]>([]);
+  const [flyingMeldType, setFlyingMeldType] = useState<"set" | "run" | "layoff" | undefined>();
   const [isAnimatingMeld, setIsAnimatingMeld] = useState(false);
   const [isDealing, setIsDealing] = useState(false);
   const [dealKey, setDealKey] = useState(0);
@@ -61,6 +62,7 @@ export default function App() {
 
   function startConfiguredGame() {
     setFlyingCards([]);
+    setFlyingMeldType(undefined);
     setIsAnimatingMeld(false);
     setPendingStockCard(null);
     setPendingDiscardPickup([]);
@@ -72,6 +74,7 @@ export default function App() {
 
   function resetGame(players: Player[] | null = null) {
     setFlyingCards([]);
+    setFlyingMeldType(undefined);
     setIsAnimatingMeld(false);
     setPendingStockCard(null);
     setPendingDiscardPickup([]);
@@ -83,6 +86,7 @@ export default function App() {
   function changePlayerCount(number: number) {
     setCount(number);
     setFlyingCards([]);
+    setFlyingMeldType(undefined);
     setIsAnimatingMeld(false);
     setPendingStockCard(null);
     setPendingDiscardPickup([]);
@@ -93,6 +97,7 @@ export default function App() {
 
   function returnToSetup() {
     setFlyingCards([]);
+    setFlyingMeldType(undefined);
     setIsAnimatingMeld(false);
     setPendingStockCard(null);
     setPendingDiscardPickup([]);
@@ -195,6 +200,7 @@ export default function App() {
     });
 
     setFlyingCards([]);
+    setFlyingMeldType(undefined);
     setIsAnimatingMeld(false);
   }
 
@@ -214,6 +220,7 @@ export default function App() {
     const cardsToPlay = sortCards(selectedCards);
     const idsToRemove = selectedCards.map((card) => card.id);
     setFlyingCards(cardsToPlay);
+    setFlyingMeldType(type);
     setIsAnimatingMeld(true);
     setMessage("Playing meld…");
     window.setTimeout(() => finishPlayMeld(type, cardsToPlay, idsToRemove), 560 + cardsToPlay.length * 45);
@@ -232,6 +239,7 @@ export default function App() {
     });
 
     setFlyingCards([]);
+    setFlyingMeldType(undefined);
     setIsAnimatingMeld(false);
   }
 
@@ -251,6 +259,7 @@ export default function App() {
     }
 
     setFlyingCards([card]);
+    setFlyingMeldType("layoff");
     setIsAnimatingMeld(true);
     setMessage(`Laying off ${label(card)}…`);
     window.setTimeout(() => finishLayoff(card, meldId), 560);
@@ -369,7 +378,7 @@ export default function App() {
           disabled={isAnimatingMeld || isDealing}
         />
 
-        <FlyingCards cards={flyingCards} />
+        <FlyingCards cards={flyingCards} type={flyingMeldType} />
 
         {tableMelds.length ? (
           <div className="meld-section">
