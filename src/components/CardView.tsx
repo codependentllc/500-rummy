@@ -28,7 +28,7 @@ export function CardView({
   onDrop,
   hint = ""
 }: Props) {
-  const size = small ? { w: 38, h: 54, rank: 11 } : { w: 54, h: 76, rank: 14 };
+  const size = small ? { w: 50, h: 70, rank: 15 } : { w: 76, h: 108, rank: 21 };
 
   if (faceDown) {
     return (
@@ -36,7 +36,7 @@ export function CardView({
         style={{
           width: size.w,
           height: size.h,
-          borderRadius: 6,
+          borderRadius: small ? 7 : 9,
           background: "repeating-linear-gradient(45deg,#1a472a,#1a472a 3px,#2d6a4f 3px,#2d6a4f 6px)",
           border: "2px solid #fff",
           flexShrink: 0
@@ -62,14 +62,14 @@ export function CardView({
       style={{
         width: size.w,
         height: size.h,
-        borderRadius: 7,
+        borderRadius: small ? 7 : 10,
         background: selected ? "#fffbe6" : "#fff",
         border: selected ? "2.5px solid #e6a817" : hintBorder,
         cursor: disabled ? "default" : "pointer",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        padding: "3px 4px",
+        padding: small ? "4px 5px" : "7px 8px",
         position: "relative",
         flexShrink: 0,
         transform: selected ? "translateY(-8px)" : "none",
@@ -80,7 +80,7 @@ export function CardView({
       <div style={{ fontSize: size.rank, fontWeight: 800, color: queenSpades ? "#8B0000" : red ? "#cc2200" : "#111", lineHeight: 1 }}>{card.rank}</div>
       <div style={{ fontSize: size.rank + 1, color: queenSpades ? "#8B0000" : red ? "#cc2200" : "#111", textAlign: "center", lineHeight: 1 }}>{card.suit}</div>
       <div style={{ fontSize: size.rank, fontWeight: 800, color: queenSpades ? "#8B0000" : red ? "#cc2200" : "#111", lineHeight: 1, alignSelf: "flex-end", transform: "rotate(180deg)" }}>{card.rank}</div>
-      {queenSpades ? <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: 7, color: "#8B0000", fontWeight: 900 }}>★40★</div> : null}
+      {queenSpades ? <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", fontSize: small ? 9 : 13, color: "#8B0000", fontWeight: 900 }}>★40★</div> : null}
     </button>
   );
 }
