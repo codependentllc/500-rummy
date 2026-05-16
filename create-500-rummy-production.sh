@@ -824,7 +824,6 @@ export function SetupScreen({ count, setCount, configs, setConfigs, onStart }: P
           </div>
         ))}
 
-        <div className="avatar-note">Save avatar images in <code>public/avatars</code>. Missing files use emoji fallbacks.</div>
         <ActionButton onClick={onStart} style={{ width: "100%", background: "#1a472a", color: "#fff", padding: 14, fontSize: 16, marginTop: 8 }}>
           Deal Cards ♠
         </ActionButton>

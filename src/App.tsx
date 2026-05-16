@@ -11,6 +11,7 @@ import { ActionButton } from "./components/ActionButton";
 import { AvatarPhoto } from "./components/AvatarPhoto";
 import { CardView } from "./components/CardView";
 import { DealSequence } from "./components/DealSequence";
+import { DiscardPickupAnimation } from "./components/DiscardPickupAnimation";
 import { DrawStockAnimation } from "./components/DrawStockAnimation";
 import { EndHandModal } from "./components/EndHandModal";
 import { FlyingCards } from "./components/FlyingCards";
@@ -39,6 +40,7 @@ export default function App() {
   const [isDealing, setIsDealing] = useState(false);
   const [dealKey, setDealKey] = useState(0);
   const [pendingStockCard, setPendingStockCard] = useState<Card | null>(null);
+  const [pendingDiscardPickup, setPendingDiscardPickup] = useState<Card[]>([]);
 
   const human = state.players[0];
   const current = state.players[state.turn];
@@ -60,6 +62,7 @@ export default function App() {
     setFlyingCards([]);
     setIsAnimatingMeld(false);
     setPendingStockCard(null);
+    setPendingDiscardPickup([]);
     setState(newGame(count, null, configs));
     setStarted(true);
     setIsDealing(true);
@@ -70,6 +73,7 @@ export default function App() {
     setFlyingCards([]);
     setIsAnimatingMeld(false);
     setPendingStockCard(null);
+    setPendingDiscardPickup([]);
     setState(newGame(count, players, configs));
     setIsDealing(true);
     setDealKey((key) => key + 1);
@@ -80,6 +84,7 @@ export default function App() {
     setFlyingCards([]);
     setIsAnimatingMeld(false);
     setPendingStockCard(null);
+    setPendingDiscardPickup([]);
     setState(newGame(number, null, configs));
     setIsDealing(true);
     setDealKey((key) => key + 1);
@@ -89,6 +94,7 @@ export default function App() {
     setFlyingCards([]);
     setIsAnimatingMeld(false);
     setPendingStockCard(null);
+    setPendingDiscardPickup([]);
     setIsDealing(false);
     setStarted(false);
   }
@@ -111,7 +117,7 @@ export default function App() {
   }
 
   function drawStock() {
-    if (state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld || isDealing || pendingStockCard) return;
+    if (state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld || isDealing || pendingStockCard || pendingDiscardPickup.length) return;
     if (!state.stock.length) {
       setMessage("Stock is empty.");
       return;
@@ -140,7 +146,7 @@ export default function App() {
   }
 
   function drawDiscard(index: number) {
-    if (state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld || isDealing || pendingStockCard) return;
+    if (state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld || isDealing || pendingStockCard || pendingDiscardPickup.length) return;
 
     const card = state.discard[index];
     const pickupPreview = discardPickup(state.discard, index);
@@ -153,17 +159,26 @@ export default function App() {
     setState((prev) => {
       const pickup = discardPickup(prev.discard, index);
       const discard = prev.discard.slice(0, index);
+      setPendingDiscardPickup(pickup);
+      return { ...prev, discard, message: `Picking up ${pickup.map(label).join(", ")}…` };
+    });
+  }
+
+  function finishDiscardPickup() {
+    if (!pendingDiscardPickup.length) return;
+
+    setState((prev) => {
       const players = [...prev.players];
-      players[0] = { ...players[0], hand: [...players[0].hand, ...pickup] };
+      players[0] = { ...players[0], hand: [...players[0].hand, ...pendingDiscardPickup] };
 
       return {
         ...prev,
         players,
-        discard,
         drawn: true,
-        message: `Picked up ${pickup.map(label).join(", ")}.`
+        message: `Picked up ${pendingDiscardPickup.map(label).join(", ")}.`
       };
     });
+    setPendingDiscardPickup([]);
   }
 
   function finishPlayMeld(type: "set" | "run", cardsToPlay: Card[], idsToRemove: string[]) {
@@ -413,6 +428,7 @@ export default function App() {
 
       {isDealing ? <DealSequence key={dealKey} playerCount={state.players.length} onComplete={() => setIsDealing(false)} /> : null}
       {pendingStockCard ? <DrawStockAnimation onComplete={finishDrawStock} /> : null}
+      {pendingDiscardPickup.length ? <DiscardPickupAnimation cards={pendingDiscardPickup} onComplete={finishDiscardPickup} /> : null}
 
       <EndHandModal
         state={state}
