@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { AVATARS } from "./data/avatars";
 import { aiTurn } from "./game/ai";
 import { discardPickup, immediatelyUsable } from "./game/discard";
@@ -327,7 +328,7 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <div className="top-bar">
+      <motion.div className="top-bar" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
         <div className="title">🃏 500 Rummy</div>
         <div className="top-actions">
           {[2, 3, 4].map((number) => (
@@ -338,15 +339,26 @@ export default function App() {
           <ActionButton disabled={isAnimatingMeld || isDealing} onClick={() => resetGame(null)} style={{ background: "#ffe082", color: "#1a472a", padding: "6px 10px" }}>New</ActionButton>
           <ActionButton disabled={isAnimatingMeld || isDealing} onClick={returnToSetup} style={{ background: "#fff", color: "#1a472a", padding: "6px 10px" }}>Names</ActionButton>
         </div>
-      </div>
+      </motion.div>
 
       <ScorePanel players={state.players} turn={state.turn} handOver={state.handOver} />
 
-      <div className={state.message.match(/must|Cannot|valid/i) ? "message error" : "message"}>
+      <motion.div
+        key={state.message}
+        className={state.message.match(/must|Cannot|valid/i) ? "message error" : "message"}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.22 }}
+      >
         <b>Turn: {current.name}</b> — {state.message}
-      </div>
+      </motion.div>
 
-      <div className={isDealing ? "game-surface dealing-hidden" : "game-surface"}>
+      <motion.div
+        className={isDealing ? "game-surface dealing-hidden" : "game-surface"}
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: isDealing ? 0 : 1, y: 0 }}
+        transition={{ duration: 0.36 }}
+      >
         <TableArea
           state={state}
           onDrawStock={drawStock}
@@ -378,8 +390,15 @@ export default function App() {
           </div>
         ) : null}
 
-        {state.players.slice(1).map((player) => (
-          <div key={player.id} className="ai-row">
+        {state.players.slice(1).map((player, index) => (
+          <motion.div
+            key={player.id}
+            className="ai-row"
+            initial={{ opacity: 0, x: 18 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ delay: index * 0.04, duration: 0.28 }}
+          >
             <div className="ai-label">
               <AvatarPhoto src={player.avatar} alt={player.name} fallback={player.fallback || "🤖"} size={28} />
               {player.name} — {player.hand.length} cards{state.turn === player.id ? " ← TURN" : ""}
@@ -387,10 +406,16 @@ export default function App() {
             <div className="ai-cards">
               {player.hand.map((card) => <CardView key={card.id} card={card} faceDown small />)}
             </div>
-          </div>
+          </motion.div>
         ))}
 
-        <div className={state.turn === 0 && !state.handOver ? "human-area active" : "human-area"}>
+        <motion.div
+          className={state.turn === 0 && !state.handOver ? "human-area active" : "human-area"}
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.32 }}
+        >
           <div className="human-header">
             <div className="human-name">
               <AvatarPhoto src={human.avatar} alt={human.name} fallback={human.fallback || "🧑"} size={30} />
@@ -423,8 +448,8 @@ export default function App() {
               <ActionButton disabled={isAnimatingMeld || isDealing} onClick={discardSelected} style={{ background: "#8B0000", color: "#fff" }}>✕ Discard Selected</ActionButton>
             </div>
           ) : null}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {isDealing ? <DealSequence key={dealKey} playerCount={state.players.length} onComplete={() => setIsDealing(false)} /> : null}
       {pendingStockCard ? <DrawStockAnimation onComplete={finishDrawStock} /> : null}

@@ -35,6 +35,7 @@ body {
     radial-gradient(circle at 50% 18%, rgba(255, 224, 130, 0.18), transparent 34%);
   pointer-events: none;
   z-index: 0;
+  animation: ambientGradientDrift 18s ease-in-out infinite alternate;
 }
 
 .app-shell > *,
@@ -56,6 +57,30 @@ body {
 .top-bar,
 .human-header {
   justify-content: space-between;
+}
+
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  margin: -12px -12px 12px;
+  padding: 10px 12px;
+  background: rgba(5, 18, 10, 0.86);
+  border-bottom: 1px solid rgba(255, 224, 130, 0.22);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
+}
+
+@keyframes ambientGradientDrift {
+  0% {
+    opacity: 0.86;
+    transform: translate3d(-1.5%, -1%, 0) scale(1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(1.5%, 1%, 0) scale(1.035);
+  }
 }
 
 .title {
@@ -480,9 +505,17 @@ body {
   text-align: center;
 }
 
+.setup-utility-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 auto clamp(8px, 1.4vh, 12px);
+}
+
 .trailer-launch {
   display: block;
-  margin: 0 auto clamp(8px, 1.4vh, 12px);
+  margin: 0;
   padding: clamp(7px, 1vh, 9px) 18px;
   border: 1px solid rgba(136, 94, 26, 0.38);
   border-radius: 999px;
@@ -493,6 +526,230 @@ body {
   letter-spacing: 0.3px;
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(45, 31, 8, 0.18);
+}
+
+.tutorial-launch {
+  background: linear-gradient(135deg, #e9fff3, #8fd7ac);
+}
+
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(3, 8, 5, 0.58), rgba(3, 8, 5, 0.86)),
+    url("/backgrounds/rummy-cinematic-table.png") center / cover;
+  color: #f9efd0;
+}
+
+.tutorial-controls {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 104;
+}
+
+.tutorial-controls button {
+  border: 1px solid rgba(255, 224, 130, 0.42);
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: rgba(6, 17, 11, 0.72);
+  color: #ffe082;
+  font-family: Georgia, serif;
+  font-weight: 800;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.tutorial-card {
+  width: min(920px, 100%);
+  border-radius: 26px;
+  padding: clamp(1rem, 2.5vw, 2rem);
+  background:
+    linear-gradient(145deg, rgba(9, 24, 15, 0.94), rgba(17, 56, 33, 0.9)),
+    radial-gradient(circle at 50% 0%, rgba(255, 224, 130, 0.18), transparent 36%);
+  border: 1px solid rgba(255, 224, 130, 0.38);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.64), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.tutorial-eyebrow {
+  color: #9ee493;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.tutorial-card h2 {
+  margin: 6px 0;
+  color: #ffe082;
+  text-align: center;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+}
+
+.tutorial-card p {
+  margin: 0 auto 18px;
+  max-width: 620px;
+  color: rgba(249, 239, 208, 0.8);
+  text-align: center;
+  font-size: clamp(1rem, 2.5vw, 1.28rem);
+}
+
+.tutorial-table {
+  position: relative;
+  min-height: 430px;
+  border-radius: 22px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 42% 45%, rgba(64, 145, 91, 0.44), transparent 54%),
+    linear-gradient(135deg, rgba(255, 224, 130, 0.09), transparent 42%),
+    #102d1c;
+  border: 1px solid rgba(255, 224, 130, 0.16);
+  box-shadow: inset 0 0 68px rgba(0, 0, 0, 0.46);
+}
+
+.tutorial-discard-stack {
+  position: absolute;
+  left: 9%;
+  top: 45%;
+  width: min(430px, 78vw);
+  height: 140px;
+  transform: translateY(-50%);
+}
+
+.tutorial-discard-card {
+  position: absolute;
+  top: 0;
+  animation: tutorialCardSettle 900ms ease both;
+}
+
+.tutorial-card-1 {
+  left: 0;
+  transform: rotate(-7deg);
+}
+
+.tutorial-card-2 {
+  left: 88px;
+  transform: rotate(-2deg);
+}
+
+.tutorial-card-3 {
+  left: 176px;
+  transform: rotate(3deg);
+  animation: tutorialSelectedCard 5.8s ease-in-out infinite;
+}
+
+.tutorial-card-4 {
+  left: 264px;
+  transform: rotate(8deg);
+  animation: tutorialAboveCard 5.8s ease-in-out infinite;
+}
+
+.tutorial-selection-ring {
+  position: absolute;
+  width: 88px;
+  height: 120px;
+  border-radius: 14px;
+  border: 3px solid #ffe082;
+  box-shadow: 0 0 22px rgba(255, 224, 130, 0.72);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.selected-q {
+  left: calc(9% + 170px);
+  top: calc(45% - 63px);
+  animation: selectedQRing 5.8s ease-in-out infinite;
+}
+
+.selected-above {
+  left: calc(9% + 170px);
+  top: calc(45% - 63px);
+  width: 184px;
+  animation: selectedPacketRing 5.8s ease-in-out infinite;
+}
+
+.tutorial-arrow {
+  position: absolute;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(5, 18, 10, 0.82);
+  color: #ffe082;
+  border: 1px solid rgba(255, 224, 130, 0.34);
+  font-size: 13px;
+  font-weight: 900;
+  opacity: 0;
+}
+
+.tutorial-arrow::after {
+  content: "";
+  position: absolute;
+  width: 70px;
+  height: 2px;
+  background: linear-gradient(90deg, #ffe082, transparent);
+}
+
+.arrow-selected {
+  left: calc(9% + 156px);
+  top: calc(45% - 120px);
+  animation: selectedArrow 5.8s ease-in-out infinite;
+}
+
+.arrow-selected::after {
+  left: 34px;
+  top: 35px;
+  transform: rotate(68deg);
+}
+
+.arrow-above {
+  left: calc(9% + 250px);
+  top: calc(45% + 90px);
+  animation: aboveArrow 5.8s ease-in-out infinite;
+}
+
+.arrow-above::after {
+  left: -50px;
+  top: -16px;
+  transform: rotate(-154deg);
+}
+
+.tutorial-hand-zone {
+  position: absolute;
+  right: 8%;
+  bottom: 13%;
+  width: min(280px, 35vw);
+  height: 110px;
+  border: 2px dashed rgba(255, 224, 130, 0.42);
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  color: rgba(249, 239, 208, 0.72);
+  font-weight: 900;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.tutorial-stack-label {
+  position: absolute;
+  color: rgba(249, 239, 208, 0.62);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bottom-label {
+  left: 9%;
+  top: calc(45% + 76px);
+}
+
+.top-label-tutorial {
+  left: calc(9% + 284px);
+  top: calc(45% - 94px);
+  color: #ffe082;
 }
 
 .trailer-overlay {
@@ -1442,6 +1699,124 @@ body {
   }
 }
 
+@keyframes tutorialCardSettle {
+  0% {
+    opacity: 0;
+    transform: translateY(-18px) rotate(0deg);
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes tutorialSelectedCard {
+  0%, 16% {
+    filter: none;
+    transform: translateY(0) rotate(3deg);
+  }
+
+  24%, 42% {
+    filter: drop-shadow(0 0 18px rgba(255, 224, 130, 0.9));
+    transform: translateY(-12px) rotate(3deg);
+  }
+
+  54%, 74% {
+    filter: drop-shadow(0 0 18px rgba(255, 224, 130, 0.9));
+    transform: translate(34vw, 21vh) rotate(0deg) scale(0.9);
+  }
+
+  86%, 100% {
+    filter: none;
+    transform: translateY(0) rotate(3deg);
+  }
+}
+
+@keyframes tutorialAboveCard {
+  0%, 43% {
+    filter: none;
+    transform: translateY(0) rotate(8deg);
+  }
+
+  50%, 74% {
+    filter: drop-shadow(0 0 18px rgba(255, 224, 130, 0.9));
+    transform: translate(calc(34vw - 88px), 21vh) rotate(0deg) scale(0.9);
+  }
+
+  86%, 100% {
+    filter: none;
+    transform: translateY(0) rotate(8deg);
+  }
+}
+
+@keyframes selectedQRing {
+  0%, 18% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  24%, 42% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  48%, 100% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes selectedPacketRing {
+  0%, 44% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  50%, 68% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  76%, 100% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes selectedArrow {
+  0%, 18% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  24%, 40% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  48%, 100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes aboveArrow {
+  0%, 44% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  50%, 68% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  76%, 100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
 @keyframes flyToMeld {
   0% {
     transform: translate(-50%, 0) scale(1) rotate(0deg);
@@ -1474,6 +1849,23 @@ body {
 }
 
 @media (max-width: 640px) {
+  .top-bar {
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .title {
+    width: 100%;
+  }
+
+  .top-actions {
+    width: 100%;
+  }
+
+  .top-actions button {
+    flex: 1;
+  }
+
   .setup-page {
     padding: 8px;
     align-items: flex-start;
@@ -1509,6 +1901,72 @@ body {
   .trailer-table {
     inset: 8vh 3vw;
     border-radius: 24px;
+  }
+
+  .tutorial-overlay {
+    padding: 8px;
+    align-items: flex-start;
+  }
+
+  .tutorial-card {
+    padding: 1rem;
+  }
+
+  .tutorial-table {
+    min-height: 520px;
+  }
+
+  .tutorial-discard-stack {
+    left: 50%;
+    top: 38%;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+
+  .selected-q {
+    left: calc(50% - 44px + 141px);
+    top: calc(38% - 51px);
+    transform: scale(0.8);
+  }
+
+  .selected-above {
+    left: calc(50% - 44px + 141px);
+    top: calc(38% - 51px);
+    width: 148px;
+    transform: scale(0.8);
+  }
+
+  .tutorial-arrow {
+    font-size: 11px;
+  }
+
+  .arrow-selected {
+    left: 15%;
+    top: 14%;
+  }
+
+  .arrow-above {
+    right: 10%;
+    left: auto;
+    top: 56%;
+  }
+
+  .tutorial-hand-zone {
+    left: 50%;
+    right: auto;
+    bottom: 7%;
+    width: 74%;
+    transform: translateX(-50%);
+  }
+
+  .bottom-label {
+    left: 14%;
+    top: 54%;
+  }
+
+  .top-label-tutorial {
+    left: auto;
+    right: 14%;
+    top: 21%;
   }
 
   .trailer-avatar {
