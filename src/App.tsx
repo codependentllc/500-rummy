@@ -11,6 +11,7 @@ import { ActionButton } from "./components/ActionButton";
 import { AvatarPhoto } from "./components/AvatarPhoto";
 import { CardView } from "./components/CardView";
 import { DealSequence } from "./components/DealSequence";
+import { DrawStockAnimation } from "./components/DrawStockAnimation";
 import { EndHandModal } from "./components/EndHandModal";
 import { FlyingCards } from "./components/FlyingCards";
 import { HandCardRow } from "./components/HandCardRow";
@@ -37,6 +38,7 @@ export default function App() {
   const [isAnimatingMeld, setIsAnimatingMeld] = useState(false);
   const [isDealing, setIsDealing] = useState(false);
   const [dealKey, setDealKey] = useState(0);
+  const [pendingStockCard, setPendingStockCard] = useState<Card | null>(null);
 
   const human = state.players[0];
   const current = state.players[state.turn];
@@ -57,6 +59,7 @@ export default function App() {
   function startConfiguredGame() {
     setFlyingCards([]);
     setIsAnimatingMeld(false);
+    setPendingStockCard(null);
     setState(newGame(count, null, configs));
     setStarted(true);
     setIsDealing(true);
@@ -66,6 +69,7 @@ export default function App() {
   function resetGame(players: Player[] | null = null) {
     setFlyingCards([]);
     setIsAnimatingMeld(false);
+    setPendingStockCard(null);
     setState(newGame(count, players, configs));
     setIsDealing(true);
     setDealKey((key) => key + 1);
@@ -75,6 +79,7 @@ export default function App() {
     setCount(number);
     setFlyingCards([]);
     setIsAnimatingMeld(false);
+    setPendingStockCard(null);
     setState(newGame(number, null, configs));
     setIsDealing(true);
     setDealKey((key) => key + 1);
@@ -83,6 +88,7 @@ export default function App() {
   function returnToSetup() {
     setFlyingCards([]);
     setIsAnimatingMeld(false);
+    setPendingStockCard(null);
     setIsDealing(false);
     setStarted(false);
   }
@@ -105,7 +111,7 @@ export default function App() {
   }
 
   function drawStock() {
-    if (state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld || isDealing) return;
+    if (state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld || isDealing || pendingStockCard) return;
     if (!state.stock.length) {
       setMessage("Stock is empty.");
       return;
@@ -116,15 +122,25 @@ export default function App() {
       const card = stock.pop();
       if (!card) return prev;
 
-      const players = [...prev.players];
-      players[0] = { ...players[0], hand: [...players[0].hand, card] };
-
-      return { ...prev, players, stock, drawn: true, message: "Drew from stock." };
+      setPendingStockCard(card);
+      return { ...prev, stock, message: "Drawing from stock…" };
     });
   }
 
+  function finishDrawStock() {
+    if (!pendingStockCard) return;
+
+    setState((prev) => {
+      const players = [...prev.players];
+      players[0] = { ...players[0], hand: [...players[0].hand, pendingStockCard] };
+
+      return { ...prev, players, drawn: true, message: "Drew from stock." };
+    });
+    setPendingStockCard(null);
+  }
+
   function drawDiscard(index: number) {
-    if (state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld || isDealing) return;
+    if (state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld || isDealing || pendingStockCard) return;
 
     const card = state.discard[index];
     const pickupPreview = discardPickup(state.discard, index);
@@ -396,6 +412,7 @@ export default function App() {
       </div>
 
       {isDealing ? <DealSequence key={dealKey} playerCount={state.players.length} onComplete={() => setIsDealing(false)} /> : null}
+      {pendingStockCard ? <DrawStockAnimation onComplete={finishDrawStock} /> : null}
 
       <EndHandModal
         state={state}
