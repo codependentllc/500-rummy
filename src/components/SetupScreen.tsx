@@ -6,6 +6,7 @@ import { ActionButton } from "./ActionButton";
 import { AvatarPhoto } from "./AvatarPhoto";
 import { BuriedDiscardTutorial } from "./BuriedDiscardTutorial";
 import { CinematicTrailer } from "./CinematicTrailer";
+import { LayOffAnimation } from "./LayOffAnimation";
 
 type Props = {
   count: number;
@@ -15,12 +16,44 @@ type Props = {
   onStart: () => void;
 };
 
+function wrapIndex(index: number, length: number) {
+  return ((index % length) + length) % length;
+}
+
+function avatarWindow(selectedIndex: number) {
+  const offsets = AVATARS.length > 4 ? [-2, -1, 0, 1, 2] : AVATARS.map((_, index) => index - selectedIndex);
+  const seen = new Set<string>();
+
+  return offsets
+    .map((offset) => {
+      const index = wrapIndex(selectedIndex + offset, AVATARS.length);
+      return { avatar: AVATARS[index], offset };
+    })
+    .filter(({ avatar }) => {
+      if (seen.has(avatar.id)) return false;
+      seen.add(avatar.id);
+      return true;
+    });
+}
+
 export function SetupScreen({ count, setCount, configs, setConfigs, onStart }: Props) {
   const [showTrailer, setShowTrailer] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showLayoff, setShowLayoff] = useState(false);
 
   function updatePlayer(index: number, patch: Partial<PlayerConfig>) {
     setConfigs((prev) => prev.map((player, i) => (i === index ? { ...player, ...patch } : player)));
+  }
+
+  function selectAvatar(playerIndex: number, avatarIndex: number) {
+    const avatar = AVATARS[wrapIndex(avatarIndex, AVATARS.length)];
+    updatePlayer(playerIndex, { avatar: avatar.src, fallback: avatar.fallback });
+  }
+
+  function moveAvatar(playerIndex: number, direction: -1 | 1) {
+    const currentAvatar = configs[playerIndex]?.avatar;
+    const currentIndex = Math.max(0, AVATARS.findIndex((avatar) => avatar.src === currentAvatar));
+    selectAvatar(playerIndex, currentIndex + direction);
   }
 
   return (
@@ -40,6 +73,9 @@ export function SetupScreen({ count, setCount, configs, setConfigs, onStart }: P
           </motion.button>
           <motion.button variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }} whileHover={{ y: -2, scale: 1.03 }} whileTap={{ scale: 0.97 }} type="button" className="trailer-launch tutorial-launch" onClick={() => setShowTutorial(true)}>
             Discard Rule
+          </motion.button>
+          <motion.button variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }} whileHover={{ y: -2, scale: 1.03 }} whileTap={{ scale: 0.97 }} type="button" className="trailer-launch layoff-launch" onClick={() => setShowLayoff(true)}>
+            Lay Off
           </motion.button>
         </motion.div>
 
@@ -76,15 +112,21 @@ export function SetupScreen({ count, setCount, configs, setConfigs, onStart }: P
               <span>{index === 0 ? "You" : "CPU"}</span>
             </div>
 
-            <div className="avatar-grid">
-              {AVATARS.map((avatar) => (
+            <div className="avatar-carousel" aria-label={`${player.name || `Player ${index + 1}`} avatar carousel`}>
+              <button type="button" className="avatar-carousel-nav" aria-label="Previous avatar" onClick={() => moveAvatar(index, -1)}>
+                ‹
+              </button>
+              <div className="avatar-carousel-track">
+              {avatarWindow(Math.max(0, AVATARS.findIndex((avatar) => avatar.src === player.avatar))).map(({ avatar, offset }) => (
                 <motion.button
                   key={avatar.id}
                   type="button"
                   title={avatar.name}
-                  onClick={() => updatePlayer(index, { avatar: avatar.src, fallback: avatar.fallback })}
+                  aria-label={`Choose ${avatar.name}`}
+                  onClick={() => selectAvatar(index, AVATARS.findIndex((item) => item.id === avatar.id))}
                   className={player.avatar === avatar.src ? "avatar-choice selected" : "avatar-choice"}
-                  whileHover={{ y: -3, scale: 1.04 }}
+                  data-offset={offset}
+                  whileHover={{ y: -3, scale: offset === 0 ? 1.04 : 1.02 }}
                   whileTap={{ scale: 0.94 }}
                   transition={{ type: "spring", stiffness: 480, damping: 28 }}
                 >
@@ -92,6 +134,10 @@ export function SetupScreen({ count, setCount, configs, setConfigs, onStart }: P
                   <small>{avatar.name}</small>
                 </motion.button>
               ))}
+              </div>
+              <button type="button" className="avatar-carousel-nav" aria-label="Next avatar" onClick={() => moveAvatar(index, 1)}>
+                ›
+              </button>
             </div>
           </motion.div>
         ))}
@@ -104,6 +150,7 @@ export function SetupScreen({ count, setCount, configs, setConfigs, onStart }: P
 
       {showTrailer ? <CinematicTrailer onClose={() => setShowTrailer(false)} /> : null}
       {showTutorial ? <BuriedDiscardTutorial onClose={() => setShowTutorial(false)} /> : null}
+      {showLayoff ? <LayOffAnimation onClose={() => setShowLayoff(false)} /> : null}
     </div>
   );
 }
