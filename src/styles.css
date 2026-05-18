@@ -592,6 +592,12 @@ body {
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.44);
 }
 
+.queen-warning-launch {
+  background: linear-gradient(135deg, #fff6cf, #c43b3b 54%, #281315);
+  color: #fff9d8;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.42);
+}
+
 .tutorial-overlay {
   position: fixed;
   inset: 0;
@@ -2349,6 +2355,236 @@ body {
   }
 }
 
+.queen-warning-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(3, 9, 5, 0.5), rgba(3, 9, 5, 0.86)),
+    url("/backgrounds/rummy-cinematic-table.png") center / cover;
+  color: #f9efd0;
+}
+
+.queen-warning-controls {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 104;
+  display: flex;
+  gap: 8px;
+}
+
+.queen-warning-controls button {
+  border: 1px solid rgba(255, 224, 130, 0.42);
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: rgba(6, 17, 11, 0.72);
+  color: #ffe082;
+  font-family: Georgia, serif;
+  font-weight: 800;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.queen-warning-stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.queen-warning-table {
+  position: relative;
+  width: min(900px, 94vw);
+  height: min(590px, 80vh);
+  min-height: 460px;
+  overflow: hidden;
+  border-radius: 32px;
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(64, 145, 91, 0.58), transparent 54%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.016), rgba(255, 255, 255, 0.016) 1px, transparent 1px, transparent 8px),
+    #103821;
+  border: 1px solid rgba(255, 224, 130, 0.2);
+  box-shadow: inset 0 0 86px rgba(0, 0, 0, 0.54), 0 34px 100px rgba(0, 0, 0, 0.62);
+  animation: queenWarningTableIn 4.4s ease both;
+}
+
+.queen-warning-dim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 43%, transparent 0 22%, rgba(0, 0, 0, 0.2) 52%, rgba(0, 0, 0, 0.54) 100%);
+  opacity: 0;
+  animation: queenWarningDim 4.4s ease both;
+}
+
+.queen-warning-discard-area {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 270px;
+  height: 250px;
+  transform: translate(-50%, -50%);
+}
+
+.queen-warning-pile-label {
+  position: absolute;
+  left: 50%;
+  top: -22px;
+  transform: translateX(-50%);
+  color: rgba(249, 239, 208, 0.64);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.queen-warning-pile {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: 112px;
+  height: 158px;
+  transform: translate(-50%, -50%);
+}
+
+.queen-warning-card-back,
+.queen-warning-card {
+  position: absolute;
+  width: 112px;
+  height: 158px;
+  border-radius: 15px;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.42);
+}
+
+.queen-warning-card-back {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16), transparent),
+    repeating-linear-gradient(45deg, #173f28, #173f28 5px, #2f7651 5px, #2f7651 10px);
+}
+
+.queen-warning-card-back.back-one {
+  transform: translate(-16px, 14px) rotate(-8deg);
+  opacity: 0.82;
+}
+
+.queen-warning-card-back.back-two {
+  transform: translate(12px, 5px) rotate(7deg);
+  opacity: 0.9;
+}
+
+.queen-warning-card {
+  z-index: 2;
+  display: grid;
+  grid-template-rows: 38px 1fr 38px;
+  place-items: center;
+  background: linear-gradient(145deg, #fff, #eadfcd);
+  color: #111;
+  transform: rotate(-1deg);
+  animation: queenWarningPulse 4.4s ease both;
+}
+
+.queen-warning-card span,
+.queen-warning-card i {
+  font-size: 34px;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.queen-warning-card b {
+  font-size: 64px;
+  line-height: 1;
+}
+
+.queen-warning-card i {
+  transform: rotate(180deg);
+}
+
+.queen-warning-label {
+  position: absolute;
+  left: 50%;
+  top: calc(42% + 130px);
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(8, 13, 10, 0.82);
+  border: 1px solid rgba(255, 224, 130, 0.4);
+  color: #ffe082;
+  font-size: clamp(15px, 2.4vw, 20px);
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-align: center;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.34), 0 0 24px rgba(188, 35, 45, 0.24);
+  opacity: 0;
+  animation: queenWarningLabel 4.4s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+@keyframes queenWarningTableIn {
+  0% {
+    filter: brightness(0.86);
+  }
+
+  32%, 100% {
+    filter: brightness(1);
+  }
+}
+
+@keyframes queenWarningDim {
+  0%, 22% {
+    opacity: 0;
+  }
+
+  38%, 100% {
+    opacity: 1;
+  }
+}
+
+@keyframes queenWarningPulse {
+  0%, 16% {
+    transform: translateY(18px) scale(0.92) rotate(-4deg);
+    opacity: 0;
+    border-color: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.42);
+  }
+
+  28% {
+    transform: translateY(0) scale(1) rotate(-1deg);
+    opacity: 1;
+  }
+
+  42%, 62%, 82% {
+    border-color: #d82134;
+    box-shadow:
+      0 0 0 4px rgba(216, 33, 52, 0.18),
+      0 0 28px rgba(216, 33, 52, 0.78),
+      0 18px 38px rgba(0, 0, 0, 0.42);
+  }
+
+  52%, 72%, 100% {
+    border-color: rgba(255, 255, 255, 0.94);
+    box-shadow:
+      0 0 0 1px rgba(255, 224, 130, 0.14),
+      0 0 16px rgba(216, 33, 52, 0.28),
+      0 18px 38px rgba(0, 0, 0, 0.42);
+  }
+}
+
+@keyframes queenWarningLabel {
+  0%, 32% {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.96);
+  }
+
+  44%, 100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
 .queen-special-overlay {
   position: fixed;
   inset: 0;
@@ -2901,6 +3137,33 @@ body {
   .queen-special-controls {
     top: 10px;
     right: 10px;
+  }
+
+  .queen-warning-stage {
+    padding: 8px;
+  }
+
+  .queen-warning-table {
+    width: 100%;
+    height: 82vh;
+    min-height: 500px;
+    border-radius: 24px;
+  }
+
+  .queen-warning-controls {
+    top: 10px;
+    right: 10px;
+  }
+
+  .queen-warning-discard-area {
+    top: 43%;
+    transform: translate(-50%, -50%) scale(0.84);
+  }
+
+  .queen-warning-label {
+    top: calc(43% + 120px);
+    width: min(330px, 86vw);
+    white-space: normal;
   }
 
   .queen-card-wrap {

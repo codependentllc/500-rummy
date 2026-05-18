@@ -7,6 +7,7 @@ import { AvatarPhoto } from "./AvatarPhoto";
 import { BuriedDiscardTutorial } from "./BuriedDiscardTutorial";
 import { CinematicTrailer } from "./CinematicTrailer";
 import { LayOffAnimation } from "./LayOffAnimation";
+import { QueenDiscardWarningAnimation } from "./QueenDiscardWarningAnimation";
 import { QueenSpadesAnimation } from "./QueenSpadesAnimation";
 
 type Props = {
@@ -41,6 +42,7 @@ export function SetupScreen({ count, setCount, configs, setConfigs, onStart }: P
   const [showTrailer, setShowTrailer] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showLayoff, setShowLayoff] = useState(false);
+  const [showQueenWarning, setShowQueenWarning] = useState(false);
   const [showQueenSpades, setShowQueenSpades] = useState(false);
 
   function updatePlayer(index: number, patch: Partial<PlayerConfig>) {
@@ -81,6 +83,9 @@ export function SetupScreen({ count, setCount, configs, setConfigs, onStart }: P
           </motion.button>
           <motion.button variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }} whileHover={{ y: -2, scale: 1.03 }} whileTap={{ scale: 0.97 }} type="button" className="trailer-launch queen-launch" onClick={() => setShowQueenSpades(true)}>
             Q♠ Moment
+          </motion.button>
+          <motion.button variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }} whileHover={{ y: -2, scale: 1.03 }} whileTap={{ scale: 0.97 }} type="button" className="trailer-launch queen-warning-launch" onClick={() => setShowQueenWarning(true)}>
+            Q♠ Warning
           </motion.button>
         </motion.div>
 
@@ -156,6 +161,7 @@ export function SetupScreen({ count, setCount, configs, setConfigs, onStart }: P
       {showTrailer ? <CinematicTrailer onClose={() => setShowTrailer(false)} /> : null}
       {showTutorial ? <BuriedDiscardTutorial onClose={() => setShowTutorial(false)} /> : null}
       {showLayoff ? <LayOffAnimation onClose={() => setShowLayoff(false)} /> : null}
+      {showQueenWarning ? <QueenDiscardWarningAnimation onClose={() => setShowQueenWarning(false)} /> : null}
       {showQueenSpades ? <QueenSpadesAnimation onClose={() => setShowQueenSpades(false)} /> : null}
     </div>
   );
