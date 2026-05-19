@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import { TARGET_SCORE } from "../game/constants";
 import type { ScoreHistoryEntry } from "../game/types";
 import { AvatarPhoto } from "./AvatarPhoto";
@@ -10,51 +9,36 @@ type Props = {
 export function ScoreHistoryTimeline({ history }: Props) {
   if (!history.length) return null;
 
-  const recentHands = history.slice(-5).reverse();
+  const latest = history[history.length - 1];
+  const totals = [...latest.rows].sort((a, b) => b.total - a.total);
 
   return (
-    <section className="score-history" aria-label="Score history">
+    <section className="score-history" aria-label="Game totals">
       <div className="score-history-header">
         <div>
-          <span>Score History</span>
-          <b>Latest Hands</b>
+          <span>Game Totals</span>
+          <b>Race to {TARGET_SCORE}</b>
         </div>
-        <em>{history.length} hand{history.length === 1 ? "" : "s"}</em>
+        <em>After hand {latest.handNumber}</em>
       </div>
 
-      <div className="score-history-list">
-        {recentHands.map((hand, index) => (
-          <div key={hand.handNumber} className="score-history-hand" style={{ "--history-delay": `${index * 70}ms` } as CSSProperties}>
-            <div className="history-hand-marker">
-              <span>{hand.handNumber}</span>
-            </div>
-            <div className="history-hand-card">
-              <div className="history-hand-title">Hand {hand.handNumber}</div>
-              <div className="history-player-list">
-                {hand.rows.map((row) => {
-                  const progress = Math.max(0, Math.min(100, (row.total / TARGET_SCORE) * 100));
-                  return (
-                    <div key={row.playerId} className="history-player-row">
-                      <div className="history-player-name">
-                        <AvatarPhoto src={row.avatar} alt={row.name} fallback={row.fallback} size={30} />
-                        <span>{row.name}</span>
-                      </div>
-                      <div className="history-score-track" aria-label={`${row.name} progress to ${TARGET_SCORE}`}>
-                        <div className="history-score-fill" style={{ width: `${progress}%` }} />
-                      </div>
-                      <div className="history-delta-total">
-                        <span className={row.net >= 0 ? "history-delta positive" : "history-delta negative"}>
-                          {row.net >= 0 ? "+" : ""}{row.net}
-                        </span>
-                        <b>{row.total}</b>
-                      </div>
-                    </div>
-                  );
-                })}
+      <div className="score-total-list">
+        {totals.map((row, index) => {
+          const progress = Math.max(0, Math.min(100, (row.total / TARGET_SCORE) * 100));
+          return (
+            <div key={row.playerId} className="score-total-row">
+              <div className="score-total-rank">{index + 1}</div>
+              <div className="history-player-name">
+                <AvatarPhoto src={row.avatar} alt={row.name} fallback={row.fallback} size={34} />
+                <span>{row.name}</span>
               </div>
+              <div className="history-score-track" aria-label={`${row.name} total progress to ${TARGET_SCORE}`}>
+                <div className="history-score-fill" style={{ width: `${progress}%` }} />
+              </div>
+              <b>{row.total}</b>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
