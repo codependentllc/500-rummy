@@ -19,9 +19,14 @@ export function scoreHand(state: GameState, outPlayerId: number): GameState {
     return {
       playerId: player.id,
       name: player.name,
+      avatar: player.avatar,
+      fallback: player.fallback,
+      meldedCards: player.melds.flatMap((meld) => meld.cards),
+      handCards: player.hand,
       table,
       hand,
-      net: table - hand
+      net: table - hand,
+      total: player.score + table - hand
     };
   });
 
@@ -42,6 +47,7 @@ export function scoreHand(state: GameState, outPlayerId: number): GameState {
     ...state,
     players,
     scoring,
+    scoreHistory: [...state.scoreHistory, { handNumber: state.scoreHistory.length + 1, rows: scoring }],
     winner,
     handOver: true,
     message: winner ? `${winner.name} wins!` : `${players[outPlayerId].name} went out. Hand scored.`

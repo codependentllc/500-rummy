@@ -35,9 +35,19 @@ export type PlayerConfig = {
 export type ScoreRow = {
   playerId: number;
   name: string;
+  avatar: string;
+  fallback: string;
+  meldedCards: Card[];
+  handCards: Card[];
   table: number;
   hand: number;
   net: number;
+  total: number;
+};
+
+export type ScoreHistoryEntry = {
+  handNumber: number;
+  rows: ScoreRow[];
 };
 
 export type GameState = {
@@ -50,5 +60,6 @@ export type GameState = {
   message: string;
   handOver: boolean;
   scoring: ScoreRow[] | null;
+  scoreHistory: ScoreHistoryEntry[];
   winner: Player | null;
 };
