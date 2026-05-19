@@ -205,9 +205,15 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
                     onClick={() => setCount(number)}
                     style={{
                       flex: 1,
-                      background: count === number ? "#1a472a" : "#f2f2f2",
-                      color: count === number ? "#fff" : "#1a472a",
-                      border: "1px solid #ddd"
+                      minHeight: 42,
+                      background: count === number
+                        ? "linear-gradient(145deg, #fff2b0 0%, #d8a941 42%, #6d4b12 100%)"
+                        : "linear-gradient(145deg, rgba(255, 248, 220, 0.96), rgba(180, 210, 178, 0.92))",
+                      color: count === number ? "#102817" : "#1a472a",
+                      border: count === number ? "1px solid rgba(255, 224, 130, 0.86)" : "1px solid rgba(255, 224, 130, 0.34)",
+                      borderRadius: 12,
+                      boxShadow: count === number ? "0 0 20px rgba(255, 224, 130, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.45)" : "inset 0 1px 0 rgba(255, 255, 255, 0.52), 0 8px 18px rgba(0, 0, 0, 0.12)",
+                      textShadow: count === number ? "0 1px 0 rgba(255, 255, 255, 0.26)" : "none"
                     }}
                   >
                     {number}
@@ -355,7 +361,24 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
             ))}
             </motion.div>
 
-            <ActionButton onClick={onStart} style={{ width: "100%", background: "#1a472a", color: "#fff", padding: 12, fontSize: 16 }}>
+            <ActionButton
+              onClick={onStart}
+              style={{
+                width: "min(100%, 360px)",
+                display: "block",
+                margin: "0 auto",
+                minHeight: 52,
+                background: "linear-gradient(135deg, #fff7d1 0%, #d8a941 28%, #1f6f48 72%, #123b24 100%)",
+                color: "#fff8dc",
+                padding: 13,
+                fontSize: 16,
+                border: "1px solid rgba(255, 224, 130, 0.58)",
+                borderRadius: 15,
+                boxShadow: "0 18px 34px rgba(0, 0, 0, 0.26), 0 0 24px rgba(255, 224, 130, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.34)",
+                textShadow: "0 1px 2px rgba(0, 0, 0, 0.46)",
+                letterSpacing: 0.3
+              }}
+            >
               Deal Cards ♠
             </ActionButton>
           </div>
