@@ -33,7 +33,7 @@ export function LayOffAnimation({ onClose }: Props) {
       <div key={replayKey} className="layoff-stage">
         <div className="layoff-table">
           <div className="layoff-spotlight" />
-          <div className="layoff-label">Lay Off</div>
+          <div className="layoff-demo-label">Lay Off</div>
 
           <div className="layoff-meld-area" aria-label="Existing run 4 hearts 5 hearts 6 hearts">
             <div className="layoff-meld-title">Existing Run</div>
