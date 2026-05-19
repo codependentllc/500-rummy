@@ -18,6 +18,7 @@ import { EndHandModal } from "./components/EndHandModal";
 import { FlyingCards } from "./components/FlyingCards";
 import { HandCardRow } from "./components/HandCardRow";
 import { MeldDisplay } from "./components/MeldDisplay";
+import { ScoreHistoryTimeline } from "./components/ScoreHistoryTimeline";
 import { ScorePanel } from "./components/ScorePanel";
 import { SetupScreen } from "./components/SetupScreen";
 import { TableArea } from "./components/TableArea";
@@ -31,9 +32,14 @@ const defaultConfigs: PlayerConfig[] = [
   { name: "Computer 3", avatar: AVATARS[3].src, fallback: AVATARS[3].fallback }
 ];
 
+export type TableTheme = "classic" | "casino" | "wood" | "luxury" | "neon" | "coffee";
+export type CardBackStyle = "red" | "blue" | "gold" | "black" | "green" | "purple" | "wood" | "marble";
+
 export default function App() {
   const [count, setCount] = useState(2);
   const [configs, setConfigs] = useState<PlayerConfig[]>(defaultConfigs);
+  const [tableTheme, setTableTheme] = useState<TableTheme>("classic");
+  const [cardBack, setCardBack] = useState<CardBackStyle>("red");
   const [started, setStarted] = useState(false);
   const [state, setState] = useState<GameState>(() => newGame(2, null, defaultConfigs));
   const [flyingCards, setFlyingCards] = useState<Card[]>([]);
@@ -78,7 +84,7 @@ export default function App() {
     setIsAnimatingMeld(false);
     setPendingStockCard(null);
     setPendingDiscardPickup([]);
-    setState(newGame(count, players, configs));
+    setState((prev) => newGame(count, players, configs, players ? prev.scoreHistory : []));
     setIsDealing(true);
     setDealKey((key) => key + 1);
   }
@@ -332,11 +338,11 @@ export default function App() {
   }
 
   if (!started) {
-    return <SetupScreen count={count} setCount={setCount} configs={configs} setConfigs={setConfigs} onStart={startConfiguredGame} />;
+    return <SetupScreen count={count} setCount={setCount} configs={configs} setConfigs={setConfigs} tableTheme={tableTheme} setTableTheme={setTableTheme} cardBack={cardBack} setCardBack={setCardBack} onStart={startConfiguredGame} />;
   }
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell table-theme-${tableTheme} card-back-${cardBack}`}>
       <motion.div className="top-bar" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
         <div className="title">🃏 500 Rummy</div>
         <div className="top-actions">
@@ -351,6 +357,7 @@ export default function App() {
       </motion.div>
 
       <ScorePanel players={state.players} turn={state.turn} handOver={state.handOver} />
+      <ScoreHistoryTimeline history={state.scoreHistory} />
 
       <motion.div
         key={state.message}
