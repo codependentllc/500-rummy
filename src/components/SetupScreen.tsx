@@ -126,227 +126,240 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
         <motion.div className="setup-logo" initial={{ scale: 0.85, rotate: -8 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.12, type: "spring", stiffness: 260, damping: 18 }}>🃏</motion.div>
         <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16, duration: 0.42 }}>500 Rummy</motion.h1>
         <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22, duration: 0.38 }}>Choose names and fictional photo avatars, then deal.</motion.p>
-        <motion.div className="setup-utility-actions" initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.26 } } }}>
-          <motion.button variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }} whileHover={{ y: -2, scale: 1.03 }} whileTap={{ scale: 0.97 }} type="button" className="setup-action-primary trailer-launch" onClick={() => setShowTrailer(true)}>
-            Trailer
-          </motion.button>
+        <motion.div className="setup-action-panel" initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.26 } } }}>
+          <div className="setup-utility-actions">
+            <motion.button variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }} whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }} type="button" className="setup-action-primary trailer-launch" onClick={() => { setActionMenu(null); setShowTrailer(true); }}>
+              <span>Trailer</span>
+            </motion.button>
 
-          <motion.button
-            variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
-            whileHover={{ y: -2, scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            type="button"
-            className={actionMenu === "lobby" ? "setup-action-primary lobby-launch active" : "setup-action-primary lobby-launch"}
-            onClick={() => setActionMenu((menu) => (menu === "lobby" ? null : "lobby"))}
-          >
-            Lobby
-          </motion.button>
+            <motion.button
+              variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
+              whileHover={{ y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              type="button"
+              className={actionMenu === "lobby" ? "setup-action-primary lobby-launch active" : "setup-action-primary lobby-launch"}
+              aria-expanded={actionMenu === "lobby"}
+              onClick={() => setActionMenu((menu) => (menu === "lobby" ? null : "lobby"))}
+            >
+              <span>Lobby</span>
+            </motion.button>
 
-          <motion.button
-            variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
-            whileHover={{ y: -2, scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            type="button"
-            className={actionMenu === "instructions" ? "setup-action-primary tutorial-launch active" : "setup-action-primary tutorial-launch"}
-            onClick={() => setActionMenu((menu) => (menu === "instructions" ? null : "instructions"))}
-          >
-            Instructions
-          </motion.button>
-        </motion.div>
-        {actionMenu ? (
-          <motion.div
-            key={actionMenu}
-            className="setup-action-submenu"
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.18 }}
-          >
-            {actionMenu === "lobby" ? (
-              <>
-                <button type="button" className="setup-subaction lobby-launch" onClick={() => { setShowLobby(true); setActionMenu(null); }}>
-                  Multiplayer Lobby
-                </button>
-                <button type="button" className="setup-subaction waiting-launch" onClick={() => { setShowWaitingRoom(true); setActionMenu(null); }}>
-                  Waiting Room
-                </button>
-              </>
-            ) : (
-              <>
-                <button type="button" className="setup-subaction tutorial-launch" onClick={() => { setShowTutorial(true); setActionMenu(null); }}>
-                  Discard Rule
-                </button>
-                <button type="button" className="setup-subaction layoff-launch" onClick={() => { setShowLayoff(true); setActionMenu(null); }}>
-                  Lay Off
-                </button>
-                <button type="button" className="setup-subaction queen-launch" onClick={() => { setShowQueenSpades(true); setActionMenu(null); }}>
-                  Q♠ Moment
-                </button>
-                <button type="button" className="setup-subaction queen-warning-launch" onClick={() => { setShowQueenWarning(true); setActionMenu(null); }}>
-                  Q♠ Warning
-                </button>
-              </>
-            )}
-          </motion.div>
-        ) : null}
-
-        <motion.div className="setup-section" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.34, duration: 0.35 }}>
-          <b>Players</b>
-          <div className="player-count-row">
-            {[2, 3, 4].map((number) => (
-              <ActionButton
-                key={number}
-                onClick={() => setCount(number)}
-                style={{
-                  flex: 1,
-                  background: count === number ? "#1a472a" : "#f2f2f2",
-                  color: count === number ? "#fff" : "#1a472a",
-                  border: "1px solid #ddd"
-                }}
-              >
-                {number}
-              </ActionButton>
-            ))}
+            <motion.button
+              variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
+              whileHover={{ y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              type="button"
+              className={actionMenu === "instructions" ? "setup-action-primary tutorial-launch active" : "setup-action-primary tutorial-launch"}
+              aria-expanded={actionMenu === "instructions"}
+              onClick={() => setActionMenu((menu) => (menu === "instructions" ? null : "instructions"))}
+            >
+              <span>Instructions</span>
+            </motion.button>
           </div>
+          {actionMenu ? (
+            <motion.div
+              key={actionMenu}
+              className="setup-action-submenu"
+              initial={{ opacity: 0, height: 0, y: -4 }}
+              animate={{ opacity: 1, height: "auto", y: 0 }}
+              exit={{ opacity: 0, height: 0, y: -4 }}
+              transition={{ duration: 0.18 }}
+            >
+              {actionMenu === "lobby" ? (
+                <>
+                  <button type="button" className="setup-subaction lobby-launch" onClick={() => { setShowLobby(true); setActionMenu(null); }}>
+                    Multiplayer Lobby
+                  </button>
+                  <button type="button" className="setup-subaction waiting-launch" onClick={() => { setShowWaitingRoom(true); setActionMenu(null); }}>
+                    Waiting Room
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button type="button" className="setup-subaction tutorial-launch" onClick={() => { setShowTutorial(true); setActionMenu(null); }}>
+                    Discard Rule
+                  </button>
+                  <button type="button" className="setup-subaction layoff-launch" onClick={() => { setShowLayoff(true); setActionMenu(null); }}>
+                    Lay Off
+                  </button>
+                  <button type="button" className="setup-subaction queen-launch" onClick={() => { setShowQueenSpades(true); setActionMenu(null); }}>
+                    Q♠ Moment
+                  </button>
+                  <button type="button" className="setup-subaction queen-warning-launch" onClick={() => { setShowQueenWarning(true); setActionMenu(null); }}>
+                    Q♠ Warning
+                  </button>
+                </>
+              )}
+            </motion.div>
+          ) : null}
         </motion.div>
 
-        <motion.div className="setup-section table-theme-section" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.38, duration: 0.35 }}>
-          <b>Table Theme</b>
-          <div className="selection-carousel table-theme-carousel" aria-label="Table theme selection">
-            <button type="button" className="selection-carousel-nav" aria-label="Previous table theme" onClick={() => moveTableTheme(-1)}>
-              ‹
-            </button>
-            <div className="theme-carousel-track">
-              {themeWindow(activeThemeIndex).map(({ theme, offset }) => (
-                <motion.button
-                  key={`${theme.id}-${offset}`}
-                  type="button"
-                  className={theme.id === tableTheme ? `selection-carousel-card table-theme-tile ${theme.id} selected` : `selection-carousel-card table-theme-tile ${theme.id}`}
-                  data-offset={offset}
-                  onClick={() => setTableTheme(theme.id)}
-                  initial={{ opacity: 0, x: offset * 16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.24 }}
-                  whileHover={{ y: -2, scale: offset === 0 ? 1.01 : 1.005 }}
-                  whileTap={{ scale: 0.985 }}
-                >
-                  <span className="theme-table-preview">
-                    <i className="theme-card card-one">A♠</i>
-                    <i className="theme-card card-two">7♥</i>
-                    <i className="theme-card card-three">Q♣</i>
-                  </span>
-                  <span className="theme-tile-copy">
-                    <strong>{theme.name}</strong>
-                    <small>{theme.detail}</small>
-                  </span>
-                </motion.button>
-              ))}
-            </div>
-            <button type="button" className="selection-carousel-nav" aria-label="Next table theme" onClick={() => moveTableTheme(1)}>
-              ›
-            </button>
-          </div>
-          <div className="selection-dots" aria-label="Choose table theme">
-            {TABLE_THEMES.map((theme) => (
-              <button
-                key={theme.id}
-                type="button"
-                className={theme.id === tableTheme ? "selection-dot selected" : "selection-dot"}
-                aria-label={`Choose ${theme.name}`}
-                onClick={() => setTableTheme(theme.id)}
-              />
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div className="setup-section card-back-section" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42, duration: 0.35 }}>
-          <b>Card Backs</b>
-          <div className="selection-carousel card-back-carousel" aria-label="Card back selection">
-            <button type="button" className="selection-carousel-nav" aria-label="Previous card back" onClick={() => moveCardBack(-1)}>
-              ‹
-            </button>
-            <div className="card-back-carousel-track">
-              {cardBackWindow(activeCardBackIndex).map(({ back, offset }) => (
-                <motion.button
-                  key={`${back.id}-${offset}`}
-                  type="button"
-                  className={back.id === cardBack ? `selection-carousel-card card-back-tile card-back-${back.id} selected` : `selection-carousel-card card-back-tile card-back-${back.id}`}
-                  data-offset={offset}
-                  onClick={() => setCardBack(back.id)}
-                  initial={{ opacity: 0, x: offset * 12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.24 }}
-                  whileHover={{ y: -2, scale: offset === 0 ? 1.01 : 1.005 }}
-                  whileTap={{ scale: 0.985 }}
-                >
-                  <span className="card-back-preview card-back-face" />
-                  <strong>{back.name}</strong>
-                </motion.button>
-              ))}
-            </div>
-            <button type="button" className="selection-carousel-nav" aria-label="Next card back" onClick={() => moveCardBack(1)}>
-              ›
-            </button>
-          </div>
-          <div className="selection-dots" aria-label="Choose card back">
-            {CARD_BACKS.map((back) => (
-              <button
-                key={back.id}
-                type="button"
-                className={back.id === cardBack ? "selection-dot selected" : "selection-dot"}
-                aria-label={`Choose ${back.name}`}
-                onClick={() => setCardBack(back.id)}
-              />
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.42 } } }}>
-        {Array.from({ length: count }, (_, index) => configs[index]).map((player, index) => (
-          <motion.div key={index} className="player-config" variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }} whileHover={{ y: -2, borderColor: "rgba(255, 224, 130, 0.42)" }} transition={{ duration: 0.25 }}>
-            <div className="player-config-main">
-              <AvatarPhoto src={player.avatar} alt={player.name || `Player ${index + 1}`} fallback={player.fallback || (index === 0 ? "🧑" : "🤖")} size={54} />
-              <input
-                value={player.name || ""}
-                onChange={(event) => updatePlayer(index, { name: event.target.value })}
-                placeholder={index === 0 ? "Your name" : `Computer ${index} name`}
-              />
-              <span>{index === 0 ? "You" : "CPU"}</span>
-            </div>
-
-            <div className="avatar-carousel" aria-label={`${player.name || `Player ${index + 1}`} avatar carousel`}>
-              <button type="button" className="avatar-carousel-nav" aria-label="Previous avatar" onClick={() => moveAvatar(index, -1)}>
-                ‹
-              </button>
-              <div className="avatar-carousel-track">
-              {avatarWindow(Math.max(0, AVATARS.findIndex((avatar) => avatar.src === player.avatar))).map(({ avatar, offset }) => (
-                <motion.button
-                  key={avatar.id}
-                  type="button"
-                  title={avatar.name}
-                  aria-label={`Choose ${avatar.name}`}
-                  onClick={() => selectAvatar(index, AVATARS.findIndex((item) => item.id === avatar.id))}
-                  className={player.avatar === avatar.src ? "avatar-choice selected" : "avatar-choice"}
-                  data-offset={offset}
-                  whileHover={{ y: -3, scale: offset === 0 ? 1.04 : 1.02 }}
-                  whileTap={{ scale: 0.94 }}
-                  transition={{ type: "spring", stiffness: 480, damping: 28 }}
-                >
-                  <AvatarPhoto src={avatar.src} alt={avatar.name} fallback={avatar.fallback} size={46} />
-                  <small>{avatar.name}</small>
-                </motion.button>
-              ))}
+        <div className="setup-modal-grid">
+          <div className="setup-count-row">
+            <motion.div className="setup-section" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.34, duration: 0.35 }}>
+              <b>Players</b>
+              <div className="player-count-row">
+                {[2, 3, 4].map((number) => (
+                  <ActionButton
+                    key={number}
+                    onClick={() => setCount(number)}
+                    style={{
+                      flex: 1,
+                      background: count === number ? "#1a472a" : "#f2f2f2",
+                      color: count === number ? "#fff" : "#1a472a",
+                      border: "1px solid #ddd"
+                    }}
+                  >
+                    {number}
+                  </ActionButton>
+                ))}
               </div>
-              <button type="button" className="avatar-carousel-nav" aria-label="Next avatar" onClick={() => moveAvatar(index, 1)}>
-                ›
-              </button>
-            </div>
-          </motion.div>
-        ))}
-        </motion.div>
+            </motion.div>
+          </div>
 
-        <ActionButton onClick={onStart} style={{ width: "100%", background: "#1a472a", color: "#fff", padding: 14, fontSize: 16, marginTop: 8 }}>
-          Deal Cards ♠
-        </ActionButton>
+          <div className="setup-customization-row">
+            <motion.div className="setup-section table-theme-section" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.38, duration: 0.35 }}>
+              <b>Table Theme</b>
+              <div className="selection-carousel table-theme-carousel" aria-label="Table theme selection">
+                <button type="button" className="selection-carousel-nav" aria-label="Previous table theme" onClick={() => moveTableTheme(-1)}>
+                  ‹
+                </button>
+                <div className="theme-carousel-track">
+                  {themeWindow(activeThemeIndex).map(({ theme, offset }) => (
+                    <motion.button
+                      key={`${theme.id}-${offset}`}
+                      type="button"
+                      className={theme.id === tableTheme ? `selection-carousel-card table-theme-tile ${theme.id} selected` : `selection-carousel-card table-theme-tile ${theme.id}`}
+                      data-offset={offset}
+                      onClick={() => setTableTheme(theme.id)}
+                      initial={{ opacity: 0, x: offset * 16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.24 }}
+                      whileHover={{ y: -2, scale: offset === 0 ? 1.01 : 1.005 }}
+                      whileTap={{ scale: 0.985 }}
+                    >
+                      <span className="theme-table-preview">
+                        <i className="theme-card card-one">A♠</i>
+                        <i className="theme-card card-two">7♥</i>
+                        <i className="theme-card card-three">Q♣</i>
+                      </span>
+                      <span className="theme-tile-copy">
+                        <strong>{theme.name}</strong>
+                        <small>{theme.detail}</small>
+                      </span>
+                    </motion.button>
+                  ))}
+                </div>
+                <button type="button" className="selection-carousel-nav" aria-label="Next table theme" onClick={() => moveTableTheme(1)}>
+                  ›
+                </button>
+              </div>
+              <div className="selection-dots" aria-label="Choose table theme">
+                {TABLE_THEMES.map((theme) => (
+                  <button
+                    key={theme.id}
+                    type="button"
+                    className={theme.id === tableTheme ? "selection-dot selected" : "selection-dot"}
+                    aria-label={`Choose ${theme.name}`}
+                    onClick={() => setTableTheme(theme.id)}
+                  />
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div className="setup-section card-back-section" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42, duration: 0.35 }}>
+              <b>Card Backs</b>
+              <div className="selection-carousel card-back-carousel" aria-label="Card back selection">
+                <button type="button" className="selection-carousel-nav" aria-label="Previous card back" onClick={() => moveCardBack(-1)}>
+                  ‹
+                </button>
+                <div className="card-back-carousel-track">
+                  {cardBackWindow(activeCardBackIndex).map(({ back, offset }) => (
+                    <motion.button
+                      key={`${back.id}-${offset}`}
+                      type="button"
+                      className={back.id === cardBack ? `selection-carousel-card card-back-tile card-back-${back.id} selected` : `selection-carousel-card card-back-tile card-back-${back.id}`}
+                      data-offset={offset}
+                      onClick={() => setCardBack(back.id)}
+                      initial={{ opacity: 0, x: offset * 12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.24 }}
+                      whileHover={{ y: -2, scale: offset === 0 ? 1.01 : 1.005 }}
+                      whileTap={{ scale: 0.985 }}
+                    >
+                      <span className="card-back-preview card-back-face" />
+                      <strong>{back.name}</strong>
+                    </motion.button>
+                  ))}
+                </div>
+                <button type="button" className="selection-carousel-nav" aria-label="Next card back" onClick={() => moveCardBack(1)}>
+                  ›
+                </button>
+              </div>
+              <div className="selection-dots" aria-label="Choose card back">
+                {CARD_BACKS.map((back) => (
+                  <button
+                    key={back.id}
+                    type="button"
+                    className={back.id === cardBack ? "selection-dot selected" : "selection-dot"}
+                    aria-label={`Choose ${back.name}`}
+                    onClick={() => setCardBack(back.id)}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="setup-players-row">
+            <motion.div className="player-config-list" initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.42 } } }}>
+            {Array.from({ length: count }, (_, index) => configs[index]).map((player, index) => (
+              <motion.div key={index} className="player-config" variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }} whileHover={{ y: -2, borderColor: "rgba(255, 224, 130, 0.42)" }} transition={{ duration: 0.25 }}>
+                <div className="player-config-main">
+                  <AvatarPhoto src={player.avatar} alt={player.name || `Player ${index + 1}`} fallback={player.fallback || (index === 0 ? "🧑" : "🤖")} size={54} />
+                  <input
+                    value={player.name || ""}
+                    onChange={(event) => updatePlayer(index, { name: event.target.value })}
+                    placeholder={index === 0 ? "Your name" : `Computer ${index} name`}
+                  />
+                  <span>{index === 0 ? "You" : "CPU"}</span>
+                </div>
+
+                <div className="avatar-carousel" aria-label={`${player.name || `Player ${index + 1}`} avatar carousel`}>
+                  <button type="button" className="avatar-carousel-nav" aria-label="Previous avatar" onClick={() => moveAvatar(index, -1)}>
+                    ‹
+                  </button>
+                  <div className="avatar-carousel-track">
+                  {avatarWindow(Math.max(0, AVATARS.findIndex((avatar) => avatar.src === player.avatar))).map(({ avatar, offset }) => (
+                    <motion.button
+                      key={avatar.id}
+                      type="button"
+                      title={avatar.name}
+                      aria-label={`Choose ${avatar.name}`}
+                      onClick={() => selectAvatar(index, AVATARS.findIndex((item) => item.id === avatar.id))}
+                      className={player.avatar === avatar.src ? "avatar-choice selected" : "avatar-choice"}
+                      data-offset={offset}
+                      whileHover={{ y: -3, scale: offset === 0 ? 1.04 : 1.02 }}
+                      whileTap={{ scale: 0.94 }}
+                      transition={{ type: "spring", stiffness: 480, damping: 28 }}
+                    >
+                      <AvatarPhoto src={avatar.src} alt={avatar.name} fallback={avatar.fallback} size={46} />
+                      <small>{avatar.name}</small>
+                    </motion.button>
+                  ))}
+                  </div>
+                  <button type="button" className="avatar-carousel-nav" aria-label="Next avatar" onClick={() => moveAvatar(index, 1)}>
+                    ›
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+            </motion.div>
+
+            <ActionButton onClick={onStart} style={{ width: "100%", background: "#1a472a", color: "#fff", padding: 12, fontSize: 16 }}>
+              Deal Cards ♠
+            </ActionButton>
+          </div>
+        </div>
       </motion.div>
 
       {showTrailer ? <CinematicTrailer onClose={() => setShowTrailer(false)} /> : null}

@@ -13,7 +13,18 @@ type Props = {
   onPlayComputer: () => void;
 };
 
-const ROOM_CODE = "RMY-500";
+const roomCodePrefixes = ["RMY", "MELD", "RUN", "SET", "500"];
+
+function createRoomCode() {
+  const prefix = roomCodePrefixes[Math.floor(Math.random() * roomCodePrefixes.length)];
+  const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `${prefix}-${suffix}`;
+}
+
+function normalizeRoomCode(value: string) {
+  return value.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 10);
+}
+
 const modeOptions: Array<{ id: LobbyMode; label: string; detail: string }> = [
   { id: "host", label: "Host Game", detail: "Create a private room" },
   { id: "join", label: "Join Game", detail: "Enter a room code" },
@@ -24,10 +35,27 @@ export function OnlineLobbyScreen({ players, count, onClose, onPlayComputer }: P
   const [mode, setMode] = useState<LobbyMode>("host");
   const [ready, setReady] = useState(false);
   const [inviteCopied, setInviteCopied] = useState(false);
-  const [roomCode, setRoomCode] = useState(ROOM_CODE);
+  const [roomCode, setRoomCode] = useState(createRoomCode);
   const seats = Array.from({ length: Math.max(4, count) }, (_, index) => players[index]);
+  const displayRoomCode = roomCode || "ROOM-CODE";
+
+  function refreshRoomCode() {
+    setRoomCode(createRoomCode());
+    setInviteCopied(false);
+  }
+
+  function updateRoomCode(value: string) {
+    setRoomCode(normalizeRoomCode(value));
+    setInviteCopied(false);
+  }
 
   function copyInvite() {
+    const inviteText = `Join my 500 Rummy room with code ${displayRoomCode}`;
+
+    if (navigator.clipboard) {
+      void navigator.clipboard.writeText(inviteText).catch(() => undefined);
+    }
+
     setInviteCopied(true);
     window.setTimeout(() => setInviteCopied(false), 1300);
   }
@@ -57,7 +85,14 @@ export function OnlineLobbyScreen({ players, count, onClose, onPlayComputer }: P
 
           <div className="lobby-room-code-display">
             <span>{mode === "join" ? "Join Code" : "Room Code"}</span>
-            <b>{roomCode || ROOM_CODE}</b>
+            <motion.b
+              key={displayRoomCode}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {displayRoomCode}
+            </motion.b>
           </div>
         </div>
 
@@ -125,10 +160,15 @@ export function OnlineLobbyScreen({ players, count, onClose, onPlayComputer }: P
           <div className="lobby-room-card">
             <label htmlFor="room-code">{mode === "join" ? "Enter Room Code" : "Room Code"}</label>
             <div className="room-code-row">
-              <input id="room-code" value={roomCode} readOnly={mode !== "join"} onChange={(event) => setRoomCode(event.target.value.toUpperCase())} />
-              <button type="button" onClick={copyInvite}>
-                {inviteCopied ? "Copied" : "Invite Link"}
-              </button>
+              <input id="room-code" value={roomCode} readOnly={mode !== "join"} onChange={(event) => updateRoomCode(event.target.value)} />
+              <div className="room-code-actions">
+                <button type="button" className="refresh-code-button" onClick={refreshRoomCode} disabled={mode === "join"}>
+                  New Code
+                </button>
+                <button type="button" onClick={copyInvite}>
+                  {inviteCopied ? "Copied" : "Invite Link"}
+                </button>
+              </div>
             </div>
             <div className="lobby-status">
               <span className="status-dot" />
