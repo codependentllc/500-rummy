@@ -1,15 +1,19 @@
-import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { motion, type HTMLMotionProps } from "framer-motion";
 
-type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
+type Props = HTMLMotionProps<"button"> & {
   children: ReactNode;
   style?: CSSProperties;
 };
 
 export function ActionButton({ children, style, ...props }: Props) {
   return (
-    <button
+    <motion.button
       type="button"
       {...props}
+      whileHover={props.disabled ? undefined : { y: -1, scale: 1.025 }}
+      whileTap={props.disabled ? undefined : { scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 520, damping: 32 }}
       style={{
         padding: "8px 14px",
         background: "#fff",
@@ -25,6 +29,6 @@ export function ActionButton({ children, style, ...props }: Props) {
       }}
     >
       {children}
-    </button>
+    </motion.button>
   );
 }

@@ -3,7 +3,7 @@ import { DEAL_COUNT } from "./constants";
 import { hasDuplicateCards } from "./deck";
 import { makeDeck } from "./deck";
 import { sortCards } from "./melds";
-import type { GameState, Player, PlayerConfig } from "./types";
+import type { GameState, Player, PlayerConfig, ScoreHistoryEntry } from "./types";
 
 export function createPlayers(count: number, configs: PlayerConfig[] = []): Player[] {
   return Array.from({ length: count }, (_, index) => ({
@@ -18,7 +18,7 @@ export function createPlayers(count: number, configs: PlayerConfig[] = []): Play
   }));
 }
 
-export function newGame(count = 2, oldPlayers: Player[] | null = null, configs: PlayerConfig[] = []): GameState {
+export function newGame(count = 2, oldPlayers: Player[] | null = null, configs: PlayerConfig[] = [], scoreHistory: ScoreHistoryEntry[] = []): GameState {
   const stock = makeDeck();
   const players = oldPlayers ? oldPlayers.map((player) => ({ ...player, hand: [], melds: [] })) : createPlayers(count, configs);
 
@@ -46,6 +46,7 @@ export function newGame(count = 2, oldPlayers: Player[] | null = null, configs: 
     message: "Your turn. Draw a card.",
     handOver: false,
     scoring: null,
+    scoreHistory,
     winner: null
   };
 }

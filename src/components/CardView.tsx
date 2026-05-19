@@ -33,11 +33,11 @@ export function CardView({
   if (faceDown) {
     return (
       <div
+        className="card-back-face"
         style={{
           width: size.w,
           height: size.h,
           borderRadius: small ? 7 : 9,
-          background: "repeating-linear-gradient(45deg,#1a472a,#1a472a 3px,#2d6a4f 3px,#2d6a4f 6px)",
           border: "2px solid #fff",
           flexShrink: 0
         }}
