@@ -8,6 +8,8 @@ import { AvatarPhoto } from "./AvatarPhoto";
 import { BuriedDiscardTutorial } from "./BuriedDiscardTutorial";
 import { CinematicTrailer } from "./CinematicTrailer";
 import { LayOffAnimation } from "./LayOffAnimation";
+import { LoadingScreenAnimation } from "./LoadingScreenAnimation";
+import { MenuLoopBackground } from "./MenuLoopBackground";
 import { MobileGameplayPreview } from "./MobileGameplayPreview";
 import { OnlineLobbyScreen } from "./OnlineLobbyScreen";
 import { QueenDiscardWarningAnimation } from "./QueenDiscardWarningAnimation";
@@ -85,6 +87,7 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
   const [showTrailer, setShowTrailer] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showLayoff, setShowLayoff] = useState(false);
+  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [showLobby, setShowLobby] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   const [showWaitingRoom, setShowWaitingRoom] = useState(false);
@@ -119,6 +122,7 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
 
   return (
     <div className={`setup-page table-theme-${tableTheme} card-back-${cardBack}`}>
+      <MenuLoopBackground />
       <motion.div
         className="setup-card"
         initial={{ opacity: 0, y: 24, scale: 0.98 }}
@@ -186,6 +190,9 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
                 </button>
                 <button type="button" className="setup-subaction mobile-preview-launch" onClick={() => { setShowMobilePreview(true); setActionMenu(null); }}>
                   Mobile View
+                </button>
+                <button type="button" className="setup-subaction loading-launch" onClick={() => { setShowLoadingScreen(true); setActionMenu(null); }}>
+                  Loading
                 </button>
                 <button type="button" className="setup-subaction queen-launch" onClick={() => { setShowQueenSpades(true); setActionMenu(null); }}>
                   Q♠ Moment
@@ -393,6 +400,7 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
       {showTrailer ? <CinematicTrailer onClose={() => setShowTrailer(false)} /> : null}
       {showLobby ? <OnlineLobbyScreen players={configs} count={count} onClose={() => setShowLobby(false)} onPlayComputer={onStart} /> : null}
       {showMobilePreview ? <MobileGameplayPreview onClose={() => setShowMobilePreview(false)} /> : null}
+      {showLoadingScreen ? <LoadingScreenAnimation onClose={() => setShowLoadingScreen(false)} /> : null}
       {showWaitingRoom ? <WaitingRoomAnimation onClose={() => setShowWaitingRoom(false)} /> : null}
       {showTutorial ? <BuriedDiscardTutorial onClose={() => setShowTutorial(false)} /> : null}
       {showLayoff ? <LayOffAnimation onClose={() => setShowLayoff(false)} /> : null}
