@@ -2863,10 +2863,54 @@ body {
   backdrop-filter: blur(18px);
 }
 
+.scoring-modal:not(.winner-modal) {
+  width: min(98vw, 1180px);
+  max-width: 1180px;
+  max-height: calc(100vh - 12px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: clamp(10px, 1.5vw, 16px);
+  overflow: hidden;
+}
+
 .end-modal h2 {
   text-align: center;
   color: #ffe082;
   margin: 0;
+}
+
+.winner-modal {
+  width: min(94vw, 760px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(250px, 0.85fr);
+  grid-template-areas:
+    "header header"
+    "celebration standings"
+    "actions actions";
+  gap: 8px 10px;
+  align-items: stretch;
+  max-height: calc(100vh - 20px);
+  padding: clamp(10px, 1.6vw, 14px);
+  overflow: hidden;
+}
+
+.winner-modal .score-modal-header {
+  grid-area: header;
+  margin-bottom: 6px;
+}
+
+.winner-modal .score-modal-header span {
+  font-size: 10px;
+}
+
+.winner-modal .score-modal-header h2 {
+  font-size: clamp(22px, 4.4vw, 34px);
+  line-height: 1.05;
+}
+
+.winner-modal .score-modal-header p {
+  display: none;
 }
 
 .score-row {
@@ -2883,6 +2927,13 @@ body {
   animation: scoreRowIn 420ms cubic-bezier(.2, .8, .2, 1) both;
 }
 
+.scoring-modal:not(.winner-modal) .score-row.detailed {
+  min-height: 0;
+  gap: 8px;
+  padding: 9px;
+  align-content: start;
+}
+
 .score-row.queen-present {
   border-color: rgba(255, 224, 130, 0.52);
   box-shadow: 0 0 0 1px rgba(139, 0, 0, 0.16), 0 0 24px rgba(255, 224, 130, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -2891,6 +2942,20 @@ body {
 .score-modal-header {
   text-align: center;
   margin-bottom: 14px;
+}
+
+.scoring-modal:not(.winner-modal) .score-modal-header {
+  margin-bottom: 0;
+}
+
+.scoring-modal:not(.winner-modal) .score-modal-header h2 {
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.05;
+}
+
+.scoring-modal:not(.winner-modal) .score-modal-header p {
+  margin-top: 4px;
+  font-size: 13px;
 }
 
 .score-modal-header span,
@@ -2914,6 +2979,12 @@ body {
   gap: 12px;
 }
 
+.scoring-modal:not(.winner-modal) .score-breakdown-list {
+  min-height: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .score-row-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -2921,11 +2992,25 @@ body {
   align-items: center;
 }
 
+.scoring-modal:not(.winner-modal) .score-row-header {
+  gap: 8px;
+}
+
 .score-player-title {
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
+}
+
+.scoring-modal:not(.winner-modal) .score-player-title {
+  gap: 8px;
+}
+
+.scoring-modal:not(.winner-modal) .score-player-title img,
+.scoring-modal:not(.winner-modal) .score-player-title > div[title] {
+  width: 36px !important;
+  height: 36px !important;
 }
 
 .score-player-title b,
@@ -2938,10 +3023,22 @@ body {
   font-size: 18px;
 }
 
+.scoring-modal:not(.winner-modal) .score-player-title b {
+  max-width: 180px;
+  overflow: hidden;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .score-player-title span {
   margin-top: 2px;
   color: rgba(249, 239, 208, 0.68);
   font-size: 13px;
+}
+
+.scoring-modal:not(.winner-modal) .score-player-title span {
+  font-size: 11px;
 }
 
 .score-net {
@@ -2953,10 +3050,19 @@ body {
   background: rgba(0, 0, 0, 0.2);
 }
 
+.scoring-modal:not(.winner-modal) .score-net {
+  min-width: 76px;
+  padding: 6px 8px;
+}
+
 .score-net > span {
   display: block;
   font-size: 28px;
   font-weight: 900;
+}
+
+.scoring-modal:not(.winner-modal) .score-net > span {
+  font-size: 21px;
 }
 
 .score-net.positive,
@@ -2976,6 +3082,11 @@ body {
   gap: 10px;
 }
 
+.scoring-modal:not(.winner-modal) .score-breakdown,
+.scoring-modal:not(.winner-modal) .score-card-groups {
+  gap: 6px;
+}
+
 .score-points {
   padding: 9px 11px;
   border-radius: 12px;
@@ -2983,10 +3094,19 @@ body {
   border: 1px solid rgba(255, 224, 130, 0.12);
 }
 
+.scoring-modal:not(.winner-modal) .score-points {
+  padding: 6px 8px;
+}
+
 .score-points b {
   display: block;
   margin-top: 3px;
   font-size: 23px;
+}
+
+.scoring-modal:not(.winner-modal) .score-points b {
+  margin-top: 1px;
+  font-size: 18px;
 }
 
 .score-card-row {
@@ -3001,12 +3121,32 @@ body {
   border: 1px solid rgba(255, 224, 130, 0.1);
 }
 
+.scoring-modal:not(.winner-modal) .score-card-row {
+  min-height: 64px;
+  max-height: 98px;
+  align-content: flex-start;
+  gap: 4px;
+  overflow: hidden;
+  padding: 5px;
+}
+
 .score-card-wrap {
   position: relative;
 }
 
 .score-card-wrap button {
   cursor: default !important;
+}
+
+.scoring-modal:not(.winner-modal) .score-card-wrap button {
+  width: 40px !important;
+  height: 56px !important;
+  padding: 3px 4px !important;
+  border-radius: 6px !important;
+}
+
+.scoring-modal:not(.winner-modal) .score-card-wrap button > div {
+  font-size: 12px !important;
 }
 
 .score-card-wrap.queen-spades-score {
@@ -3020,6 +3160,12 @@ body {
   border-radius: 12px;
   border: 2px solid rgba(255, 224, 130, 0.82);
   pointer-events: none;
+}
+
+.scoring-modal:not(.winner-modal) .score-card-wrap.queen-spades-score::before {
+  inset: -3px;
+  border-radius: 8px;
+  border-width: 1px;
 }
 
 .score-card-wrap.queen-spades-score span {
@@ -3037,6 +3183,12 @@ body {
   box-shadow: 0 0 12px rgba(255, 224, 130, 0.35);
 }
 
+.scoring-modal:not(.winner-modal) .score-card-wrap.queen-spades-score span {
+  bottom: -5px;
+  padding: 1px 4px;
+  font-size: 8px;
+}
+
 .score-empty-cards {
   width: 100%;
   padding: 18px 8px;
@@ -3044,6 +3196,11 @@ body {
   font-size: 12px;
   font-weight: 800;
   text-align: center;
+}
+
+.scoring-modal:not(.winner-modal) .score-empty-cards {
+  padding: 10px 6px;
+  font-size: 11px;
 }
 
 .queen-score-note {
@@ -3054,6 +3211,14 @@ body {
   color: #ffe082;
   font-size: 12px;
   font-weight: 800;
+}
+
+.scoring-modal:not(.winner-modal) .queen-score-note {
+  overflow: hidden;
+  padding: 6px 8px;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .victory-celebration {
@@ -3069,6 +3234,25 @@ body {
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.018) 1px, transparent 1px, transparent 8px),
     #123b24;
   box-shadow: inset 0 0 64px rgba(0, 0, 0, 0.45), 0 18px 40px rgba(0, 0, 0, 0.3);
+}
+
+.winner-modal .victory-celebration {
+  grid-area: celebration;
+  min-height: clamp(210px, 38vh, 285px);
+  height: 100%;
+  margin: 0;
+}
+
+.winner-modal .victory-card-burst {
+  bottom: 18px;
+}
+
+.winner-modal .victory-card-burst span {
+  left: -24px;
+  width: 48px;
+  height: 66px;
+  border-radius: 8px;
+  font-size: 14px;
 }
 
 .victory-table-glow {
@@ -3148,6 +3332,17 @@ body {
   animation: victoryAvatarGlow 1.9s ease-in-out infinite alternate;
 }
 
+.winner-modal .victory-avatar-wrap {
+  top: 38%;
+  width: 78px;
+  height: 78px;
+}
+
+.winner-modal .victory-avatar-wrap img {
+  width: 62px !important;
+  height: 62px !important;
+}
+
 .victory-copy {
   position: absolute;
   left: 50%;
@@ -3157,9 +3352,75 @@ body {
   text-shadow: 0 3px 14px rgba(0, 0, 0, 0.45);
 }
 
+.winner-modal .victory-copy {
+  bottom: 16px;
+}
+
+.winner-modal .victory-copy span {
+  font-size: clamp(28px, 5.4vw, 44px);
+}
+
+.winner-modal .victory-copy b {
+  font-size: clamp(13px, 2.4vw, 18px);
+}
+
 .victory-copy span,
 .victory-copy b {
   display: block;
+}
+
+.winner-standings {
+  grid-area: standings;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: center;
+  gap: 6px;
+}
+
+.winner-standing-row {
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: 26px 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 224, 130, 0.14);
+  background: rgba(0, 0, 0, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.winner-standing-row.champion {
+  border-color: rgba(255, 224, 130, 0.58);
+  background:
+    linear-gradient(145deg, rgba(255, 224, 130, 0.18), rgba(0, 0, 0, 0.12)),
+    rgba(10, 43, 25, 0.44);
+  box-shadow: 0 0 22px rgba(255, 224, 130, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.winner-rank {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 224, 130, 0.16);
+  color: #ffe082;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.winner-standing-row b {
+  overflow: hidden;
+  color: #fff8dc;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.winner-standing-row > span {
+  color: #9ee493;
+  font-size: 17px;
+  font-weight: 900;
 }
 
 .victory-copy span {
@@ -3183,6 +3444,27 @@ body {
   gap: 8px;
   flex-wrap: wrap;
   margin-top: 12px;
+}
+
+.winner-modal .modal-actions {
+  grid-area: actions;
+  margin-top: 8px;
+  flex-wrap: nowrap;
+}
+
+.winner-modal .modal-actions button {
+  min-height: 38px;
+  padding: 8px 12px !important;
+}
+
+.scoring-modal:not(.winner-modal) .modal-actions {
+  margin-top: 0;
+  flex-wrap: nowrap;
+}
+
+.scoring-modal:not(.winner-modal) .modal-actions button {
+  min-height: 38px;
+  padding: 8px 12px !important;
 }
 
 @keyframes victoryGlow {
@@ -4924,6 +5206,65 @@ body {
   .history-delta-total {
     justify-content: space-between;
     min-width: 0;
+  }
+
+  .scoring-modal:not(.winner-modal) {
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 8px);
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .scoring-modal:not(.winner-modal) .score-breakdown-list {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .scoring-modal:not(.winner-modal) .score-row.detailed {
+    gap: 5px;
+    padding: 6px;
+  }
+
+  .scoring-modal:not(.winner-modal) .score-card-groups {
+    display: none;
+  }
+
+  .scoring-modal:not(.winner-modal) .score-modal-header p {
+    display: none;
+  }
+
+  .winner-modal {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "celebration"
+      "standings"
+      "actions";
+    gap: 6px;
+    max-height: calc(100vh - 16px);
+    padding: 9px;
+    overflow: hidden;
+  }
+
+  .winner-modal .victory-celebration {
+    min-height: 145px;
+  }
+
+  .winner-standings {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .winner-standing-row {
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+  }
+
+  .winner-standing-row > span {
+    font-size: 15px;
+  }
+
+  .winner-standing-row img,
+  .winner-standing-row > div[title] {
+    display: none;
   }
 
   .setup-page {
