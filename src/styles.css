@@ -1347,6 +1347,335 @@ body {
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.42);
 }
 
+.mobile-preview-launch {
+  background:
+    radial-gradient(circle at 30% 0%, rgba(255, 255, 255, 0.34), transparent 34%),
+    linear-gradient(135deg, #e8fff3 0%, #38bdf8 42%, #123b24 100%);
+  color: #fff8dc;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+.mobile-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background:
+    radial-gradient(ellipse at 50% 12%, rgba(255, 224, 130, 0.22), transparent 36%),
+    linear-gradient(180deg, rgba(3, 9, 5, 0.64), rgba(3, 9, 5, 0.94)),
+    url("/backgrounds/rummy-cinematic-table.png") center / cover;
+}
+
+.mobile-preview-controls {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  z-index: 2;
+}
+
+.mobile-preview-controls button {
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 224, 130, 0.38);
+  border-radius: 999px;
+  background: rgba(5, 18, 10, 0.74);
+  color: #ffe082;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  font-weight: 900;
+}
+
+.mobile-phone-shell {
+  width: min(92vw, 390px);
+  aspect-ratio: 9 / 18.9;
+  position: relative;
+  padding: 14px 12px 16px;
+  border: 1px solid rgba(255, 224, 130, 0.38);
+  border-radius: 34px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.32)),
+    #07120b;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.mobile-phone-speaker {
+  position: absolute;
+  left: 50%;
+  top: 9px;
+  width: 72px;
+  height: 5px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.mobile-game-screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 26px;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(82, 183, 136, 0.38), transparent 54%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.018) 1px, transparent 1px, transparent 8px),
+    #123b24;
+  box-shadow: inset 0 0 64px rgba(0, 0, 0, 0.48);
+}
+
+.mobile-game-felt {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 224, 130, 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(3, 9, 5, 0.08), rgba(3, 9, 5, 0.28));
+  pointer-events: none;
+}
+
+.mobile-game-topbar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px 16px 8px;
+}
+
+.mobile-game-topbar span,
+.mobile-game-topbar b,
+.mobile-game-topbar strong {
+  display: block;
+}
+
+.mobile-game-topbar span {
+  color: rgba(249, 239, 208, 0.62);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.mobile-game-topbar b {
+  margin-top: 2px;
+  color: #ffe082;
+  font-size: 20px;
+}
+
+.mobile-game-topbar strong {
+  align-self: center;
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.24);
+  color: #9ee493;
+  font-size: 12px;
+}
+
+.mobile-opponents {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  padding: 4px 12px 0;
+}
+
+.mobile-opponent {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 7px 4px;
+  border: 1px solid rgba(255, 224, 130, 0.14);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.mobile-opponent.active {
+  border-color: rgba(255, 224, 130, 0.5);
+  box-shadow: 0 0 18px rgba(255, 224, 130, 0.12);
+}
+
+.mobile-opponent span {
+  max-width: 100%;
+  overflow: hidden;
+  color: #fff8dc;
+  font-size: 10px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-table-center {
+  position: absolute;
+  left: 50%;
+  top: 43%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  transform: translate(-50%, -50%);
+}
+
+.mobile-stock-pile,
+.mobile-discard-pile {
+  position: relative;
+  width: 68px;
+  height: 96px;
+}
+
+.mobile-stock-pile span {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(255, 255, 255, 0.86);
+  border-radius: 10px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.14), transparent 42%),
+    repeating-linear-gradient(45deg, #8b1d1d, #8b1d1d 5px, #b82929 5px, #b82929 10px);
+  box-shadow: 0 14px 24px rgba(0, 0, 0, 0.28);
+}
+
+.mobile-stock-pile span:nth-child(2) {
+  transform: translate(4px, -4px);
+}
+
+.mobile-stock-pile span:nth-child(3) {
+  transform: translate(8px, -8px);
+}
+
+.mobile-discard-pile {
+  display: grid;
+  grid-template-rows: 24px 1fr 20px;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.94);
+  border-radius: 10px;
+  background: linear-gradient(145deg, #fff, #eadfcd);
+  color: #111;
+  box-shadow: 0 18px 28px rgba(0, 0, 0, 0.34), 0 0 20px rgba(255, 224, 130, 0.14);
+}
+
+.mobile-discard-pile i,
+.mobile-discard-pile b {
+  color: #111;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.mobile-discard-pile i {
+  font-size: 22px;
+}
+
+.mobile-discard-pile b {
+  font-size: 38px;
+}
+
+.mobile-discard-pile small {
+  color: #8b0000;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.mobile-meld-preview {
+  position: absolute;
+  left: 50%;
+  top: 61%;
+  z-index: 1;
+  display: flex;
+  gap: 5px;
+  transform: translateX(-50%);
+}
+
+.mobile-meld-preview span {
+  width: 40px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 7px;
+  background: linear-gradient(145deg, #fff, #eadfcd);
+  color: #b7122b;
+  font-size: 14px;
+  font-weight: 900;
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.22);
+}
+
+.mobile-action-bar {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 108px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mobile-action-bar button {
+  min-height: 48px;
+  border: 1px solid rgba(255, 224, 130, 0.28);
+  border-radius: 14px;
+  background: rgba(5, 18, 10, 0.68);
+  color: #fff8dc;
+  font-family: Georgia, serif;
+  font-size: 13px;
+  font-weight: 900;
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.mobile-action-bar button.primary {
+  background: linear-gradient(135deg, #fff7d1, #d8a941 42%, #1f6f48);
+  color: #102817;
+  box-shadow: 0 0 20px rgba(255, 224, 130, 0.22), 0 10px 18px rgba(0, 0, 0, 0.22);
+}
+
+.mobile-player-hand {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  z-index: 1;
+  width: 100%;
+  height: 92px;
+  transform: translateX(-50%);
+}
+
+.mobile-hand-card {
+  position: absolute;
+  left: calc(50% - 156px + var(--hand-index) * 48px);
+  bottom: 0;
+  width: 54px;
+  height: 78px;
+  display: grid;
+  grid-template-rows: 22px 1fr;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: 9px;
+  background: linear-gradient(145deg, #fff, #eadfcd);
+  color: #111;
+  box-shadow: 0 14px 22px rgba(0, 0, 0, 0.28);
+  transform: rotate(calc((var(--hand-index) - 3) * 3deg));
+  transform-origin: 50% 110%;
+}
+
+.mobile-hand-card.red {
+  color: #b7122b;
+}
+
+.mobile-hand-card span,
+.mobile-hand-card b {
+  font-weight: 900;
+  line-height: 1;
+}
+
+.mobile-hand-card span {
+  align-self: end;
+  font-size: 16px;
+}
+
+.mobile-hand-card b {
+  align-self: start;
+  font-size: 28px;
+}
+
 .lobby-overlay {
   position: fixed;
   inset: 0;

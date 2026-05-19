@@ -8,6 +8,7 @@ import { AvatarPhoto } from "./AvatarPhoto";
 import { BuriedDiscardTutorial } from "./BuriedDiscardTutorial";
 import { CinematicTrailer } from "./CinematicTrailer";
 import { LayOffAnimation } from "./LayOffAnimation";
+import { MobileGameplayPreview } from "./MobileGameplayPreview";
 import { OnlineLobbyScreen } from "./OnlineLobbyScreen";
 import { QueenDiscardWarningAnimation } from "./QueenDiscardWarningAnimation";
 import { QueenSpadesAnimation } from "./QueenSpadesAnimation";
@@ -85,6 +86,7 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
   const [showTutorial, setShowTutorial] = useState(false);
   const [showLayoff, setShowLayoff] = useState(false);
   const [showLobby, setShowLobby] = useState(false);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
   const [showWaitingRoom, setShowWaitingRoom] = useState(false);
   const [showQueenWarning, setShowQueenWarning] = useState(false);
   const [showQueenSpades, setShowQueenSpades] = useState(false);
@@ -179,11 +181,14 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
                   <button type="button" className="setup-subaction tutorial-launch" onClick={() => { setShowTutorial(true); setActionMenu(null); }}>
                     Discard Rule
                   </button>
-                  <button type="button" className="setup-subaction layoff-launch" onClick={() => { setShowLayoff(true); setActionMenu(null); }}>
-                    Lay Off
-                  </button>
-                  <button type="button" className="setup-subaction queen-launch" onClick={() => { setShowQueenSpades(true); setActionMenu(null); }}>
-                    Q♠ Moment
+                <button type="button" className="setup-subaction layoff-launch" onClick={() => { setShowLayoff(true); setActionMenu(null); }}>
+                  Lay Off
+                </button>
+                <button type="button" className="setup-subaction mobile-preview-launch" onClick={() => { setShowMobilePreview(true); setActionMenu(null); }}>
+                  Mobile View
+                </button>
+                <button type="button" className="setup-subaction queen-launch" onClick={() => { setShowQueenSpades(true); setActionMenu(null); }}>
+                  Q♠ Moment
                   </button>
                   <button type="button" className="setup-subaction queen-warning-launch" onClick={() => { setShowQueenWarning(true); setActionMenu(null); }}>
                     Q♠ Warning
@@ -387,6 +392,7 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
 
       {showTrailer ? <CinematicTrailer onClose={() => setShowTrailer(false)} /> : null}
       {showLobby ? <OnlineLobbyScreen players={configs} count={count} onClose={() => setShowLobby(false)} onPlayComputer={onStart} /> : null}
+      {showMobilePreview ? <MobileGameplayPreview onClose={() => setShowMobilePreview(false)} /> : null}
       {showWaitingRoom ? <WaitingRoomAnimation onClose={() => setShowWaitingRoom(false)} /> : null}
       {showTutorial ? <BuriedDiscardTutorial onClose={() => setShowTutorial(false)} /> : null}
       {showLayoff ? <LayOffAnimation onClose={() => setShowLayoff(false)} /> : null}
