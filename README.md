@@ -26,3 +26,20 @@ A production-ready local 500 Rummy game built with React, TypeScript, and Vite.
 ```bash
 npm install
 npm run dev
+```
+
+## Android App
+
+This project uses Capacitor to wrap the Vite game as a native Android app.
+
+```bash
+npm run android:sync
+npm run android:open
+```
+
+To build an APK from the command line:
+
+```bash
+cd android
+./gradlew assembleDebug
+```

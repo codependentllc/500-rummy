@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">500 Rummy</string>
+    <string name="title_activity_main">500 Rummy</string>
+    <string name="package_name">com.codependentllc.rummy500</string>
+    <string name="custom_url_scheme">com.codependentllc.rummy500</string>
+</resources>
