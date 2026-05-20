@@ -52,6 +52,7 @@ export function CardView({
   return (
     <button
       type="button"
+      className={queenSpades ? "playing-card queen-spades-card" : "playing-card"}
       disabled={disabled}
       draggable={!disabled}
       onDragStart={onDragStart}

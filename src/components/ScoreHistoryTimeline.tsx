@@ -17,7 +17,7 @@ export function ScoreHistoryTimeline({ history }: Props) {
       <div className="score-history-header">
         <div>
           <span>Score History</span>
-          <b>Race to {TARGET_SCORE}</b>
+          <b>Latest Hands</b>
         </div>
         <em>{history.length} hand{history.length === 1 ? "" : "s"}</em>
       </div>

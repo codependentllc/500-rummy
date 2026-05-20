@@ -61,7 +61,7 @@ export function EndHandModal({ state, onNextHand, onNewGame, onExit }: Props) {
 
   return (
     <div className="modal-backdrop">
-      <div className="end-modal scoring-modal">
+      <div className={state.winner ? "end-modal scoring-modal winner-modal" : "end-modal scoring-modal"}>
         <div className="score-modal-header">
           <span>{state.winner ? "Game Over" : "Hand Complete"}</span>
           <h2>{state.winner ? `${state.winner.name} Wins` : "End of Hand Scoring"}</h2>
@@ -70,57 +70,73 @@ export function EndHandModal({ state, onNextHand, onNewGame, onExit }: Props) {
 
         {state.winner ? <VictoryCelebration winner={state.winner} /> : null}
 
-        <div className="score-breakdown-list">
-          {scoring.map((row) => {
-            const hasQueen = [...row.meldedCards, ...row.handCards].some((card) => card.rank === "Q" && card.suit === "♠");
-            return (
-              <div key={row.playerId} className={hasQueen ? "score-row detailed queen-present" : "score-row detailed"}>
-                <div className="score-row-header">
-                  <div className="score-player-title">
-                    <AvatarPhoto src={row.avatar} alt={row.name} fallback={row.fallback} size={46} />
-                    <div>
-                      <b>{row.name}</b>
-                      <span>Total: <AnimatedScore value={row.total} /></span>
+        {state.winner ? (
+          <div className="winner-standings" aria-label="Final standings">
+            {scoring
+              .slice()
+              .sort((a, b) => b.total - a.total)
+              .map((row, index) => (
+                <div key={row.playerId} className={row.playerId === state.winner?.id ? "winner-standing-row champion" : "winner-standing-row"}>
+                  <div className="winner-rank">{index + 1}</div>
+                  <AvatarPhoto src={row.avatar} alt={row.name} fallback={row.fallback} size={38} />
+                  <b>{row.name}</b>
+                  <span><AnimatedScore value={row.total} /></span>
+                </div>
+              ))}
+          </div>
+        ) : (
+          <div className="score-breakdown-list">
+            {scoring.map((row) => {
+              const hasQueen = [...row.meldedCards, ...row.handCards].some((card) => card.rank === "Q" && card.suit === "♠");
+              return (
+                <div key={row.playerId} className={hasQueen ? "score-row detailed queen-present" : "score-row detailed"}>
+                  <div className="score-row-header">
+                    <div className="score-player-title">
+                      <AvatarPhoto src={row.avatar} alt={row.name} fallback={row.fallback} size={46} />
+                      <div>
+                        <b>{row.name}</b>
+                        <span>Total: <AnimatedScore value={row.total} /></span>
+                      </div>
+                    </div>
+                    <div className={row.net >= 0 ? "score-net positive" : "score-net negative"}>
+                      <small>Net</small>
+                      <AnimatedScore value={row.net} prefix={row.net > 0 ? "+" : ""} />
                     </div>
                   </div>
-                  <div className={row.net >= 0 ? "score-net positive" : "score-net negative"}>
-                    <small>Net</small>
-                    <AnimatedScore value={row.net} prefix={row.net > 0 ? "+" : ""} />
-                  </div>
-                </div>
 
-                <div className="score-breakdown">
-                  <div className="score-points positive">
-                    <span>Melded</span>
-                    <b><AnimatedScore value={row.table} prefix="+" /></b>
+                  <div className="score-breakdown">
+                    <div className="score-points positive">
+                      <span>Melded</span>
+                      <b><AnimatedScore value={row.table} prefix="+" /></b>
+                    </div>
+                    <div className="score-points negative">
+                      <span>In Hand</span>
+                      <b><AnimatedScore value={row.hand} prefix="-" /></b>
+                    </div>
                   </div>
-                  <div className="score-points negative">
-                    <span>In Hand</span>
-                    <b><AnimatedScore value={row.hand} prefix="-" /></b>
-                  </div>
-                </div>
 
-                <div className="score-card-groups">
-                  <div>
-                    <div className="score-group-label">Cards Melded</div>
-                    <CardStrip cards={row.meldedCards} emptyLabel="No melded cards" />
+                  <div className="score-card-groups">
+                    <div>
+                      <div className="score-group-label">Cards Melded</div>
+                      <CardStrip cards={row.meldedCards} emptyLabel="No melded cards" />
+                    </div>
+                    <div>
+                      <div className="score-group-label">Cards Remaining</div>
+                      <CardStrip cards={row.handCards} emptyLabel="Hand empty" />
+                    </div>
                   </div>
-                  <div>
-                    <div className="score-group-label">Cards Remaining</div>
-                    <CardStrip cards={row.handCards} emptyLabel="Hand empty" />
-                  </div>
-                </div>
 
-                {hasQueen ? (
-                  <div className="queen-score-note">
-                    Q♠ highlighted at {cardValue({ id: "Q♠", rank: "Q", suit: "♠" })} points.
-                    {[...row.meldedCards, ...row.handCards].some((card) => card.rank === "Q" && card.suit === "♠") ? ` Found in ${row.name}'s cards: ${[...row.meldedCards, ...row.handCards].filter((card) => card.rank === "Q" && card.suit === "♠").map(label).join(", ")}.` : null}
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
+                  {hasQueen ? (
+                    <div className="queen-score-note">
+                      Q♠ highlighted at {cardValue({ id: "Q♠", rank: "Q", suit: "♠" })} points.
+                      {[...row.meldedCards, ...row.handCards].some((card) => card.rank === "Q" && card.suit === "♠") ? ` Found in ${row.name}'s cards: ${[...row.meldedCards, ...row.handCards].filter((card) => card.rank === "Q" && card.suit === "♠").map(label).join(", ")}.` : null}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         <div className="modal-actions">
           {state.winner ? (

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import type { CSSProperties } from "react";
 import { DEAL_COUNT } from "../game/constants";
+import { playSound } from "../utils/audio";
 
 type Props = {
   playerCount: number;
@@ -35,6 +36,7 @@ export function DealSequence({ playerCount, onComplete }: Props) {
   });
 
   useEffect(() => {
+    playSound("/sounds/shuffle-square-deal-sequence.wav", 0.62);
     const lastDelay = cards[cards.length - 1]?.delay || 0;
     const timer = window.setTimeout(onComplete, lastDelay + 760);
     return () => window.clearTimeout(timer);

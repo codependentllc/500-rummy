@@ -344,7 +344,7 @@ export default function App() {
   return (
     <div className={`app-shell table-theme-${tableTheme} card-back-${cardBack}`}>
       <motion.div className="top-bar" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
-        <div className="title">🃏 500 Rummy</div>
+        <div className="title"><span>500</span> Rummy</div>
         <div className="top-actions">
           {[2, 3, 4].map((number) => (
             <ActionButton key={number} disabled={isAnimatingMeld || isDealing} onClick={() => changePlayerCount(number)} style={{ background: count === number ? "#ffe082" : "rgba(255,255,255,0.92)", color: "#1a472a", padding: "6px 10px" }}>

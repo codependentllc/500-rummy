@@ -25,11 +25,13 @@ export function ScorePanel({ players, turn, handOver }: Props) {
           transition={{ duration: 0.24 }}
         >
           <div className="score-avatar">
-            <AvatarPhoto src={player.avatar} alt={player.name} fallback={player.fallback || (player.isAI ? "🤖" : "🧑")} size={42} />
+            <AvatarPhoto src={player.avatar} alt={player.name} fallback={player.fallback || (player.isAI ? "🤖" : "🧑")} size={62} />
           </div>
-          <div className="score-name">{player.name}</div>
-          <div className="score-value">{player.score}</div>
-          <div className="score-meta">{player.hand.length} cards</div>
+          <div className="score-details">
+            <div className="score-name">{player.name}</div>
+            <div className="score-value">{player.score}</div>
+            <div className="score-meta">{player.hand.length} cards</div>
+          </div>
         </motion.div>
       ))}
     </motion.div>
