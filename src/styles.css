@@ -639,6 +639,28 @@ body {
   flex: 0 1 560px;
 }
 
+.discard-area.discard-ready {
+  cursor: pointer;
+}
+
+.discard-area.discard-ready .section-label {
+  color: #ffe082;
+}
+
+.discard-area.discard-ready .discard-row {
+  border-color: rgba(255, 224, 130, 0.58);
+  background:
+    linear-gradient(145deg, rgba(255, 224, 130, 0.08), rgba(0, 0, 0, 0.12)),
+    rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 0 22px rgba(255, 224, 130, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.discard-area.discard-ready .playing-card {
+  pointer-events: none;
+}
+
 .discard-row,
 .ai-cards,
 .hand-row,

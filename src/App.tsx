@@ -379,6 +379,7 @@ export default function App() {
           state={state}
           onDrawStock={drawStock}
           onDrawDiscard={drawDiscard}
+          onDiscardSelected={discardSelected}
           onPlayMeld={playMeld}
           onDropDiscard={dropDiscard}
           allowDrop={allowDrop}
