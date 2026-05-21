@@ -271,6 +271,22 @@ export default function App() {
     window.setTimeout(() => finishLayoff(card, meldId), 560);
   }
 
+  function layoffSelected() {
+    if (isAnimatingMeld || isDealing) return;
+    if (!state.drawn || selectedCards.length !== 1) {
+      setMessage("Select one card to lay off.");
+      return;
+    }
+
+    const target = tableMelds.find((meld) => canLay(selectedCards[0], meld));
+    if (!target) {
+      setMessage("No lay off is available for that card.");
+      return;
+    }
+
+    layoff(target.id);
+  }
+
   function discardSelected() {
     if (isAnimatingMeld || isDealing) return;
     if (!state.drawn || selectedCards.length !== 1) {
@@ -407,24 +423,29 @@ export default function App() {
           </div>
         ) : null}
 
-        {state.players.slice(1).map((player, index) => (
-          <motion.div
-            key={player.id}
-            className="ai-row"
-            initial={{ opacity: 0, x: 18 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ delay: index * 0.04, duration: 0.28 }}
-          >
-            <div className="ai-label">
-              <AvatarPhoto src={player.avatar} alt={player.name} fallback={player.fallback || "🤖"} size={28} />
-              {player.name} — {player.hand.length} cards{state.turn === player.id ? " ← TURN" : ""}
-            </div>
-            <div className="ai-cards">
-              {player.hand.map((card) => <CardView key={card.id} card={card} faceDown small />)}
-            </div>
-          </motion.div>
-        ))}
+        <div className={`opponent-seats seats-${state.players.length - 1}`} aria-label="Opponent seats">
+          {state.players.slice(1).map((player, index) => (
+            <motion.div
+              key={player.id}
+              className={state.turn === player.id ? "ai-row seat-active" : "ai-row"}
+              initial={{ opacity: 0, x: 18 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ delay: index * 0.04, duration: 0.28 }}
+            >
+              <div className="ai-label">
+                <AvatarPhoto src={player.avatar} alt={player.name} fallback={player.fallback || "🤖"} size={28} />
+                <span>
+                  <b>{player.name}</b>
+                  <small>{player.score} pts · {player.hand.length} cards{state.turn === player.id ? " · Turn" : ""}</small>
+                </span>
+              </div>
+              <div className="ai-cards">
+                {player.hand.map((card) => <CardView key={card.id} card={card} faceDown small />)}
+              </div>
+            </motion.div>
+          ))}
+        </div>
 
         <motion.div
           className={state.turn === 0 && !state.handOver ? "human-area active" : "human-area"}
@@ -439,7 +460,7 @@ export default function App() {
               {human.name} {state.turn === 0 ? `— ${state.drawn ? "Meld/Lay off, then discard" : "Draw a card"}` : ""}
             </div>
             <div className="hand-actions">
-              <span>{human.hand.length} cards · {selectedCards.length} selected · {points(selectedCards)} pts</span>
+              <span>{human.score} score · {human.hand.length} cards · {selectedCards.length} selected · {points(selectedCards)} pts</span>
               <ActionButton className="secondary-action" disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandByMelds} style={{ padding: "6px 10px", fontSize: 12 }}>Group Melds</ActionButton>
               <ActionButton className="secondary-action light-action" disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandBySuit} style={{ padding: "6px 10px", fontSize: 12 }}>Sort Suit</ActionButton>
             </div>
@@ -457,6 +478,13 @@ export default function App() {
               onCardDrop={dropOnHandCard}
               allowDrop={allowDrop}
             />
+          </div>
+
+          <div className="mobile-turn-actions" aria-label="Turn actions">
+            <ActionButton className="secondary-action" disabled={state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld || isDealing} onClick={drawStock}>Draw</ActionButton>
+            <ActionButton className="primary-action" disabled={state.turn !== 0 || !state.drawn || state.handOver || isAnimatingMeld || isDealing} onClick={playMeld}>Meld</ActionButton>
+            <ActionButton className="secondary-action" disabled={state.turn !== 0 || !state.drawn || state.handOver || isAnimatingMeld || isDealing} onClick={layoffSelected}>Lay Off</ActionButton>
+            <ActionButton className="danger-action" disabled={state.turn !== 0 || !state.drawn || state.handOver || isAnimatingMeld || isDealing} onClick={discardSelected}>Discard</ActionButton>
           </div>
 
           {state.turn === 0 && state.drawn ? (
