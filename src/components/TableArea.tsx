@@ -8,12 +8,13 @@ type Props = {
   onDrawStock: () => void;
   onDrawDiscard: (index: number) => void;
   onDiscardSelected: () => void;
+  onDropToDiscardPile: (event: DragEvent<HTMLDivElement>) => void;
   onPlayMeld: () => void;
   onDropDiscard: (event: DragEvent<HTMLDivElement>) => void;
   allowDrop: (event: DragEvent) => void;
 };
 
-export function TableArea({ state, disabled, onDrawStock, onDrawDiscard, onDiscardSelected, onPlayMeld, onDropDiscard, allowDrop }: Props) {
+export function TableArea({ state, disabled, onDrawStock, onDrawDiscard, onDiscardSelected, onDropToDiscardPile, onPlayMeld, onDropDiscard, allowDrop }: Props) {
   const visibleDiscard = [...state.discard].reverse();
   const canDrawStock = !disabled && state.turn === 0 && !state.drawn && !state.handOver;
   const canDiscardToPile = !disabled && state.turn === 0 && state.drawn && !state.handOver;
@@ -45,6 +46,8 @@ export function TableArea({ state, disabled, onDrawStock, onDrawDiscard, onDisca
           aria-label={canDiscardToPile ? "Discard selected card to pile" : undefined}
           onClick={canDiscardToPile ? onDiscardSelected : undefined}
           onKeyDown={handleDiscardKey}
+          onDragOver={canDiscardToPile ? allowDrop : undefined}
+          onDrop={canDiscardToPile ? onDropToDiscardPile : undefined}
         >
           <div className="section-label">{canDiscardToPile ? "DISCARD SELECTED CARD" : "DISCARD PILE"}</div>
           <div className="discard-row">

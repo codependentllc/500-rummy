@@ -307,6 +307,30 @@ export default function App() {
     });
   }
 
+  function discardCardById(cardId: string) {
+    if (isAnimatingMeld || isDealing) return;
+    if (!state.drawn) {
+      setMessage("Draw first.");
+      return;
+    }
+
+    const card = human.hand.find((handCard) => handCard.id === cardId);
+    if (!card) {
+      setMessage("Select one card to discard.");
+      return;
+    }
+
+    setState((prev) => {
+      const players = [...prev.players];
+      players[0] = { ...players[0], hand: removeCards(players[0].hand, [card.id]) };
+      const next = { ...prev, players, discard: [...prev.discard, card], selected: [], drawn: false };
+
+      return players[0].hand.length
+        ? { ...next, turn: (prev.turn + 1) % prev.players.length, message: `${label(card)} discarded. Computer is playing…` }
+        : scoreHand(next, 0);
+    });
+  }
+
   function dragCard(event: React.DragEvent<HTMLButtonElement>, cardId: string) {
     if (isAnimatingMeld || isDealing) return;
     selectCards([cardId]);
@@ -353,6 +377,16 @@ export default function App() {
     if (data.startsWith("discard:")) drawDiscard(Number(data.split(":")[1]));
   }
 
+  function dropToDiscardPile(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    if (isAnimatingMeld || isDealing) return;
+
+    const data = event.dataTransfer.getData("text/plain");
+    if (data.startsWith("hand:")) {
+      discardCardById(data.split(":")[1]);
+    }
+  }
+
   if (!started) {
     return <SetupScreen count={count} setCount={setCount} configs={configs} setConfigs={setConfigs} tableTheme={tableTheme} setTableTheme={setTableTheme} cardBack={cardBack} setCardBack={setCardBack} onStart={startConfiguredGame} />;
   }
@@ -395,6 +429,7 @@ export default function App() {
             onDrawStock={drawStock}
             onDrawDiscard={drawDiscard}
             onDiscardSelected={discardSelected}
+            onDropToDiscardPile={dropToDiscardPile}
             onPlayMeld={playMeld}
             onDropDiscard={dropDiscard}
             allowDrop={allowDrop}
@@ -436,7 +471,7 @@ export default function App() {
               transition={{ delay: index * 0.04, duration: 0.28 }}
             >
               <div className="ai-label">
-                <AvatarPhoto src={player.avatar} alt={player.name} fallback={player.fallback || "🤖"} size={28} />
+                <AvatarPhoto src={player.avatar} alt={player.name} fallback={player.fallback || "🤖"} size={40} />
                 <span>
                   <b>{player.name}</b>
                   <small>{player.score} pts · {player.hand.length} cards{state.turn === player.id ? " · Turn" : ""}</small>
@@ -459,7 +494,7 @@ export default function App() {
           >
             <div className="human-header">
               <div className="human-name">
-                <AvatarPhoto src={human.avatar} alt={human.name} fallback={human.fallback || "🧑"} size={30} />
+                <AvatarPhoto src={human.avatar} alt={human.name} fallback={human.fallback || "🧑"} size={42} />
                 {human.name} {state.turn === 0 ? `— ${state.drawn ? "Meld/Lay off, then discard" : "Draw a card"}` : ""}
               </div>
               <div className="hand-actions">
