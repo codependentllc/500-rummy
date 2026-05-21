@@ -1,4 +1,4 @@
-import type { DragEvent } from "react";
+import type { DragEvent, KeyboardEvent } from "react";
 import { CardView } from "./CardView";
 import type { GameState } from "../game/types";
 
@@ -7,20 +7,28 @@ type Props = {
   disabled: boolean;
   onDrawStock: () => void;
   onDrawDiscard: (index: number) => void;
+  onDiscardSelected: () => void;
   onPlayMeld: () => void;
   onDropDiscard: (event: DragEvent<HTMLDivElement>) => void;
   allowDrop: (event: DragEvent) => void;
 };
 
-export function TableArea({ state, disabled, onDrawStock, onDrawDiscard, onPlayMeld, onDropDiscard, allowDrop }: Props) {
+export function TableArea({ state, disabled, onDrawStock, onDrawDiscard, onDiscardSelected, onPlayMeld, onDropDiscard, allowDrop }: Props) {
   const visibleDiscard = [...state.discard].reverse();
   const canDrawStock = !disabled && state.turn === 0 && !state.drawn && !state.handOver;
+  const canDiscardToPile = !disabled && state.turn === 0 && state.drawn && !state.handOver;
+
+  function handleDiscardKey(event: KeyboardEvent<HTMLDivElement>) {
+    if (!canDiscardToPile || (event.key !== "Enter" && event.key !== " ")) return;
+    event.preventDefault();
+    onDiscardSelected();
+  }
 
   return (
     <>
       <div className="table-area">
-        <div>
-          <div className="section-label">STOCK ({state.stock.length})</div>
+        <div className={canDrawStock ? "stock-area action-ready" : "stock-area"}>
+          <div className="section-label">{canDrawStock ? "DRAW FROM STOCK" : `STOCK (${state.stock.length})`}</div>
           <div onClick={canDrawStock ? onDrawStock : undefined} style={{ cursor: canDrawStock ? "pointer" : "default" }}>
             {state.stock.length ? (
               <CardView card={{ id: "back", rank: "A", suit: "♠" }} faceDown />
@@ -30,8 +38,15 @@ export function TableArea({ state, disabled, onDrawStock, onDrawDiscard, onPlayM
           </div>
         </div>
 
-        <div className="discard-area">
-          <div className="section-label">DISCARD PILE (top → bottom)</div>
+        <div
+          className={canDiscardToPile ? "discard-area discard-ready" : "discard-area"}
+          role={canDiscardToPile ? "button" : undefined}
+          tabIndex={canDiscardToPile ? 0 : undefined}
+          aria-label={canDiscardToPile ? "Discard selected card to pile" : undefined}
+          onClick={canDiscardToPile ? onDiscardSelected : undefined}
+          onKeyDown={handleDiscardKey}
+        >
+          <div className="section-label">{canDiscardToPile ? "DISCARD SELECTED CARD" : "DISCARD PILE"}</div>
           <div className="discard-row">
             {visibleDiscard.map((card, visibleIndex) => {
               const realIndex = state.discard.length - 1 - visibleIndex;

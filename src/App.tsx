@@ -379,6 +379,7 @@ export default function App() {
           state={state}
           onDrawStock={drawStock}
           onDrawDiscard={drawDiscard}
+          onDiscardSelected={discardSelected}
           onPlayMeld={playMeld}
           onDropDiscard={dropDiscard}
           allowDrop={allowDrop}
@@ -439,8 +440,8 @@ export default function App() {
             </div>
             <div className="hand-actions">
               <span>{human.hand.length} cards · {selectedCards.length} selected · {points(selectedCards)} pts</span>
-              <ActionButton disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandByMelds} style={{ background: "#2d6a4f", color: "#fff", padding: "6px 10px", fontSize: 12 }}>Group Melds</ActionButton>
-              <ActionButton disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandBySuit} style={{ background: "#fff", color: "#1a472a", padding: "6px 10px", fontSize: 12 }}>Sort Suit</ActionButton>
+              <ActionButton className="secondary-action" disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandByMelds} style={{ padding: "6px 10px", fontSize: 12 }}>Group Melds</ActionButton>
+              <ActionButton className="secondary-action light-action" disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandBySuit} style={{ padding: "6px 10px", fontSize: 12 }}>Sort Suit</ActionButton>
             </div>
           </div>
 
@@ -460,8 +461,8 @@ export default function App() {
 
           {state.turn === 0 && state.drawn ? (
             <div className="turn-actions">
-              <ActionButton disabled={isAnimatingMeld || isDealing} onClick={playMeld} style={{ background: "#2d6a4f", color: "#fff" }}>♣ Meld Selected ({selectedCards.length})</ActionButton>
-              <ActionButton disabled={isAnimatingMeld || isDealing} onClick={discardSelected} style={{ background: "#8B0000", color: "#fff" }}>✕ Discard Selected</ActionButton>
+              <ActionButton className="primary-action" disabled={isAnimatingMeld || isDealing} onClick={playMeld}>Play Meld ({selectedCards.length})</ActionButton>
+              <ActionButton className="danger-action" disabled={isAnimatingMeld || isDealing} onClick={discardSelected}>Discard</ActionButton>
             </div>
           ) : null}
         </motion.div>
