@@ -7,10 +7,13 @@ type Props = HTMLMotionProps<"button"> & {
 };
 
 export function ActionButton({ children, style, ...props }: Props) {
+  const className = props.className ? `action-button ${props.className}` : "action-button";
+
   return (
     <motion.button
       type="button"
       {...props}
+      className={className}
       whileHover={props.disabled ? undefined : { y: -1, scale: 1.025 }}
       whileTap={props.disabled ? undefined : { scale: 0.97 }}
       transition={{ type: "spring", stiffness: 520, damping: 32 }}

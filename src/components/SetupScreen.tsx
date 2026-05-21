@@ -332,14 +332,9 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
             <motion.div className="player-config-list" initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.42 } } }}>
             {Array.from({ length: count }, (_, index) => configs[index]).map((player, index) => (
               <motion.div key={index} className="player-config" variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0 } }} whileHover={{ y: -2, borderColor: "rgba(255, 224, 130, 0.42)" }} transition={{ duration: 0.25 }}>
-                <div className="player-config-main">
-                  <AvatarPhoto src={player.avatar} alt={player.name || `Player ${index + 1}`} fallback={player.fallback || (index === 0 ? "🧑" : "🤖")} size={54} />
-                  <input
-                    value={player.name || ""}
-                    onChange={(event) => updatePlayer(index, { name: event.target.value })}
-                    placeholder={index === 0 ? "Your name" : `Computer ${index} name`}
-                  />
-                  <span>{index === 0 ? "You" : "CPU"}</span>
+                <div className="player-config-heading">
+                  <span>{index === 0 ? "You" : `CPU ${index}`}</span>
+                  <b>{player.name || `Player ${index + 1}`}</b>
                 </div>
 
                 <div className="avatar-carousel" aria-label={`${player.name || `Player ${index + 1}`} avatar carousel`}>
@@ -351,8 +346,8 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
                     <motion.button
                       key={avatar.id}
                       type="button"
-                      title={avatar.name}
-                      aria-label={`Choose ${avatar.name}`}
+                      title={`${avatar.name} - ${avatar.role}`}
+                      aria-label={`Choose ${avatar.name}, ${avatar.role}`}
                       onClick={() => selectAvatar(index, AVATARS.findIndex((item) => item.id === avatar.id))}
                       className={player.avatar === avatar.src ? "avatar-choice selected" : "avatar-choice"}
                       data-offset={offset}
@@ -361,13 +356,24 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
                       transition={{ type: "spring", stiffness: 480, damping: 28 }}
                     >
                       <AvatarPhoto src={avatar.src} alt={avatar.name} fallback={avatar.fallback} size={46} />
-                      <small>{avatar.name}</small>
+                      <small>
+                        <b>{avatar.name}</b>
+                        <em>{avatar.role}</em>
+                      </small>
                     </motion.button>
                   ))}
                   </div>
                   <button type="button" className="avatar-carousel-nav" aria-label="Next avatar" onClick={() => moveAvatar(index, 1)}>
                     ›
                   </button>
+                </div>
+
+                <div className="player-config-main">
+                  <input
+                    value={player.name || ""}
+                    onChange={(event) => updatePlayer(index, { name: event.target.value })}
+                    placeholder={index === 0 ? "Your name" : `Computer ${index} name`}
+                  />
                 </div>
               </motion.div>
             ))}

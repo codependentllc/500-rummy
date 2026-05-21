@@ -41,6 +41,7 @@ export default function App() {
   const [tableTheme, setTableTheme] = useState<TableTheme>("classic");
   const [cardBack, setCardBack] = useState<CardBackStyle>("red");
   const [started, setStarted] = useState(false);
+  const [meldTrayExpanded, setMeldTrayExpanded] = useState(false);
   const [state, setState] = useState<GameState>(() => newGame(2, null, defaultConfigs));
   const [flyingCards, setFlyingCards] = useState<Card[]>([]);
   const [flyingMeldType, setFlyingMeldType] = useState<"set" | "run" | "layoff" | undefined>();
@@ -54,6 +55,8 @@ export default function App() {
   const current = state.players[state.turn];
   const selectedCards = human.hand.filter((card) => state.selected.includes(card.id));
   const tableMelds = state.players.flatMap((player) => player.melds);
+  const tableMeldEntries = state.players.flatMap((player) => player.melds.map((meld) => ({ player, meld })));
+  const layoffTargetCount = tableMeldEntries.filter(({ meld }) => selectedCards.length === 1 && state.turn === 0 && state.drawn && canLay(selectedCards[0], meld)).length;
   const handHints = useMemo(() => cardHints(human.hand), [human.hand]);
 
   useEffect(() => {
@@ -271,6 +274,22 @@ export default function App() {
     window.setTimeout(() => finishLayoff(card, meldId), 560);
   }
 
+  function layoffSelected() {
+    if (isAnimatingMeld || isDealing) return;
+    if (!state.drawn || selectedCards.length !== 1) {
+      setMessage("Select one card to lay off.");
+      return;
+    }
+
+    const target = tableMelds.find((meld) => canLay(selectedCards[0], meld));
+    if (!target) {
+      setMessage("No lay off is available for that card.");
+      return;
+    }
+
+    layoff(target.id);
+  }
+
   function discardSelected() {
     if (isAnimatingMeld || isDealing) return;
     if (!state.drawn || selectedCards.length !== 1) {
@@ -279,6 +298,30 @@ export default function App() {
     }
 
     const card = selectedCards[0];
+
+    setState((prev) => {
+      const players = [...prev.players];
+      players[0] = { ...players[0], hand: removeCards(players[0].hand, [card.id]) };
+      const next = { ...prev, players, discard: [...prev.discard, card], selected: [], drawn: false };
+
+      return players[0].hand.length
+        ? { ...next, turn: (prev.turn + 1) % prev.players.length, message: `${label(card)} discarded. Computer is playing…` }
+        : scoreHand(next, 0);
+    });
+  }
+
+  function discardCardById(cardId: string) {
+    if (isAnimatingMeld || isDealing) return;
+    if (!state.drawn) {
+      setMessage("Draw first.");
+      return;
+    }
+
+    const card = human.hand.find((handCard) => handCard.id === cardId);
+    if (!card) {
+      setMessage("Select one card to discard.");
+      return;
+    }
 
     setState((prev) => {
       const players = [...prev.players];
@@ -337,6 +380,16 @@ export default function App() {
     if (data.startsWith("discard:")) drawDiscard(Number(data.split(":")[1]));
   }
 
+  function dropToDiscardPile(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    if (isAnimatingMeld || isDealing) return;
+
+    const data = event.dataTransfer.getData("text/plain");
+    if (data.startsWith("hand:")) {
+      discardCardById(data.split(":")[1]);
+    }
+  }
+
   if (!started) {
     return <SetupScreen count={count} setCount={setCount} configs={configs} setConfigs={setConfigs} tableTheme={tableTheme} setTableTheme={setTableTheme} cardBack={cardBack} setCardBack={setCardBack} onStart={startConfiguredGame} />;
   }
@@ -345,19 +398,15 @@ export default function App() {
     <div className={`app-shell table-theme-${tableTheme} card-back-${cardBack}`}>
       <motion.div className="top-bar" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
         <div className="title"><span>500</span> Rummy</div>
-        <div className="top-actions">
-          {[2, 3, 4].map((number) => (
-            <ActionButton key={number} disabled={isAnimatingMeld || isDealing} onClick={() => changePlayerCount(number)} style={{ background: count === number ? "#ffe082" : "rgba(255,255,255,0.92)", color: "#1a472a", padding: "6px 10px" }}>
-              {number}P
-            </ActionButton>
-          ))}
-          <ActionButton disabled={isAnimatingMeld || isDealing} onClick={() => resetGame(null)} style={{ background: "#ffe082", color: "#1a472a", padding: "6px 10px" }}>New</ActionButton>
-          <ActionButton disabled={isAnimatingMeld || isDealing} onClick={returnToSetup} style={{ background: "#fff", color: "#1a472a", padding: "6px 10px" }}>Names</ActionButton>
+        <div className="header-right">
+          <div className="header-score-panel">
+            <ScorePanel players={state.players} turn={state.turn} handOver={state.handOver} />
+          </div>
+          <div className="top-actions">
+            <ActionButton disabled={isAnimatingMeld || isDealing} onClick={() => resetGame(null)} style={{ background: "#ffe082", color: "#1a472a", padding: "6px 10px" }}>New</ActionButton>
+          </div>
         </div>
       </motion.div>
-
-      <ScorePanel players={state.players} turn={state.turn} handOver={state.handOver} />
-      <ScoreHistoryTimeline history={state.scoreHistory} />
 
       <motion.div
         key={state.message}
@@ -375,96 +424,151 @@ export default function App() {
         animate={{ opacity: isDealing ? 0 : 1, y: 0 }}
         transition={{ duration: 0.36 }}
       >
-        <TableArea
-          state={state}
-          onDrawStock={drawStock}
-          onDrawDiscard={drawDiscard}
-          onPlayMeld={playMeld}
-          onDropDiscard={dropDiscard}
-          allowDrop={allowDrop}
-          disabled={isAnimatingMeld || isDealing}
-        />
+        <section className="table-zone" aria-label="Card table">
+          <TableArea
+            state={state}
+            onDrawStock={drawStock}
+            onDrawDiscard={drawDiscard}
+            onDiscardSelected={discardSelected}
+            onDropToDiscardPile={dropToDiscardPile}
+            onPlayMeld={playMeld}
+            onDropDiscard={dropDiscard}
+            allowDrop={allowDrop}
+            disabled={isAnimatingMeld || isDealing}
+          />
+        </section>
 
         <FlyingCards cards={flyingCards} type={flyingMeldType} />
 
         {tableMelds.length ? (
-          <div className="meld-section">
-            <div className="section-label">TABLE MELDS</div>
-            <div className="meld-grid">
-              {state.players.flatMap((player) => player.melds.map((meld) => ({ player, meld }))).map(({ player, meld }) => (
-                <MeldDisplay
-                  key={meld.id}
-                  meld={meld}
-                  playerName={player.name}
-                  canLayoffCard={selectedCards.length === 1 && state.turn === 0 && state.drawn && canLay(selectedCards[0], meld)}
-                  onLayoff={layoff}
-                  allowDrop={allowDrop}
-                  disabled={isAnimatingMeld || isDealing}
-                />
-              ))}
+          <div className={meldTrayExpanded ? "table-meld-layer expanded" : "table-meld-layer"}>
+            <button type="button" className="table-meld-toggle" onClick={() => setMeldTrayExpanded((expanded) => !expanded)} aria-expanded={meldTrayExpanded}>
+              <span>Table Melds</span>
+              <small>{tableMelds.length} groups{layoffTargetCount ? ` · ${layoffTargetCount} layoff` : ""}</small>
+            </button>
+            <div className="meld-section">
+              <div className="section-label">TABLE MELDS</div>
+              <div className="meld-grid">
+                {tableMeldEntries.map(({ player, meld }) => (
+                  <MeldDisplay
+                    key={meld.id}
+                    meld={meld}
+                    playerName={player.name}
+                    canLayoffCard={selectedCards.length === 1 && state.turn === 0 && state.drawn && canLay(selectedCards[0], meld)}
+                    onLayoff={layoff}
+                    allowDrop={allowDrop}
+                    disabled={isAnimatingMeld || isDealing}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         ) : null}
 
-        {state.players.slice(1).map((player, index) => (
+        <div className={`opponent-seats seats-${state.players.length - 1}`} aria-label="Opponent seats">
+          {state.players.slice(1).map((player, index) => (
+            <motion.div
+              key={player.id}
+              className={state.turn === player.id ? "ai-row seat-active" : "ai-row"}
+              initial={{ opacity: 0, x: 18 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ delay: index * 0.04, duration: 0.28 }}
+            >
+              <div className="ai-label">
+                <AvatarPhoto src={player.avatar} alt={player.name} fallback={player.fallback || "🤖"} size={40} />
+                <span>
+                  <b>{player.name}</b>
+                  <small>{player.score} pts · {player.hand.length} cards{state.turn === player.id ? " · Turn" : ""}</small>
+                </span>
+              </div>
+              <div className="ai-cards">
+                {player.hand.map((card) => <CardView key={card.id} card={card} faceDown small />)}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <aside className="desktop-drawers" aria-label="Game drawers">
+          <details>
+            <summary>Score</summary>
+            <ScoreHistoryTimeline history={state.scoreHistory} />
+          </details>
+          <details>
+            <summary>Rules</summary>
+            <div className="drawer-copy">
+              <b>Turn order</b>
+              <span>Draw, play melds or lay off, then discard.</span>
+            </div>
+          </details>
+          <details>
+            <summary>Settings</summary>
+            <div className="drawer-copy">
+              <b>{tableTheme} table</b>
+              <span>{cardBack} card backs · {state.players.length} players</span>
+            </div>
+          </details>
+        </aside>
+
+        <section className="player-zone" aria-label="Your hand">
           <motion.div
-            key={player.id}
-            className="ai-row"
-            initial={{ opacity: 0, x: 18 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ delay: index * 0.04, duration: 0.28 }}
+            className={state.turn === 0 && !state.handOver ? "human-area active" : "human-area"}
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.32 }}
           >
-            <div className="ai-label">
-              <AvatarPhoto src={player.avatar} alt={player.name} fallback={player.fallback || "🤖"} size={28} />
-              {player.name} — {player.hand.length} cards{state.turn === player.id ? " ← TURN" : ""}
+            <div className="human-header">
+              <div className="human-name">
+                <AvatarPhoto src={human.avatar} alt={human.name} fallback={human.fallback || "🧑"} size={42} />
+                {human.name} {state.turn === 0 ? `— ${state.drawn ? "Meld/Lay off, then discard" : "Draw a card"}` : ""}
+              </div>
+              <div className="hand-actions">
+                <span data-mobile-label={`${human.score} · ${human.hand.length} cards · ${selectedCards.length} selected`}>{human.score} score · {human.hand.length} cards · {selectedCards.length} selected · {points(selectedCards)} pts</span>
+                <ActionButton className="secondary-action" disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandByMelds} style={{ padding: "6px 10px", fontSize: 12 }}>Group Melds</ActionButton>
+                <ActionButton className="secondary-action light-action" disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandBySuit} style={{ padding: "6px 10px", fontSize: 12 }}>Sort Suit</ActionButton>
+              </div>
             </div>
-            <div className="ai-cards">
-              {player.hand.map((card) => <CardView key={card.id} card={card} faceDown small />)}
+
+            <div className="hand-scroll-wrap" onDragOver={allowDrop} onDrop={dropDiscard}>
+              <HandCardRow
+                cards={human.hand}
+                hints={handHints}
+                selectedIds={state.selected}
+                disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing}
+                onSelect={selectCards}
+                onCardClick={toggleCard}
+                onCardDrag={dragCard}
+                onCardDrop={dropOnHandCard}
+                allowDrop={allowDrop}
+              />
             </div>
+
+            <div className="mobile-turn-actions" aria-label="Turn actions">
+              {state.turn === 0 && !state.drawn && !state.handOver ? (
+                <>
+                  <ActionButton className="secondary-action" disabled={isAnimatingMeld || isDealing} onClick={drawStock}>Draw Stock</ActionButton>
+                  {state.discard.length ? <ActionButton className="primary-action" disabled={isAnimatingMeld || isDealing} onClick={() => drawDiscard(state.discard.length - 1)}>Pick Discard</ActionButton> : null}
+                </>
+              ) : null}
+              {state.turn === 0 && state.drawn && !state.handOver ? (
+                <>
+                  <ActionButton className="primary-action" disabled={isAnimatingMeld || isDealing} onClick={playMeld}>Meld</ActionButton>
+                  <ActionButton className="secondary-action" disabled={isAnimatingMeld || isDealing} onClick={layoffSelected}>Lay Off</ActionButton>
+                  <ActionButton className="danger-action" disabled={isAnimatingMeld || isDealing} onClick={discardSelected}>Discard</ActionButton>
+                </>
+              ) : null}
+              {state.turn !== 0 && !state.handOver ? <span className="waiting-turn-pill">Waiting for {current.name}</span> : null}
+            </div>
+
+            {state.turn === 0 && state.drawn ? (
+              <div className="turn-actions">
+                <ActionButton className="primary-action" disabled={isAnimatingMeld || isDealing} onClick={playMeld}>Play Meld ({selectedCards.length})</ActionButton>
+                <ActionButton className="danger-action" disabled={isAnimatingMeld || isDealing} onClick={discardSelected}>Discard</ActionButton>
+              </div>
+            ) : null}
           </motion.div>
-        ))}
-
-        <motion.div
-          className={state.turn === 0 && !state.handOver ? "human-area active" : "human-area"}
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.32 }}
-        >
-          <div className="human-header">
-            <div className="human-name">
-              <AvatarPhoto src={human.avatar} alt={human.name} fallback={human.fallback || "🧑"} size={30} />
-              {human.name} {state.turn === 0 ? `— ${state.drawn ? "Meld/Lay off, then discard" : "Draw a card"}` : ""}
-            </div>
-            <div className="hand-actions">
-              <span>{human.hand.length} cards · {selectedCards.length} selected · {points(selectedCards)} pts</span>
-              <ActionButton disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandByMelds} style={{ background: "#2d6a4f", color: "#fff", padding: "6px 10px", fontSize: 12 }}>Group Melds</ActionButton>
-              <ActionButton disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandBySuit} style={{ background: "#fff", color: "#1a472a", padding: "6px 10px", fontSize: 12 }}>Sort Suit</ActionButton>
-            </div>
-          </div>
-
-          <div onDragOver={allowDrop} onDrop={dropDiscard}>
-            <HandCardRow
-              cards={human.hand}
-              hints={handHints}
-              selectedIds={state.selected}
-              disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing}
-              onSelect={selectCards}
-              onCardClick={toggleCard}
-              onCardDrag={dragCard}
-              onCardDrop={dropOnHandCard}
-              allowDrop={allowDrop}
-            />
-          </div>
-
-          {state.turn === 0 && state.drawn ? (
-            <div className="turn-actions">
-              <ActionButton disabled={isAnimatingMeld || isDealing} onClick={playMeld} style={{ background: "#2d6a4f", color: "#fff" }}>♣ Meld Selected ({selectedCards.length})</ActionButton>
-              <ActionButton disabled={isAnimatingMeld || isDealing} onClick={discardSelected} style={{ background: "#8B0000", color: "#fff" }}>✕ Discard Selected</ActionButton>
-            </div>
-          ) : null}
-        </motion.div>
+        </section>
       </motion.div>
 
       {isDealing ? <DealSequence key={dealKey} playerCount={state.players.length} onComplete={() => setIsDealing(false)} /> : null}
