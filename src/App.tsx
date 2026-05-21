@@ -361,6 +361,9 @@ export default function App() {
     <div className={`app-shell table-theme-${tableTheme} card-back-${cardBack}`}>
       <motion.div className="top-bar" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
         <div className="title"><span>500</span> Rummy</div>
+        <div className="header-score-panel">
+          <ScorePanel players={state.players} turn={state.turn} handOver={state.handOver} />
+        </div>
         <div className="top-actions">
           {[2, 3, 4].map((number) => (
             <ActionButton key={number} disabled={isAnimatingMeld || isDealing} onClick={() => changePlayerCount(number)} style={{ background: count === number ? "#ffe082" : "rgba(255,255,255,0.92)", color: "#1a472a", padding: "6px 10px" }}>
@@ -372,7 +375,6 @@ export default function App() {
         </div>
       </motion.div>
 
-      <ScorePanel players={state.players} turn={state.turn} handOver={state.handOver} />
       <ScoreHistoryTimeline history={state.scoreHistory} />
 
       <motion.div
@@ -405,7 +407,8 @@ export default function App() {
         <FlyingCards cards={flyingCards} type={flyingMeldType} />
 
         {tableMelds.length ? (
-          <div className="meld-section">
+          <div className="table-meld-layer">
+            <div className="meld-section">
             <div className="section-label">TABLE MELDS</div>
             <div className="meld-grid">
               {state.players.flatMap((player) => player.melds.map((meld) => ({ player, meld }))).map(({ player, meld }) => (
@@ -420,6 +423,7 @@ export default function App() {
                 />
               ))}
             </div>
+          </div>
           </div>
         ) : null}
 
