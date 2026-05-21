@@ -41,6 +41,7 @@ export default function App() {
   const [tableTheme, setTableTheme] = useState<TableTheme>("classic");
   const [cardBack, setCardBack] = useState<CardBackStyle>("red");
   const [started, setStarted] = useState(false);
+  const [meldTrayExpanded, setMeldTrayExpanded] = useState(false);
   const [state, setState] = useState<GameState>(() => newGame(2, null, defaultConfigs));
   const [flyingCards, setFlyingCards] = useState<Card[]>([]);
   const [flyingMeldType, setFlyingMeldType] = useState<"set" | "run" | "layoff" | undefined>();
@@ -54,6 +55,8 @@ export default function App() {
   const current = state.players[state.turn];
   const selectedCards = human.hand.filter((card) => state.selected.includes(card.id));
   const tableMelds = state.players.flatMap((player) => player.melds);
+  const tableMeldEntries = state.players.flatMap((player) => player.melds.map((meld) => ({ player, meld })));
+  const layoffTargetCount = tableMeldEntries.filter(({ meld }) => selectedCards.length === 1 && state.turn === 0 && state.drawn && canLay(selectedCards[0], meld)).length;
   const handHints = useMemo(() => cardHints(human.hand), [human.hand]);
 
   useEffect(() => {
@@ -440,11 +443,15 @@ export default function App() {
         <FlyingCards cards={flyingCards} type={flyingMeldType} />
 
         {tableMelds.length ? (
-          <div className="table-meld-layer">
+          <div className={meldTrayExpanded ? "table-meld-layer expanded" : "table-meld-layer"}>
+            <button type="button" className="table-meld-toggle" onClick={() => setMeldTrayExpanded((expanded) => !expanded)} aria-expanded={meldTrayExpanded}>
+              <span>Table Melds</span>
+              <small>{tableMelds.length} groups{layoffTargetCount ? ` · ${layoffTargetCount} layoff` : ""}</small>
+            </button>
             <div className="meld-section">
               <div className="section-label">TABLE MELDS</div>
               <div className="meld-grid">
-                {state.players.flatMap((player) => player.melds.map((meld) => ({ player, meld }))).map(({ player, meld }) => (
+                {tableMeldEntries.map(({ player, meld }) => (
                   <MeldDisplay
                     key={meld.id}
                     meld={meld}
