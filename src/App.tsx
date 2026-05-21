@@ -408,8 +408,6 @@ export default function App() {
         </div>
       </motion.div>
 
-      <ScoreHistoryTimeline history={state.scoreHistory} />
-
       <motion.div
         key={state.message}
         className={state.message.match(/must|Cannot|valid/i) ? "message error" : "message"}
@@ -491,6 +489,27 @@ export default function App() {
           ))}
         </div>
 
+        <aside className="desktop-drawers" aria-label="Game drawers">
+          <details>
+            <summary>Score</summary>
+            <ScoreHistoryTimeline history={state.scoreHistory} />
+          </details>
+          <details>
+            <summary>Rules</summary>
+            <div className="drawer-copy">
+              <b>Turn order</b>
+              <span>Draw, play melds or lay off, then discard.</span>
+            </div>
+          </details>
+          <details>
+            <summary>Settings</summary>
+            <div className="drawer-copy">
+              <b>{tableTheme} table</b>
+              <span>{cardBack} card backs · {state.players.length} players</span>
+            </div>
+          </details>
+        </aside>
+
         <section className="player-zone" aria-label="Your hand">
           <motion.div
             className={state.turn === 0 && !state.handOver ? "human-area active" : "human-area"}
@@ -505,13 +524,13 @@ export default function App() {
                 {human.name} {state.turn === 0 ? `— ${state.drawn ? "Meld/Lay off, then discard" : "Draw a card"}` : ""}
               </div>
               <div className="hand-actions">
-                <span>{human.score} score · {human.hand.length} cards · {selectedCards.length} selected · {points(selectedCards)} pts</span>
+                <span data-mobile-label={`${human.score} · ${human.hand.length} cards · ${selectedCards.length} selected`}>{human.score} score · {human.hand.length} cards · {selectedCards.length} selected · {points(selectedCards)} pts</span>
                 <ActionButton className="secondary-action" disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandByMelds} style={{ padding: "6px 10px", fontSize: 12 }}>Group Melds</ActionButton>
                 <ActionButton className="secondary-action light-action" disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandBySuit} style={{ padding: "6px 10px", fontSize: 12 }}>Sort Suit</ActionButton>
               </div>
             </div>
 
-            <div onDragOver={allowDrop} onDrop={dropDiscard}>
+            <div className="hand-scroll-wrap" onDragOver={allowDrop} onDrop={dropDiscard}>
               <HandCardRow
                 cards={human.hand}
                 hints={handHints}
@@ -526,10 +545,20 @@ export default function App() {
             </div>
 
             <div className="mobile-turn-actions" aria-label="Turn actions">
-              <ActionButton className="secondary-action" disabled={state.turn !== 0 || state.drawn || state.handOver || isAnimatingMeld || isDealing} onClick={drawStock}>Draw</ActionButton>
-              <ActionButton className="primary-action" disabled={state.turn !== 0 || !state.drawn || state.handOver || isAnimatingMeld || isDealing} onClick={playMeld}>Meld</ActionButton>
-              <ActionButton className="secondary-action" disabled={state.turn !== 0 || !state.drawn || state.handOver || isAnimatingMeld || isDealing} onClick={layoffSelected}>Lay Off</ActionButton>
-              <ActionButton className="danger-action" disabled={state.turn !== 0 || !state.drawn || state.handOver || isAnimatingMeld || isDealing} onClick={discardSelected}>Discard</ActionButton>
+              {state.turn === 0 && !state.drawn && !state.handOver ? (
+                <>
+                  <ActionButton className="secondary-action" disabled={isAnimatingMeld || isDealing} onClick={drawStock}>Draw Stock</ActionButton>
+                  {state.discard.length ? <ActionButton className="primary-action" disabled={isAnimatingMeld || isDealing} onClick={() => drawDiscard(state.discard.length - 1)}>Pick Discard</ActionButton> : null}
+                </>
+              ) : null}
+              {state.turn === 0 && state.drawn && !state.handOver ? (
+                <>
+                  <ActionButton className="primary-action" disabled={isAnimatingMeld || isDealing} onClick={playMeld}>Meld</ActionButton>
+                  <ActionButton className="secondary-action" disabled={isAnimatingMeld || isDealing} onClick={layoffSelected}>Lay Off</ActionButton>
+                  <ActionButton className="danger-action" disabled={isAnimatingMeld || isDealing} onClick={discardSelected}>Discard</ActionButton>
+                </>
+              ) : null}
+              {state.turn !== 0 && !state.handOver ? <span className="waiting-turn-pill">Waiting for {current.name}</span> : null}
             </div>
 
             {state.turn === 0 && state.drawn ? (

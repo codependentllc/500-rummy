@@ -346,8 +346,8 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
                     <motion.button
                       key={avatar.id}
                       type="button"
-                      title={avatar.name}
-                      aria-label={`Choose ${avatar.name}`}
+                      title={`${avatar.name} - ${avatar.role}`}
+                      aria-label={`Choose ${avatar.name}, ${avatar.role}`}
                       onClick={() => selectAvatar(index, AVATARS.findIndex((item) => item.id === avatar.id))}
                       className={player.avatar === avatar.src ? "avatar-choice selected" : "avatar-choice"}
                       data-offset={offset}
@@ -356,7 +356,10 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
                       transition={{ type: "spring", stiffness: 480, damping: 28 }}
                     >
                       <AvatarPhoto src={avatar.src} alt={avatar.name} fallback={avatar.fallback} size={46} />
-                      <small>{avatar.name}</small>
+                      <small>
+                        <b>{avatar.name}</b>
+                        <em>{avatar.role}</em>
+                      </small>
                     </motion.button>
                   ))}
                   </div>

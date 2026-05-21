@@ -53,6 +53,16 @@ function CardStrip({ cards, emptyLabel }: { cards: Card[]; emptyLabel: string })
   );
 }
 
+function ScoreProgress({ total }: { total: number }) {
+  const progress = Math.min(Math.max(total / 500, 0), 1);
+
+  return (
+    <div className="score-progress" aria-label={`${total} points toward 500`}>
+      <span style={{ width: `${progress * 100}%` }} />
+    </div>
+  );
+}
+
 export function EndHandModal({ state, onNextHand, onNewGame, onExit }: Props) {
   if (!state.handOver) return null;
 
@@ -96,6 +106,7 @@ export function EndHandModal({ state, onNextHand, onNewGame, onExit }: Props) {
                       <div>
                         <b>{row.name}</b>
                         <span>Total: <AnimatedScore value={row.total} /></span>
+                        <ScoreProgress total={row.total} />
                       </div>
                     </div>
                     <div className={row.net >= 0 ? "score-net positive" : "score-net negative"}>
@@ -144,7 +155,8 @@ export function EndHandModal({ state, onNextHand, onNewGame, onExit }: Props) {
           ) : (
             <ActionButton onClick={onNextHand} style={{ flex: 1, background: "#1a472a", color: "#fff" }}>Next Hand</ActionButton>
           )}
-          <ActionButton onClick={onExit} style={{ flex: 1, background: "#eee", color: "#1a472a" }}>Names / Exit</ActionButton>
+          {!state.winner ? <ActionButton onClick={onNewGame} style={{ flex: 1, background: "#ffe082", color: "#1a472a" }}>New Game</ActionButton> : null}
+          <ActionButton onClick={onExit} style={{ flex: 1, background: "#eee", color: "#1a472a" }}>Change Players</ActionButton>
         </div>
       </div>
     </div>
