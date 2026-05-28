@@ -1,7 +1,6 @@
 * {
   box-sizing: border-box;
 }
-
 body {
   margin: 0;
   background: #06110b;
@@ -1715,6 +1714,15 @@ body {
 }
 
 .mobile-turn-actions {
+  display: none;
+}
+
+.mobile-organize-actions {
+  display: none;
+}
+
+.mobile-header-players,
+.mobile-hand-stats {
   display: none;
 }
 
@@ -8395,9 +8403,13 @@ body {
 
   .game-surface {
     display: grid;
-    grid-template-rows: 48px 100px 50px minmax(0, 1fr);
+    grid-template-rows: 48px 96px 0 minmax(0, 1fr);
     gap: 5px;
     padding: 6px 8px 0;
+  }
+
+  .game-surface.has-table-melds {
+    grid-template-rows: 48px 88px 142px minmax(0, 1fr);
   }
 
   .opponent-seats,
@@ -8444,7 +8456,7 @@ body {
   .table-zone {
     grid-row: 2;
     order: 1;
-    height: 100px;
+    height: 88px;
     overflow: hidden;
   }
 
@@ -8498,37 +8510,118 @@ body {
     grid-row: 3;
     order: 2;
     flex: none;
-    height: 50px;
-    overflow: hidden;
+    height: 142px;
+    overflow: visible;
   }
 
   .table-meld-layer.expanded {
-    height: 124px;
+    height: 142px;
   }
 
   .table-meld-toggle {
-    min-height: 26px;
-    margin-bottom: 3px;
-    padding: 5px 9px;
-  }
-
-  .table-meld-layer .meld-section {
     min-height: 30px;
-    max-height: 30px;
-    padding: 4px 5px;
+    margin-bottom: 5px;
+    padding: 6px 10px;
+    cursor: default;
+    border-radius: 14px;
   }
 
+  .table-meld-layer .meld-section,
   .table-meld-layer.expanded .meld-section {
-    min-height: 90px;
-    max-height: 90px;
+    min-height: 106px;
+    max-height: 106px;
+    padding: 7px;
+    overflow: visible;
+    border-color: rgba(255, 224, 130, 0.28);
+    background:
+      radial-gradient(circle at 10% 0%, rgba(255, 224, 130, 0.12), transparent 42%),
+      linear-gradient(145deg, rgba(255, 232, 163, 0.1), rgba(255, 255, 255, 0.035)),
+      rgba(3, 12, 7, 0.58);
   }
 
-  .meld-grid {
-    height: 24px;
-  }
-
+  .meld-grid,
   .table-meld-layer.expanded .meld-grid {
-    height: 78px;
+    height: 92px;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 1px 2px 8px;
+    scroll-snap-type: x proximity;
+  }
+
+  .meld-display,
+  .table-meld-layer.expanded .meld-display {
+    box-sizing: border-box;
+    width: max-content;
+    min-width: 150px;
+    max-width: none;
+    height: 86px;
+    display: block;
+    padding: 7px 8px;
+    border-radius: 14px;
+    scroll-snap-align: start;
+  }
+
+  .meld-title,
+  .table-meld-layer.expanded .meld-title {
+    display: block;
+    margin-bottom: 5px;
+    color: rgba(255, 241, 184, 0.84);
+    font-size: 9px;
+    line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .meld-cards {
+    width: max-content;
+    overflow: visible;
+    gap: 0;
+  }
+
+  .meld-cards .playing-card,
+  .table-meld-layer.expanded .meld-cards .playing-card {
+    width: 38px !important;
+    height: 54px !important;
+    min-width: 38px !important;
+    margin-left: -11px;
+    border-radius: 7px !important;
+  }
+
+  .meld-cards .playing-card .card-corner,
+  .table-meld-layer.expanded .meld-cards .playing-card .card-corner {
+    font-size: 13px !important;
+  }
+
+  .meld-cards .playing-card .card-center-suit,
+  .table-meld-layer.expanded .meld-cards .playing-card .card-center-suit {
+    font-size: 19px !important;
+  }
+
+  .meld-display.layoff-ready {
+    padding-right: 8px;
+    border-color: rgba(255, 224, 130, 0.98);
+    background:
+      radial-gradient(circle at 100% 0%, rgba(255, 224, 130, 0.2), transparent 42%),
+      linear-gradient(145deg, rgba(255, 232, 163, 0.16), rgba(255, 255, 255, 0.05)),
+      rgba(3, 12, 7, 0.72);
+  }
+
+  .layoff-label,
+  .table-meld-layer.expanded .layoff-label {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    bottom: auto;
+    left: auto;
+    min-height: 18px;
+    display: inline-flex;
+    margin: 0;
+    padding: 3px 6px;
+    font-size: 8px;
+    box-shadow: 0 0 16px rgba(255, 224, 130, 0.26), 0 6px 14px rgba(0, 0, 0, 0.22);
   }
 
   .player-zone {
@@ -8577,9 +8670,23 @@ body {
 
   .mobile-turn-actions {
     grid-row: 3;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     padding: 5px;
     gap: 5px;
     border-radius: 14px;
+  }
+
+  .mobile-organize-actions {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .mobile-organize-actions .action-button {
+    min-height: 30px;
+    padding: 5px 6px !important;
+    font-size: 11px !important;
   }
 
   .mobile-turn-actions .action-button {
@@ -8620,6 +8727,14 @@ body {
   }
 
   @media (max-height: 720px) {
+    .game-surface {
+      grid-template-rows: 44px 88px 0 minmax(0, 1fr);
+    }
+
+    .game-surface.has-table-melds {
+      grid-template-rows: 44px 78px 120px minmax(0, 1fr);
+    }
+
     .top-bar .score-card {
       flex-basis: 112px;
     }
@@ -8631,37 +8746,60 @@ body {
     }
 
     .opponent-seats {
-      flex-basis: 58px;
+      height: 44px;
+    }
+
+    .opponent-seats .ai-row {
+      min-height: 42px;
+      padding-top: 5px;
+      padding-bottom: 5px;
     }
 
     .opponent-seats .ai-cards {
       display: none;
     }
 
-    .table-meld-layer {
-      flex-basis: 66px;
-    }
-
+    .table-meld-layer,
     .table-meld-layer.expanded {
-      flex-basis: 116px;
+      height: 120px;
     }
 
-    .table-meld-layer .meld-section {
-      min-height: 34px;
-      max-height: 34px;
-    }
-
+    .table-meld-layer .meld-section,
     .table-meld-layer.expanded .meld-section {
       min-height: 88px;
       max-height: 88px;
     }
 
-    .meld-grid {
-      height: 27px;
-    }
-
+    .meld-grid,
     .table-meld-layer.expanded .meld-grid {
       height: 76px;
+    }
+
+    .meld-display,
+    .table-meld-layer.expanded .meld-display {
+      height: 70px;
+      min-width: 132px;
+      max-width: none;
+      padding: 6px 7px;
+    }
+
+    .meld-cards .playing-card,
+    .table-meld-layer.expanded .meld-cards .playing-card {
+      width: 32px !important;
+      height: 45px !important;
+      min-width: 32px !important;
+      margin-left: -10px;
+    }
+
+    .table-zone {
+      height: 78px;
+    }
+
+    .stock-area .card-back-face,
+    .empty-stock,
+    .discard-row .discard-card-wrap:first-child .playing-card {
+      width: 46px !important;
+      height: 64px !important;
     }
 
     .human-header {
@@ -8669,13 +8807,13 @@ body {
     }
 
     .mobile-turn-actions .action-button {
-      min-height: 38px;
+      min-height: 34px;
       padding-top: 7px !important;
       padding-bottom: 7px !important;
     }
 
     .human-area {
-      grid-template-rows: 28px minmax(124px, 1fr) auto;
+      grid-template-rows: 28px minmax(94px, 1fr) auto;
     }
 
     .hand-scroll-wrap {
@@ -8919,5 +9057,5225 @@ body {
   .queen-black-aura {
     width: 340px;
     height: 340px;
+  }
+}
+
+/* Final gameplay layout ownership. Kept at the end intentionally so these
+   responsive rules win over older screen-specific styles above. */
+
+:root {
+  --ui-touch-target: 44px;
+  --card-mobile-w: clamp(64px, 18vw, 78px);
+  --card-mobile-h: calc(var(--card-mobile-w) * 1.42);
+  --card-mobile-overlap: calc(var(--card-mobile-w) * -0.48);
+}
+
+button,
+[role="button"],
+summary {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.action-button,
+.playing-card,
+.table-meld-toggle,
+.meld-display,
+.stock-area [role="button"],
+.discard-area[role="button"],
+.desktop-drawers summary {
+  outline: none;
+}
+
+.action-button:focus-visible,
+.playing-card:focus-visible,
+.table-meld-toggle:focus-visible,
+.meld-display:focus-visible,
+.stock-area [role="button"]:focus-visible,
+.discard-area[role="button"]:focus-visible,
+.desktop-drawers summary:focus-visible {
+  outline: 3px solid rgba(255, 224, 130, 0.95);
+  outline-offset: 3px;
+  box-shadow:
+    0 0 0 6px rgba(255, 224, 130, 0.16),
+    0 16px 30px rgba(0, 0, 0, 0.26) !important;
+}
+
+.hand-scroll-wrap,
+.discard-row,
+.meld-grid,
+.opponent-seats {
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hand-scroll-wrap::-webkit-scrollbar,
+.hand-row::-webkit-scrollbar,
+.discard-row::-webkit-scrollbar,
+.meld-grid::-webkit-scrollbar,
+.opponent-seats::-webkit-scrollbar {
+  display: none;
+}
+
+.message {
+  overflow-wrap: anywhere;
+}
+
+.meld-display {
+  min-width: max-content;
+}
+
+.meld-cards {
+  flex-wrap: nowrap;
+  overflow: visible;
+}
+
+.table-meld-layer .meld-grid {
+  align-items: stretch;
+}
+
+.table-meld-layer .meld-display {
+  display: grid;
+  align-content: start;
+}
+
+.discard-row .playing-card .card-corner {
+  width: auto;
+  min-width: 1.2em;
+  font-size: 13px !important;
+}
+
+.discard-row .playing-card .card-corner-top {
+  top: 6px;
+  left: 6px;
+}
+
+.discard-row .playing-card .card-corner-bottom {
+  right: 6px;
+  bottom: 6px;
+}
+
+.discard-row .playing-card .card-center-suit {
+  font-size: 23px !important;
+}
+
+.discard-row .discard-card-wrap:not(:first-child) .playing-card .card-corner-bottom {
+  display: none;
+}
+
+.mobile-turn-actions .action-button,
+.turn-actions .action-button,
+.top-actions .action-button {
+  min-height: var(--ui-touch-target);
+}
+
+@media (min-width: 641px) and (max-width: 980px) {
+  .app-shell {
+    min-height: 100svh;
+    padding-inline: 10px;
+  }
+
+  .top-bar,
+  .message,
+  .game-surface {
+    max-width: 100%;
+  }
+
+  .game-surface {
+    min-height: min(860px, calc(100svh - 132px));
+    grid-template-areas:
+      "opponents opponents"
+      "table table"
+      "melds melds"
+      "player drawers";
+    grid-template-columns: minmax(0, 1fr) minmax(190px, 240px);
+    grid-template-rows: auto minmax(180px, auto) minmax(108px, auto) minmax(190px, auto);
+    gap: 14px;
+    padding: 30px clamp(18px, 3vw, 34px) 24px;
+  }
+
+  .opponent-seats {
+    grid-area: opponents;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    align-content: stretch;
+  }
+
+  .table-area {
+    width: min(100%, 720px);
+    margin-inline: auto;
+  }
+
+  .player-zone .human-area {
+    max-width: none;
+  }
+
+  .human-area .hand-row {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-inline: 40px 20px;
+  }
+
+  .human-area .hand-row .playing-card {
+    width: 72px !important;
+    height: 102px !important;
+    min-width: 72px !important;
+    margin-left: -28px;
+  }
+}
+
+@media (min-width: 981px) {
+  .game-surface {
+    min-height: min(760px, calc(100vh - 126px));
+  }
+
+  .table-meld-layer .meld-display {
+    min-width: 186px;
+  }
+
+  .human-area .hand-row {
+    overflow-x: auto;
+    padding-inline: 42px 22px;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --card-mobile-w: clamp(66px, 18.5vw, 76px);
+    --card-mobile-h: calc(var(--card-mobile-w) * 1.42);
+    --card-mobile-overlap: calc(var(--card-mobile-w) * -0.5);
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .app-shell {
+    height: 100svh;
+    height: 100dvh;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: 4px;
+    padding: max(4px, env(safe-area-inset-top)) 0 0;
+    overflow: hidden;
+    background-attachment: scroll;
+  }
+
+  .top-bar {
+    width: calc(100vw - 10px);
+    margin: 0 5px;
+    padding: 6px 8px;
+    border-radius: 14px;
+    gap: 7px;
+  }
+
+  .title {
+    flex: 0 0 auto;
+    font-size: clamp(21px, 6vw, 28px);
+  }
+
+  .header-right {
+    min-width: 0;
+  }
+
+  .top-actions .action-button {
+    min-height: 34px;
+    min-width: 58px;
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+  }
+
+  .message {
+    width: calc(100vw - 14px);
+    min-height: 28px;
+    margin: 0 7px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .game-surface {
+    width: 100vw;
+    max-width: none;
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: 52px minmax(112px, 17dvh) 0 minmax(0, 1fr);
+    gap: 6px;
+    margin: 0;
+    padding: 7px 8px 0;
+    border-width: 7px 0 0;
+    border-radius: 22px 22px 0 0;
+    overflow: hidden;
+  }
+
+  .game-surface.has-table-melds {
+    grid-template-rows: 52px minmax(108px, 16dvh) minmax(130px, 20dvh) minmax(0, 1fr);
+  }
+
+  .game-surface::before {
+    inset: 8px 8px 0;
+    height: auto;
+  }
+
+  .opponent-seats {
+    grid-row: 1;
+    order: 0;
+    height: auto;
+    min-height: 0;
+    display: flex;
+    gap: 7px;
+    padding: 0 1px 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .opponent-seats .ai-row {
+    flex: 0 0 min(172px, 52vw);
+    min-height: 48px;
+    padding: 7px 8px;
+    border-radius: 15px;
+  }
+
+  .opponent-seats .ai-label {
+    gap: 8px;
+  }
+
+  .opponent-seats .ai-label img,
+  .opponent-seats .ai-label > div[title] {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .opponent-seats .ai-cards {
+    display: none;
+  }
+
+  .table-zone {
+    grid-row: 2;
+    order: 1;
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .table-area {
+    height: 100%;
+    display: grid;
+    grid-template-columns: minmax(70px, 22vw) minmax(0, 1fr);
+    gap: 8px;
+    align-items: stretch;
+    margin: 0;
+    min-height: 0;
+  }
+
+  .stock-area,
+  .discard-area {
+    min-width: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    padding: 7px;
+    border-radius: 16px;
+  }
+
+  .stock-area .section-label,
+  .discard-area .section-label {
+    margin-bottom: 5px;
+    font-size: 8px;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .stock-area .card-back-face,
+  .empty-stock,
+  .discard-row .discard-card-wrap:first-child .playing-card {
+    width: clamp(58px, 16vw, 66px) !important;
+    height: clamp(82px, 23vw, 94px) !important;
+  }
+
+  .discard-row {
+    min-height: 0;
+    max-height: none;
+    height: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 3px 3px 5px;
+  }
+
+  .discard-row .discard-card-wrap {
+    flex: 0 0 auto;
+  }
+
+  .discard-row .playing-card {
+    width: 48px !important;
+    height: 68px !important;
+    margin-left: -10px;
+  }
+
+  .discard-row .discard-card-wrap:first-child .playing-card {
+    margin-left: 0;
+  }
+
+  .discard-row .playing-card .card-corner {
+    font-size: 10px !important;
+    line-height: 0.92;
+  }
+
+  .discard-row .playing-card .card-corner-top {
+    top: 5px;
+    left: 5px;
+  }
+
+  .discard-row .playing-card .card-corner-bottom {
+    right: 5px;
+    bottom: 5px;
+  }
+
+  .discard-row .playing-card .card-center-suit {
+    font-size: 16px !important;
+    opacity: 0.14;
+  }
+
+  .discard-row .discard-card-wrap:first-child .playing-card .card-corner {
+    font-size: 14px !important;
+  }
+
+  .discard-row .discard-card-wrap:first-child .playing-card .card-center-suit {
+    font-size: 24px !important;
+  }
+
+  .drop-zones {
+    display: none;
+  }
+
+  .table-meld-layer {
+    grid-row: 3;
+    order: 2;
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+    z-index: 8;
+  }
+
+  .table-meld-toggle {
+    display: flex;
+    min-height: 32px;
+    margin: 0 0 5px;
+    padding: 6px 10px;
+    border-radius: 16px;
+    cursor: default;
+  }
+
+  .table-meld-layer .meld-section,
+  .table-meld-layer.expanded .meld-section {
+    width: 100%;
+    min-height: 0;
+    max-height: none;
+    height: calc(100% - 37px);
+    margin: 0;
+    padding: 7px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 224, 130, 0.28);
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at 12% 0%, rgba(255, 224, 130, 0.12), transparent 42%),
+      linear-gradient(145deg, rgba(255, 232, 163, 0.1), rgba(255, 255, 255, 0.035)),
+      rgba(3, 12, 7, 0.62);
+  }
+
+  .meld-section .section-label {
+    display: none;
+  }
+
+  .meld-grid,
+  .table-meld-layer.expanded .meld-grid {
+    height: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 1px 2px 7px;
+    scroll-snap-type: x proximity;
+  }
+
+  .meld-display,
+  .table-meld-layer.expanded .meld-display {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    width: max-content;
+    min-width: 152px;
+    max-width: none;
+    height: 82px;
+    display: grid;
+    align-content: start;
+    padding: 7px 8px;
+    border-radius: 14px;
+    scroll-snap-align: start;
+  }
+
+  .meld-title,
+  .table-meld-layer.expanded .meld-title {
+    display: block;
+    max-width: 142px;
+    margin: 0 0 5px;
+    color: rgba(255, 241, 184, 0.84);
+    font-size: 9px;
+    line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .meld-cards {
+    width: max-content;
+    flex-wrap: nowrap;
+    gap: 0;
+    overflow: visible;
+  }
+
+  .meld-cards .playing-card,
+  .table-meld-layer.expanded .meld-cards .playing-card {
+    width: 38px !important;
+    height: 54px !important;
+    min-width: 38px !important;
+    margin-left: -10px;
+    border-radius: 7px !important;
+  }
+
+  .meld-cards .playing-card:first-child {
+    margin-left: 0;
+  }
+
+  .meld-cards .playing-card .card-corner,
+  .table-meld-layer.expanded .meld-cards .playing-card .card-corner {
+    font-size: 12px !important;
+  }
+
+  .meld-cards .playing-card .card-center-suit,
+  .table-meld-layer.expanded .meld-cards .playing-card .card-center-suit {
+    font-size: 18px !important;
+  }
+
+  .meld-display.layoff-ready {
+    padding-right: 8px;
+    border-width: 2px;
+  }
+
+  .layoff-label,
+  .table-meld-layer.expanded .layoff-label {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    bottom: auto;
+    left: auto;
+    display: inline-flex;
+    min-height: 19px;
+    margin: 0;
+    padding: 3px 7px;
+    font-size: 8px;
+  }
+
+  .player-zone {
+    grid-row: 4;
+    order: 3;
+    align-self: stretch;
+    width: calc(100% + 16px);
+    height: 100%;
+    min-height: 0;
+    margin: 0 -8px;
+  }
+
+  .human-area {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: 32px minmax(0, 1fr) auto;
+    gap: 7px;
+    margin: 0;
+    padding: 8px 8px max(8px, env(safe-area-inset-bottom));
+    border-radius: 18px 18px 0 0;
+    overflow: hidden;
+  }
+
+  .human-header {
+    min-height: 0;
+    margin: 0;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .human-name {
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 6px;
+    font-size: 11px;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .human-name img,
+  .human-name > div[title] {
+    width: 30px !important;
+    height: 30px !important;
+    flex: 0 0 auto;
+  }
+
+  .hand-actions {
+    flex: 0 0 auto;
+    gap: 0;
+  }
+
+  .hand-actions span {
+    padding: 4px 7px;
+    font-size: 0;
+    white-space: nowrap;
+  }
+
+  .hand-actions span::before {
+    content: attr(data-mobile-label);
+    font-size: 10px;
+  }
+
+  .hand-actions .secondary-action,
+  .hand-helper {
+    display: none;
+  }
+
+  .hand-scroll-wrap {
+    grid-row: 2;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .hand-scroll-wrap > div {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .hand-row {
+    height: 100%;
+    min-height: 0;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 12px 18px 16px calc(var(--card-mobile-w) * 0.68);
+    perspective: 900px;
+  }
+
+  .human-area .hand-row .playing-card {
+    width: var(--card-mobile-w) !important;
+    height: var(--card-mobile-h) !important;
+    min-width: var(--card-mobile-w) !important;
+    margin-left: var(--card-mobile-overlap);
+    border-radius: 9px !important;
+  }
+
+  .human-area .hand-row .playing-card:first-child {
+    margin-left: 0;
+  }
+
+  .human-area .hand-row .playing-card .card-corner {
+    font-size: clamp(15px, 4.2vw, 18px) !important;
+  }
+
+  .human-area .hand-row .playing-card .card-center-suit {
+    font-size: clamp(27px, 8vw, 34px) !important;
+  }
+
+  .human-area .hand-row .playing-card .card-corner span {
+    font-size: 0.68em !important;
+  }
+
+  .mobile-turn-actions {
+    grid-row: 3;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin: 0;
+    padding: 6px;
+    border-radius: 16px;
+  }
+
+  .mobile-organize-actions {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .mobile-turn-actions .action-button {
+    min-width: 0 !important;
+    min-height: 42px;
+    padding: 8px 7px !important;
+    border-radius: 13px !important;
+    font-size: 12px !important;
+    line-height: 1.05;
+    white-space: nowrap;
+  }
+
+  .mobile-organize-actions .action-button {
+    min-height: 34px;
+    padding: 6px 8px !important;
+    font-size: 11px !important;
+  }
+
+  .turn-actions {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) and (max-height: 720px) {
+  :root {
+    --card-mobile-w: clamp(60px, 17vw, 68px);
+  }
+
+  .message {
+    min-height: 24px;
+    padding-block: 4px;
+  }
+
+  .game-surface {
+    grid-template-rows: 46px minmax(92px, 15dvh) 0 minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .game-surface.has-table-melds {
+    grid-template-rows: 46px minmax(88px, 14dvh) minmax(112px, 18dvh) minmax(0, 1fr);
+  }
+
+  .opponent-seats .ai-row {
+    min-height: 42px;
+    padding-block: 5px;
+  }
+
+  .stock-area .card-back-face,
+  .empty-stock,
+  .discard-row .discard-card-wrap:first-child .playing-card {
+    width: 52px !important;
+    height: 74px !important;
+  }
+
+  .discard-row .playing-card {
+    width: 42px !important;
+    height: 59px !important;
+  }
+
+  .table-meld-toggle {
+    min-height: 28px;
+    padding-block: 5px;
+  }
+
+  .table-meld-layer .meld-section,
+  .table-meld-layer.expanded .meld-section {
+    height: calc(100% - 33px);
+    padding: 6px;
+  }
+
+  .meld-display,
+  .table-meld-layer.expanded .meld-display {
+    min-width: 136px;
+    height: 68px;
+    padding: 6px 7px;
+  }
+
+  .meld-cards .playing-card,
+  .table-meld-layer.expanded .meld-cards .playing-card {
+    width: 32px !important;
+    height: 45px !important;
+    min-width: 32px !important;
+    margin-left: -9px;
+  }
+
+  .human-area {
+    grid-template-rows: 28px minmax(0, 1fr) auto;
+    gap: 5px;
+    padding-top: 6px;
+  }
+
+  .mobile-turn-actions {
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .mobile-turn-actions .action-button {
+    min-height: 36px;
+    padding-block: 7px !important;
+    font-size: 11px !important;
+  }
+
+  .mobile-organize-actions .action-button {
+    min-height: 30px;
+  }
+}
+
+@media (max-width: 640px) and (orientation: landscape) {
+  .app-shell {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .message {
+    display: none;
+  }
+
+  .game-surface.has-table-melds {
+    grid-template-rows: 44px minmax(76px, 1fr) minmax(96px, 1fr) minmax(0, 1.35fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .playing-card.selected {
+    transform: none;
+  }
+}
+
+/* Mobile-first gameplay refactor.
+   These rules intentionally sit last: they define the practical app layout
+   hierarchy by device size while preserving the existing game logic and visual
+   language above. */
+
+.game-surface,
+.human-area,
+.table-area,
+.table-meld-layer,
+.opponent-seats {
+  min-width: 0;
+}
+
+.playing-card {
+  will-change: transform;
+}
+
+.playing-card:active {
+  transform: translateY(-2px) scale(1.015);
+}
+
+.playing-card.selected {
+  z-index: 8;
+}
+
+.playing-card.hint-ready,
+.playing-card.hint-near {
+  isolation: isolate;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    --mobile-gap: clamp(4px, 1.2dvh, 8px);
+    --mobile-edge: clamp(6px, 2vw, 10px);
+    --card-mobile-w: clamp(64px, 18vw, 76px);
+    --card-mobile-h: calc(var(--card-mobile-w) * 1.42);
+    --hand-overlap: clamp(-38px, -9.3vw, -29px);
+    height: 100dvh;
+    max-height: 100dvh;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: var(--mobile-gap);
+    overflow: hidden;
+    padding: max(4px, env(safe-area-inset-top)) 0 0;
+  }
+
+  .top-bar {
+    width: calc(100vw - (var(--mobile-edge) * 2));
+    min-height: 42px;
+    margin-inline: var(--mobile-edge);
+    padding: 6px 8px;
+    border-radius: 14px;
+  }
+
+  .title {
+    font-size: clamp(21px, 6vw, 27px);
+    white-space: nowrap;
+  }
+
+  .header-right {
+    justify-content: flex-end;
+  }
+
+  .top-actions .action-button {
+    min-width: 56px;
+    min-height: 34px;
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+  }
+
+  .message {
+    width: calc(100vw - (var(--mobile-edge) * 2));
+    min-height: 26px;
+    margin-inline: var(--mobile-edge);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    line-height: 1.15;
+  }
+
+  .message b {
+    font-size: 10px;
+  }
+
+  .game-surface {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-areas:
+      "opponents"
+      "table"
+      "melds"
+      "player";
+    grid-template-rows:
+      minmax(46px, 6.5dvh)
+      minmax(126px, 18dvh)
+      0
+      minmax(0, 1fr);
+    gap: var(--mobile-gap);
+    margin: 0;
+    padding: 7px var(--mobile-edge) 0;
+    border-width: 7px 0 0;
+    border-radius: 22px 22px 0 0;
+    overflow: hidden;
+  }
+
+  .game-surface.has-table-melds {
+    grid-template-rows:
+      minmax(46px, 6.5dvh)
+      minmax(118px, 16.5dvh)
+      minmax(118px, 17dvh)
+      minmax(0, 1fr);
+  }
+
+  .game-surface::before {
+    inset: 8px var(--mobile-edge) 0;
+    height: auto;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .opponent-seats {
+    grid-area: opponents;
+    order: 0;
+    display: flex;
+    height: auto;
+    min-height: 0;
+    gap: 7px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 1px 2px;
+    scroll-snap-type: x proximity;
+  }
+
+  .opponent-seats .ai-row {
+    flex: 0 0 clamp(150px, 48vw, 174px);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 6px 8px;
+    border-radius: 15px;
+    scroll-snap-align: start;
+  }
+
+  .opponent-seats .ai-label {
+    width: 100%;
+    gap: 8px;
+    margin: 0;
+  }
+
+  .opponent-seats .ai-label img,
+  .opponent-seats .ai-label > div[title] {
+    width: 31px !important;
+    height: 31px !important;
+    flex: 0 0 auto;
+  }
+
+  .opponent-seats .ai-label b {
+    font-size: 11px;
+  }
+
+  .opponent-seats .ai-label small {
+    font-size: 9px;
+  }
+
+  .opponent-seats .ai-cards {
+    display: none;
+  }
+
+  .table-zone {
+    grid-area: table;
+    order: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .table-area {
+    height: 100%;
+    display: grid;
+    grid-template-columns: minmax(76px, 23vw) minmax(0, 1fr);
+    gap: 8px;
+    align-items: stretch;
+    margin: 0;
+    min-height: 0;
+  }
+
+  .stock-area,
+  .discard-area {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    min-width: 0;
+    padding: 7px;
+    border-radius: 16px;
+  }
+
+  .stock-area .section-label,
+  .discard-area .section-label {
+    margin-bottom: 5px;
+    font-size: 8px;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .stock-area .card-back-face,
+  .empty-stock,
+  .discard-row .discard-card-wrap:first-child .playing-card {
+    width: clamp(58px, 16vw, 68px) !important;
+    height: clamp(82px, 23vw, 96px) !important;
+  }
+
+  .discard-row {
+    height: 100%;
+    min-height: 0;
+    max-height: none;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 3px 4px 5px;
+  }
+
+  .discard-row .discard-card-wrap {
+    flex: 0 0 auto;
+  }
+
+  .discard-row .playing-card {
+    width: 48px !important;
+    height: 68px !important;
+    margin-left: -10px;
+  }
+
+  .discard-row .discard-card-wrap:first-child .playing-card {
+    margin-left: 0;
+  }
+
+  .discard-row .playing-card .card-corner {
+    font-size: 10px !important;
+    line-height: 0.92;
+  }
+
+  .discard-row .discard-card-wrap:first-child .playing-card .card-corner {
+    font-size: 14px !important;
+  }
+
+  .discard-row .playing-card .card-center-suit {
+    font-size: 16px !important;
+  }
+
+  .discard-row .discard-card-wrap:first-child .playing-card .card-center-suit {
+    font-size: 24px !important;
+  }
+
+  .drop-zones {
+    display: none;
+  }
+
+  .table-meld-layer {
+    grid-area: melds;
+    order: 2;
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+    z-index: 8;
+  }
+
+  .table-meld-toggle {
+    display: flex;
+    min-height: 30px;
+    margin: 0 0 5px;
+    padding: 5px 10px;
+    border-radius: 15px;
+  }
+
+  .table-meld-toggle span {
+    font-size: 12px;
+  }
+
+  .table-meld-toggle small {
+    font-size: 10px;
+  }
+
+  .table-meld-layer .meld-section {
+    height: calc(100% - 35px);
+    min-height: 0;
+    max-height: none;
+    margin: 0;
+    padding: 6px;
+    overflow: hidden;
+    border-radius: 15px;
+  }
+
+  .meld-section .section-label {
+    display: none;
+  }
+
+  .meld-grid {
+    height: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 7px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 1px 2px 6px;
+    scroll-snap-type: x proximity;
+  }
+
+  .meld-display {
+    flex: 0 0 auto;
+    width: max-content;
+    min-width: 142px;
+    max-width: none;
+    height: 74px;
+    display: grid;
+    align-content: start;
+    padding: 6px 7px;
+    border-radius: 13px;
+    scroll-snap-align: start;
+  }
+
+  .meld-title {
+    display: block;
+    max-width: 130px;
+    margin: 0 0 4px;
+    font-size: 9px;
+    line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .meld-cards .playing-card {
+    width: 34px !important;
+    height: 48px !important;
+    min-width: 34px !important;
+    margin-left: -9px;
+    border-radius: 7px !important;
+  }
+
+  .meld-cards .playing-card:first-child {
+    margin-left: 0;
+  }
+
+  .meld-cards .playing-card .card-corner {
+    font-size: 11px !important;
+  }
+
+  .meld-cards .playing-card .card-center-suit {
+    font-size: 17px !important;
+  }
+
+  .layoff-label {
+    position: absolute;
+    inset: 5px 5px auto auto;
+    min-height: 18px;
+    display: inline-flex;
+    margin: 0;
+    padding: 3px 6px;
+    font-size: 8px;
+  }
+
+  .player-zone {
+    grid-area: player;
+    order: 3;
+    align-self: stretch;
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .human-area {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: 30px minmax(0, 1fr) auto;
+    gap: 7px;
+    margin: 0;
+    padding: 8px 8px max(8px, env(safe-area-inset-bottom));
+    border-radius: 18px 18px 0 0;
+    overflow: hidden;
+  }
+
+  .human-header {
+    min-height: 0;
+    margin: 0;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .human-name {
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 6px;
+    font-size: 11px;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .human-name img,
+  .human-name > div[title] {
+    width: 29px !important;
+    height: 29px !important;
+    flex: 0 0 auto;
+  }
+
+  .hand-actions {
+    flex: 0 0 auto;
+  }
+
+  .hand-actions span {
+    padding: 4px 7px;
+    font-size: 0;
+    white-space: nowrap;
+  }
+
+  .hand-actions span::before {
+    content: attr(data-mobile-label);
+    font-size: 10px;
+  }
+
+  .hand-actions .secondary-action,
+  .hand-helper {
+    display: none;
+  }
+
+  .hand-scroll-wrap {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .hand-scroll-wrap > div {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .hand-row {
+    --hand-start-pad: calc(var(--card-mobile-w) * 0.64);
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 12px 18px 16px var(--hand-start-pad);
+    scroll-padding-inline: var(--hand-start-pad) 18px;
+    scroll-snap-type: x proximity;
+  }
+
+  .human-area.hand-few {
+    --card-mobile-w: clamp(72px, 20vw, 84px);
+    --hand-overlap: clamp(-35px, -8vw, -24px);
+  }
+
+  .human-area.hand-medium {
+    --card-mobile-w: clamp(66px, 18vw, 76px);
+    --hand-overlap: clamp(-39px, -9vw, -30px);
+  }
+
+  .human-area.hand-many {
+    --card-mobile-w: clamp(60px, 16.5vw, 70px);
+    --hand-overlap: clamp(-42px, -10vw, -34px);
+  }
+
+  .human-area .hand-row .playing-card {
+    width: var(--card-mobile-w) !important;
+    height: calc(var(--card-mobile-w) * 1.42) !important;
+    min-width: var(--card-mobile-w) !important;
+    margin-left: var(--hand-overlap);
+    border-radius: 9px !important;
+    scroll-snap-align: center;
+  }
+
+  .human-area .hand-row .playing-card:first-child {
+    margin-left: 0;
+  }
+
+  .human-area .hand-row .playing-card.selected {
+    transform: translateY(-10px) scale(1.025);
+  }
+
+  .human-area .hand-row .playing-card .card-corner {
+    font-size: clamp(14px, 4vw, 18px) !important;
+  }
+
+  .human-area .hand-row .playing-card .card-center-suit {
+    font-size: clamp(26px, 7.5vw, 34px) !important;
+  }
+
+  .mobile-turn-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin: 0;
+    padding: 6px;
+    border-radius: 16px;
+  }
+
+  .mobile-organize-actions {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .mobile-turn-actions .action-button {
+    min-width: 0 !important;
+    min-height: 42px;
+    padding: 8px 6px !important;
+    border-radius: 13px !important;
+    font-size: 12px !important;
+    line-height: 1.05;
+    white-space: nowrap;
+  }
+
+  .mobile-organize-actions .action-button {
+    min-height: 34px;
+    padding-block: 6px !important;
+    font-size: 11px !important;
+  }
+
+  .turn-actions {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) and (max-height: 720px) {
+  .app-shell {
+    --mobile-gap: 4px;
+  }
+
+  .top-bar {
+    min-height: 38px;
+  }
+
+  .message {
+    min-height: 23px;
+    padding-block: 3px;
+  }
+
+  .game-surface {
+    grid-template-rows:
+      43px
+      minmax(94px, 15dvh)
+      0
+      minmax(0, 1fr);
+  }
+
+  .game-surface.has-table-melds {
+    grid-template-rows:
+      43px
+      minmax(88px, 14dvh)
+      minmax(96px, 16dvh)
+      minmax(0, 1fr);
+  }
+
+  .stock-area .card-back-face,
+  .empty-stock,
+  .discard-row .discard-card-wrap:first-child .playing-card {
+    width: 52px !important;
+    height: 74px !important;
+  }
+
+  .discard-row .playing-card {
+    width: 42px !important;
+    height: 59px !important;
+  }
+
+  .meld-display {
+    min-width: 128px;
+    height: 62px;
+  }
+
+  .meld-cards .playing-card {
+    width: 30px !important;
+    height: 42px !important;
+    min-width: 30px !important;
+  }
+
+  .human-area {
+    grid-template-rows: 28px minmax(0, 1fr) auto;
+    gap: 5px;
+    padding-top: 6px;
+  }
+
+  .human-area.hand-few {
+    --card-mobile-w: clamp(64px, 18vw, 74px);
+  }
+
+  .human-area.hand-medium,
+  .human-area.hand-many {
+    --card-mobile-w: clamp(58px, 16vw, 66px);
+  }
+
+  .mobile-turn-actions {
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .mobile-turn-actions .action-button {
+    min-height: 36px;
+    font-size: 11px !important;
+  }
+
+  .mobile-organize-actions .action-button {
+    min-height: 30px;
+  }
+}
+
+@media (max-width: 640px) and (orientation: landscape) {
+  .app-shell {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .message {
+    display: none;
+  }
+
+  .game-surface {
+    grid-template-areas:
+      "opponents table"
+      "melds table"
+      "player player";
+    grid-template-columns: minmax(160px, 34vw) minmax(0, 1fr);
+    grid-template-rows: minmax(42px, auto) minmax(76px, 1fr) minmax(132px, 1.15fr);
+    gap: 6px;
+  }
+
+  .game-surface.no-table-melds {
+    grid-template-rows: minmax(42px, auto) 0 minmax(140px, 1fr);
+  }
+
+  .table-area {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+
+  .opponent-seats {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .opponent-seats .ai-row {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .human-area {
+    grid-template-columns: minmax(0, 1fr) minmax(210px, 34vw);
+    grid-template-rows: 28px minmax(0, 1fr);
+    grid-template-areas:
+      "header actions"
+      "hand actions";
+  }
+
+  .human-header {
+    grid-area: header;
+  }
+
+  .hand-scroll-wrap {
+    grid-area: hand;
+  }
+
+  .mobile-turn-actions {
+    grid-area: actions;
+    align-self: stretch;
+    grid-template-columns: 1fr;
+    align-content: center;
+  }
+
+  .mobile-organize-actions {
+    grid-column: auto;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) and (orientation: portrait) {
+  .game-surface {
+    min-height: calc(100svh - 132px);
+    grid-template-areas:
+      "opponents"
+      "table"
+      "melds"
+      "player"
+      "drawers";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(210px, auto) minmax(120px, auto) minmax(210px, auto) auto;
+  }
+
+  .desktop-drawers {
+    grid-area: drawers;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .table-meld-layer .meld-grid {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1100px) and (orientation: landscape) {
+  .game-surface {
+    grid-template-columns: minmax(180px, 230px) minmax(0, 1fr);
+    grid-template-areas:
+      "opponents table"
+      "opponents melds"
+      "player player"
+      "drawers drawers";
+  }
+
+  .desktop-drawers {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1101px) {
+  .table-meld-layer .meld-grid {
+    flex-wrap: wrap;
+    overflow-x: hidden;
+  }
+
+  .table-meld-layer .meld-display {
+    min-width: 176px;
+  }
+}
+
+/* Premium visual system skin.
+   This layer unifies color, spacing, shadows, motion, and card styling across
+   the existing responsive layout without changing gameplay behavior. */
+
+:root {
+  --rummy-bg: #07110c;
+  --rummy-felt-900: #071b11;
+  --rummy-felt-800: #0c2a19;
+  --rummy-felt-700: #124329;
+  --rummy-felt-500: #217a4a;
+  --rummy-gold-700: #9d6d25;
+  --rummy-gold-500: #d8a941;
+  --rummy-gold-300: #f6d98a;
+  --rummy-cream: #fff7dd;
+  --rummy-muted: rgba(255, 247, 221, 0.68);
+  --rummy-success: #7bd88f;
+  --rummy-warning: #f6d98a;
+  --rummy-danger: #d96d68;
+  --rummy-panel: rgba(7, 19, 12, 0.74);
+  --rummy-panel-strong: rgba(7, 19, 12, 0.88);
+  --rummy-border: rgba(246, 217, 138, 0.22);
+  --rummy-border-strong: rgba(246, 217, 138, 0.46);
+  --rummy-radius-xs: 8px;
+  --rummy-radius-sm: 12px;
+  --rummy-radius-md: 16px;
+  --rummy-radius-lg: 22px;
+  --rummy-space-1: 4px;
+  --rummy-space-2: 8px;
+  --rummy-space-3: 12px;
+  --rummy-space-4: 16px;
+  --rummy-space-5: 24px;
+  --rummy-shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.24);
+  --rummy-shadow-panel: 0 18px 42px rgba(0, 0, 0, 0.34);
+  --rummy-shadow-card: 0 10px 18px rgba(0, 0, 0, 0.24), 0 2px 2px rgba(0, 0, 0, 0.14);
+  --rummy-shadow-lift: 0 18px 30px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(246, 217, 138, 0.16);
+  --rummy-ease: cubic-bezier(.2, .8, .2, 1);
+  --rummy-fast: 140ms;
+  --rummy-medium: 220ms;
+}
+
+.app-shell {
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  color: var(--rummy-cream);
+  background-color: var(--rummy-bg);
+  background-image:
+    radial-gradient(circle at 50% 8%, rgba(246, 217, 138, 0.16), transparent 28%),
+    radial-gradient(circle at 16% 18%, rgba(33, 122, 74, 0.18), transparent 28%),
+    radial-gradient(circle at 84% 16%, rgba(216, 169, 65, 0.12), transparent 25%),
+    linear-gradient(180deg, rgba(3, 9, 6, 0.18), rgba(3, 9, 6, 0.92)),
+    var(--table-bg);
+}
+
+.app-shell::before {
+  background:
+    radial-gradient(ellipse at 50% 6%, rgba(246, 217, 138, 0.2), transparent 34%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.62), rgba(7, 27, 17, 0.08) 35%, rgba(7, 27, 17, 0.08) 65%, rgba(0, 0, 0, 0.62));
+  animation-duration: 24s;
+}
+
+.top-bar,
+.message,
+.score-card,
+.ai-row,
+.human-area,
+.stock-area,
+.discard-area,
+.meld-display,
+.desktop-drawers details,
+.mobile-turn-actions,
+.table-meld-layer .meld-section {
+  border: 1px solid var(--rummy-border) !important;
+  background:
+    linear-gradient(145deg, rgba(255, 247, 221, 0.07), rgba(255, 247, 221, 0.025)),
+    var(--rummy-panel) !important;
+  box-shadow: var(--rummy-shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(14px);
+}
+
+.top-bar {
+  border-radius: var(--rummy-radius-lg);
+}
+
+.title {
+  color: var(--rummy-gold-300);
+  font-weight: 950;
+  letter-spacing: 0;
+  text-shadow: 0 1px 0 rgba(85, 51, 16, 0.9), 0 10px 26px rgba(0, 0, 0, 0.5);
+}
+
+.title span {
+  color: #fff2b8;
+}
+
+.message {
+  color: var(--rummy-muted);
+  border-radius: 999px;
+}
+
+.message b {
+  color: var(--rummy-gold-300);
+}
+
+.message.error {
+  color: #ffd0cc;
+  border-color: rgba(217, 109, 104, 0.44) !important;
+  background:
+    linear-gradient(145deg, rgba(217, 109, 104, 0.1), rgba(255, 247, 221, 0.025)),
+    var(--rummy-panel) !important;
+}
+
+.game-surface {
+  background:
+    radial-gradient(ellipse at 50% 18%, rgba(255, 247, 221, 0.09), transparent 28%),
+    radial-gradient(ellipse at 50% 44%, rgba(33, 122, 74, 0.42), transparent 54%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.018) 1px, transparent 1px, transparent 10px),
+    linear-gradient(145deg, var(--rummy-felt-700), var(--rummy-felt-800) 52%, var(--rummy-felt-900)) !important;
+  border-color: rgba(73, 43, 20, 0.95) !important;
+  box-shadow:
+    inset 0 0 92px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px rgba(246, 217, 138, 0.2),
+    0 30px 80px rgba(0, 0, 0, 0.48) !important;
+}
+
+.game-surface::before {
+  border-color: rgba(246, 217, 138, 0.28);
+  box-shadow: inset 0 0 34px rgba(246, 217, 138, 0.04);
+}
+
+.section-label,
+.score-modal-header span,
+.score-group-label,
+.score-points span,
+.score-net small {
+  color: rgba(246, 217, 138, 0.68);
+  letter-spacing: 0.11em;
+}
+
+.action-button {
+  min-height: 40px;
+  border: 1px solid rgba(246, 217, 138, 0.34) !important;
+  border-radius: 999px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 244, 204, 0.98), rgba(216, 169, 65, 0.96)) !important;
+  color: #102317 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
+  transition: transform var(--rummy-fast) var(--rummy-ease), box-shadow var(--rummy-fast) var(--rummy-ease), filter var(--rummy-fast) var(--rummy-ease);
+}
+
+.action-button:hover:not(:disabled) {
+  filter: saturate(1.05) brightness(1.03);
+  box-shadow: var(--rummy-shadow-lift) !important;
+}
+
+.action-button.secondary-action {
+  background:
+    linear-gradient(180deg, rgba(37, 112, 68, 0.98), rgba(12, 52, 31, 0.98)) !important;
+  color: var(--rummy-cream) !important;
+}
+
+.action-button.light-action {
+  background:
+    linear-gradient(180deg, rgba(255, 250, 235, 0.98), rgba(219, 208, 184, 0.96)) !important;
+  color: #17331f !important;
+}
+
+.action-button.primary-action {
+  background:
+    linear-gradient(180deg, rgba(82, 171, 105, 0.98), rgba(22, 91, 49, 0.98)) !important;
+  color: #ffffff !important;
+}
+
+.action-button.danger-action {
+  background:
+    linear-gradient(180deg, rgba(205, 91, 85, 0.98), rgba(116, 36, 34, 0.98)) !important;
+  color: #fff7dd !important;
+}
+
+.action-button:disabled {
+  filter: grayscale(0.2);
+  opacity: 0.42 !important;
+  box-shadow: none !important;
+}
+
+.playing-card {
+  border: 1px solid rgba(83, 65, 40, 0.32) !important;
+  border-radius: 11px !important;
+  background:
+    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.95), transparent 30%),
+    linear-gradient(145deg, #fffdf5 0%, #f8f0df 60%, #e8dcc5 100%) !important;
+  box-shadow: var(--rummy-shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  transition:
+    transform var(--rummy-medium) var(--rummy-ease),
+    box-shadow var(--rummy-medium) var(--rummy-ease),
+    border-color var(--rummy-fast) var(--rummy-ease),
+    filter var(--rummy-fast) var(--rummy-ease);
+}
+
+.playing-card::before {
+  inset: 5px;
+  border-color: rgba(83, 65, 40, 0.1);
+}
+
+.playing-card:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: var(--rummy-shadow-lift), inset 0 1px 0 rgba(255, 255, 255, 0.94) !important;
+}
+
+.playing-card.selected {
+  border-color: rgba(216, 169, 65, 0.96) !important;
+  box-shadow:
+    0 0 0 2px rgba(246, 217, 138, 0.22),
+    0 12px 24px rgba(216, 169, 65, 0.26),
+    0 20px 32px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94) !important;
+}
+
+.playing-card.hint-ready {
+  border-color: rgba(123, 216, 143, 0.95) !important;
+  box-shadow:
+    0 0 0 2px rgba(123, 216, 143, 0.16),
+    0 0 18px rgba(123, 216, 143, 0.2),
+    var(--rummy-shadow-card) !important;
+}
+
+.playing-card.hint-near {
+  border-color: rgba(246, 217, 138, 0.94) !important;
+  box-shadow:
+    0 0 0 2px rgba(246, 217, 138, 0.14),
+    0 0 18px rgba(246, 217, 138, 0.18),
+    var(--rummy-shadow-card) !important;
+}
+
+.queen-spades-card {
+  border-color: rgba(138, 30, 39, 0.74) !important;
+  box-shadow:
+    0 0 0 2px rgba(138, 30, 39, 0.12),
+    0 0 18px rgba(216, 169, 65, 0.22),
+    var(--rummy-shadow-card) !important;
+}
+
+.card-corner {
+  font-weight: 950;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.56);
+}
+
+.card-center-suit {
+  opacity: 0.14;
+}
+
+.stock-area,
+.discard-area {
+  border-radius: var(--rummy-radius-md);
+}
+
+.stock-area.action-ready,
+.discard-area.discard-ready,
+.meld-display.layoff-ready,
+.human-area.active,
+.ai-row.seat-active,
+.score-card.active {
+  border-color: var(--rummy-border-strong) !important;
+  box-shadow:
+    0 0 0 1px rgba(246, 217, 138, 0.14),
+    0 0 24px rgba(246, 217, 138, 0.14),
+    var(--rummy-shadow-soft),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.discard-row {
+  border-color: rgba(246, 217, 138, 0.14);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.meld-display {
+  border-radius: var(--rummy-radius-md);
+}
+
+.meld-title,
+.ai-label small,
+.score-meta,
+.hand-actions span,
+.drawer-copy span {
+  color: var(--rummy-muted);
+}
+
+.ai-label b,
+.human-name,
+.score-name,
+.drawer-copy b {
+  color: var(--rummy-cream);
+}
+
+.human-area,
+.ai-row,
+.score-card {
+  border-radius: var(--rummy-radius-lg);
+}
+
+.score-value,
+.history-delta-total b {
+  color: var(--rummy-gold-300);
+}
+
+.mobile-turn-actions {
+  background:
+    linear-gradient(180deg, rgba(255, 247, 221, 0.06), rgba(0, 0, 0, 0.1)),
+    rgba(5, 15, 10, 0.78) !important;
+}
+
+@media (max-width: 640px) {
+  .top-bar,
+  .message,
+  .stock-area,
+  .discard-area,
+  .table-meld-layer .meld-section,
+  .human-area,
+  .mobile-turn-actions {
+    backdrop-filter: blur(10px);
+  }
+
+  .action-button {
+    min-height: 42px;
+    font-size: 12px !important;
+  }
+
+  .mobile-organize-actions .action-button {
+    min-height: 34px;
+    font-size: 11px !important;
+  }
+
+  .human-area {
+    background:
+      linear-gradient(180deg, rgba(255, 247, 221, 0.06), rgba(0, 0, 0, 0.14)),
+      rgba(5, 15, 10, 0.86) !important;
+  }
+
+  .human-area .hand-row .playing-card:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .human-area .hand-row .playing-card.selected {
+    transform: translateY(-10px) scale(1.025);
+  }
+}
+
+/* Adaptive layout architecture v2.
+   Final responsive pass: device families get intentional grid systems instead
+   of inheriting a compressed desktop layout. */
+
+.app-shell {
+  --layout-edge: clamp(8px, 2vw, 28px);
+  --layout-gap: clamp(8px, 1.3vw, 18px);
+  --surface-max: min(100% - (var(--layout-edge) * 2), 1680px);
+  --table-card-w: clamp(58px, 5vw, 78px);
+  --table-card-h: calc(var(--table-card-w) * 1.42);
+}
+
+.top-bar,
+.message,
+.game-surface {
+  width: var(--surface-max);
+  max-width: var(--surface-max);
+}
+
+.game-surface {
+  container-type: inline-size;
+  margin-inline: auto;
+  gap: var(--layout-gap);
+}
+
+.table-area,
+.hand-row,
+.meld-grid,
+.discard-row,
+.opponent-seats {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.stock-area .card-back-face,
+.empty-stock,
+.discard-row .discard-card-wrap:first-child .playing-card {
+  width: var(--table-card-w) !important;
+  height: var(--table-card-h) !important;
+}
+
+.discard-row .playing-card {
+  width: calc(var(--table-card-w) * 0.72) !important;
+  height: calc(var(--table-card-h) * 0.72) !important;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    --layout-edge: clamp(6px, 2.2vw, 10px);
+    --layout-gap: clamp(4px, 1dvh, 7px);
+    --surface-max: 100vw;
+    --table-card-w: clamp(58px, 16vw, 68px);
+    height: 100dvh;
+    max-height: 100dvh;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: var(--layout-gap);
+    padding: max(4px, env(safe-area-inset-top)) 0 0;
+    overflow: hidden;
+  }
+
+  .top-bar,
+  .message {
+    width: calc(100vw - (var(--layout-edge) * 2));
+    max-width: none;
+    margin-inline: var(--layout-edge);
+  }
+
+  .top-bar {
+    min-height: 40px;
+    padding: 6px 8px;
+  }
+
+  .title {
+    font-size: clamp(20px, 5.8vw, 27px);
+  }
+
+  .message {
+    min-height: 24px;
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+
+  .game-surface {
+    width: 100vw;
+    height: 100%;
+    max-width: none;
+    min-height: 0;
+    display: grid;
+    grid-template-areas:
+      "opponents"
+      "table"
+      "melds"
+      "player";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows:
+      minmax(44px, 6.2dvh)
+      minmax(118px, 17dvh)
+      0
+      minmax(0, 1fr);
+    gap: var(--layout-gap);
+    padding: 7px var(--layout-edge) 0;
+    overflow: hidden;
+  }
+
+  .game-surface.has-table-melds {
+    grid-template-rows:
+      minmax(44px, 6.2dvh)
+      minmax(110px, 15.5dvh)
+      minmax(108px, 16dvh)
+      minmax(0, 1fr);
+  }
+
+  .opponent-seats {
+    grid-area: opponents;
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 1px 2px;
+  }
+
+  .opponent-seats .ai-row {
+    flex: 0 0 clamp(148px, 47vw, 172px);
+    min-width: 0;
+  }
+
+  .table-zone {
+    grid-area: table;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .table-area {
+    height: 100%;
+    display: grid;
+    grid-template-columns: minmax(72px, 24vw) minmax(0, 1fr);
+    gap: clamp(6px, 2vw, 9px);
+    align-items: stretch;
+    margin: 0;
+  }
+
+  .stock-area,
+  .discard-area {
+    padding: clamp(6px, 1.8vw, 8px);
+  }
+
+  .discard-row {
+    height: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .table-meld-layer {
+    grid-area: melds;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .table-meld-layer .meld-section {
+    height: calc(100% - 34px);
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .meld-grid {
+    height: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .player-zone {
+    grid-area: player;
+    min-height: 0;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .human-area {
+    height: 100%;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: clamp(5px, 1dvh, 8px);
+    padding: 8px 8px max(8px, env(safe-area-inset-bottom));
+    overflow: hidden;
+  }
+
+  .hand-row {
+    height: 100%;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+}
+
+@media (max-width: 640px) and (max-height: 720px) {
+  .app-shell {
+    --table-card-w: clamp(52px, 14.8vw, 60px);
+  }
+
+  .game-surface {
+    grid-template-rows:
+      minmax(40px, 6dvh)
+      minmax(92px, 14dvh)
+      0
+      minmax(0, 1fr);
+  }
+
+  .game-surface.has-table-melds {
+    grid-template-rows:
+      minmax(40px, 6dvh)
+      minmax(86px, 13dvh)
+      minmax(90px, 15dvh)
+      minmax(0, 1fr);
+  }
+
+  .meld-display {
+    height: 60px;
+  }
+}
+
+@media (max-width: 640px) and (orientation: landscape) {
+  .app-shell {
+    --table-card-w: clamp(50px, 8vw, 62px);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .message {
+    display: none;
+  }
+
+  .game-surface {
+    grid-template-areas:
+      "opponents table table"
+      "melds table table"
+      "player player player";
+    grid-template-columns: minmax(150px, 30vw) minmax(0, 1fr) minmax(0, 0.75fr);
+    grid-template-rows: minmax(42px, auto) minmax(74px, 1fr) minmax(136px, 1.15fr);
+  }
+
+  .opponent-seats {
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .opponent-seats .ai-row {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .human-area {
+    grid-template-columns: minmax(0, 1fr) minmax(190px, 32vw);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+      "header actions"
+      "hand actions";
+  }
+
+  .human-header {
+    grid-area: header;
+  }
+
+  .hand-scroll-wrap {
+    grid-area: hand;
+  }
+
+  .mobile-turn-actions {
+    grid-area: actions;
+    grid-template-columns: 1fr;
+    align-content: center;
+  }
+
+  .mobile-organize-actions {
+    grid-column: auto;
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .app-shell {
+    --layout-edge: clamp(10px, 2vw, 20px);
+    --surface-max: min(100% - (var(--layout-edge) * 2), 980px);
+    --table-card-w: clamp(66px, 8vw, 78px);
+    min-height: 100svh;
+    overflow-x: hidden;
+  }
+
+  .game-surface {
+    min-height: auto;
+    display: grid;
+    grid-template-areas:
+      "opponents opponents"
+      "table table"
+      "melds melds"
+      "player player"
+      "drawers drawers";
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto minmax(200px, auto) auto auto auto;
+    padding: clamp(20px, 3vw, 34px);
+  }
+
+  .opponent-seats {
+    grid-area: opponents;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--layout-gap);
+  }
+
+  .table-zone {
+    grid-area: table;
+  }
+
+  .table-area {
+    width: min(100%, 760px);
+    margin-inline: auto;
+  }
+
+  .table-meld-layer {
+    grid-area: melds;
+  }
+
+  .table-meld-layer .meld-grid {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .player-zone {
+    grid-area: player;
+  }
+
+  .desktop-drawers {
+    grid-area: drawers;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .human-area {
+    max-width: none;
+  }
+
+  .human-area .hand-row {
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-shell {
+    --surface-max: min(100% - (var(--layout-edge) * 2), 1720px);
+    --table-card-w: clamp(68px, 4.6vw, 82px);
+  }
+
+  .game-surface {
+    display: grid;
+    grid-template-areas:
+      "opponents table drawers"
+      "opponents melds drawers"
+      "player player player";
+    grid-template-columns:
+      minmax(210px, clamp(230px, 18vw, 320px))
+      minmax(440px, 1fr)
+      minmax(190px, clamp(210px, 16vw, 290px));
+    grid-template-rows: minmax(220px, auto) minmax(112px, auto) auto;
+    align-items: stretch;
+    min-height: clamp(700px, calc(100svh - 130px), 880px);
+    padding: clamp(28px, 3vw, 54px);
+  }
+
+  .opponent-seats {
+    grid-area: opponents;
+    display: grid;
+    align-content: center;
+    gap: var(--layout-gap);
+  }
+
+  .table-zone {
+    grid-area: table;
+    align-self: center;
+    justify-self: center;
+    width: 100%;
+  }
+
+  .table-area {
+    width: min(100%, 820px);
+    margin-inline: auto;
+    justify-content: center;
+  }
+
+  .table-meld-layer {
+    grid-area: melds;
+    align-self: start;
+  }
+
+  .table-meld-layer .meld-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow: visible;
+  }
+
+  .player-zone {
+    grid-area: player;
+  }
+
+  .desktop-drawers {
+    grid-area: drawers;
+    align-self: center;
+  }
+
+  .human-area {
+    max-width: min(100%, 1120px);
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 1500px) {
+  .app-shell {
+    --layout-edge: clamp(24px, 3vw, 54px);
+    --table-card-w: clamp(74px, 4vw, 88px);
+  }
+
+  .game-surface {
+    grid-template-columns:
+      minmax(280px, 340px)
+      minmax(620px, 1fr)
+      minmax(260px, 330px);
+    min-height: min(900px, calc(100svh - 132px));
+  }
+
+  .table-area {
+    width: min(100%, 920px);
+  }
+
+  .human-area {
+    max-width: 1260px;
+  }
+}
+
+@container (min-width: 1200px) {
+  .table-meld-layer .meld-display {
+    min-width: clamp(176px, 14cqw, 230px);
+  }
+
+  .opponent-seats .ai-row {
+    min-width: 0;
+  }
+}
+
+/* Interaction and motion polish.
+   Fast, tactile feedback for card-game actions without adding heavy animation
+   loops or changing game state behavior. */
+
+:root {
+  --motion-snap: 110ms;
+  --motion-quick: 170ms;
+  --motion-smooth: 260ms;
+  --motion-ease-out: cubic-bezier(.16, 1, .3, 1);
+  --motion-ease-in-out: cubic-bezier(.4, 0, .2, 1);
+}
+
+@keyframes noticeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.985);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes invalidShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+
+  22% {
+    transform: translateX(-5px);
+  }
+
+  44% {
+    transform: translateX(4px);
+  }
+
+  66% {
+    transform: translateX(-2px);
+  }
+}
+
+@keyframes activePulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(246, 217, 138, 0.12),
+      0 0 18px rgba(246, 217, 138, 0.1),
+      var(--rummy-shadow-soft),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(246, 217, 138, 0.28),
+      0 0 28px rgba(246, 217, 138, 0.2),
+      var(--rummy-shadow-soft),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+}
+
+@keyframes cardSelectPop {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+
+  60% {
+    transform: translateY(-12px) scale(1.035);
+  }
+
+  100% {
+    transform: translateY(-9px) scale(1.02);
+  }
+}
+
+@keyframes targetReadySweep {
+  0% {
+    background-position: 120% 50%;
+  }
+
+  100% {
+    background-position: -20% 50%;
+  }
+}
+
+.message {
+  animation: noticeIn var(--motion-quick) var(--motion-ease-out) both;
+}
+
+.message.error {
+  animation: noticeIn var(--motion-snap) var(--motion-ease-out) both, invalidShake 240ms var(--motion-ease-in-out) 80ms both;
+}
+
+.action-button {
+  transform: translateZ(0);
+  transition:
+    transform var(--motion-snap) var(--motion-ease-out),
+    filter var(--motion-snap) var(--motion-ease-out),
+    box-shadow var(--motion-snap) var(--motion-ease-out),
+    opacity var(--motion-snap) linear !important;
+}
+
+.action-button:hover:not(:disabled),
+.action-button:focus-visible:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.action-button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
+  filter: brightness(0.98);
+}
+
+.playing-card,
+.card-back-face {
+  transform: translateZ(0);
+  transition:
+    transform var(--motion-quick) var(--motion-ease-out),
+    box-shadow var(--motion-quick) var(--motion-ease-out),
+    border-color var(--motion-snap) linear,
+    filter var(--motion-snap) linear !important;
+}
+
+.playing-card:hover:not(:disabled) {
+  transform: translateY(-5px) scale(1.012);
+}
+
+.playing-card:active:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.02);
+}
+
+.human-area .hand-row .playing-card.selected {
+  animation: cardSelectPop 190ms var(--motion-ease-out) both;
+  filter: saturate(1.04) brightness(1.02);
+}
+
+.human-area .hand-row .playing-card.hint-ready:not(.selected),
+.human-area .hand-row .playing-card.hint-near:not(.selected) {
+  transform: translateY(-3px);
+}
+
+.human-area .hand-row .playing-card[draggable="true"]:active {
+  cursor: grabbing;
+  z-index: 20;
+}
+
+.turn-human.phase-draw .stock-area.action-ready,
+.turn-human.phase-play .discard-area.discard-ready,
+.turn-human.phase-play .human-area.active,
+.turn-opponent .opponent-seats .ai-row.seat-active {
+  animation: activePulse 1.45s var(--motion-ease-in-out) infinite;
+}
+
+.turn-human.phase-draw .stock-area.action-ready,
+.turn-human.phase-play .discard-area.discard-ready,
+.meld-display.layoff-ready,
+.drop-zone {
+  transition:
+    transform var(--motion-quick) var(--motion-ease-out),
+    border-color var(--motion-snap) linear,
+    box-shadow var(--motion-quick) var(--motion-ease-out),
+    background var(--motion-quick) var(--motion-ease-out);
+}
+
+.turn-human.phase-draw .stock-area.action-ready:hover,
+.turn-human.phase-play .discard-area.discard-ready:hover,
+.meld-display.layoff-ready:hover {
+  transform: translateY(-2px);
+  border-color: rgba(246, 217, 138, 0.72) !important;
+}
+
+.meld-display.layoff-ready,
+.discard-area.discard-ready,
+.stock-area.action-ready {
+  background-image:
+    linear-gradient(110deg, transparent 0%, rgba(246, 217, 138, 0.08) 42%, rgba(246, 217, 138, 0.16) 50%, rgba(246, 217, 138, 0.08) 58%, transparent 100%),
+    linear-gradient(145deg, rgba(255, 247, 221, 0.07), rgba(255, 247, 221, 0.025)) !important;
+  background-size: 220% 100%, 100% 100% !important;
+  animation-name: targetReadySweep;
+  animation-duration: 2.2s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.discard-area.discard-ready .section-label,
+.stock-area.action-ready .section-label,
+.meld-display.layoff-ready .meld-title {
+  color: var(--rummy-gold-300);
+}
+
+.hand-row {
+  scroll-behavior: smooth;
+}
+
+.hand-row .playing-card {
+  backface-visibility: hidden;
+}
+
+.score-card,
+.ai-row,
+.human-area,
+.meld-display,
+.stock-area,
+.discard-area {
+  transition:
+    border-color var(--motion-quick) var(--motion-ease-out),
+    box-shadow var(--motion-quick) var(--motion-ease-out),
+    transform var(--motion-quick) var(--motion-ease-out),
+    background-color var(--motion-quick) var(--motion-ease-out);
+}
+
+.score-card.active,
+.ai-row.seat-active {
+  transform: translateY(-1px);
+}
+
+.score-value,
+.history-delta-total b,
+.score-net > span {
+  transition: color var(--motion-quick) var(--motion-ease-out), transform var(--motion-quick) var(--motion-ease-out);
+}
+
+.score-card.active .score-value {
+  transform: scale(1.04);
+}
+
+.discard-row .discard-card-wrap:first-child .playing-card {
+  transform-origin: 50% 80%;
+}
+
+.discard-row .discard-card-wrap:first-child .playing-card:hover:not(:disabled) {
+  transform: translateY(-4px) rotate(-1deg) scale(1.015);
+}
+
+.table-meld-layer .meld-display {
+  transform-origin: 50% 100%;
+}
+
+.waiting-turn-pill {
+  animation: noticeIn var(--motion-quick) var(--motion-ease-out) both;
+}
+
+@media (hover: none) {
+  .playing-card:hover:not(:disabled),
+  .turn-human.phase-draw .stock-area.action-ready:hover,
+  .turn-human.phase-play .discard-area.discard-ready:hover,
+  .meld-display.layoff-ready:hover,
+  .action-button:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .human-area .hand-row .playing-card.selected {
+    transform: translateY(-10px) scale(1.025);
+  }
+}
+
+@media (max-width: 640px) {
+  .playing-card,
+  .card-back-face,
+  .action-button {
+    transition-duration: var(--motion-snap) !important;
+  }
+
+  .turn-human.phase-draw .stock-area.action-ready,
+  .turn-human.phase-play .discard-area.discard-ready,
+  .turn-human.phase-play .human-area.active,
+  .turn-opponent .opponent-seats .ai-row.seat-active {
+    animation-duration: 1.8s;
+  }
+}
+
+/* UX audit production correction layer.
+   The old prototype showed too much at once and let secondary UI compete with
+   the table. This layer prioritizes: current turn task, table piles, meld
+   visibility, hand usability, then secondary drawers. */
+
+.app-shell {
+  overflow-x: hidden;
+}
+
+.pile-action-hint {
+  position: relative;
+  z-index: 2;
+  margin-top: var(--rummy-space-2);
+  color: rgba(255, 247, 221, 0.72);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.table-area {
+  isolation: isolate;
+}
+
+.table-awaiting-draw .stock-area,
+.table-awaiting-discard .discard-area {
+  position: relative;
+}
+
+.table-awaiting-draw .stock-area::after,
+.table-awaiting-discard .discard-area::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: inherit;
+  border: 1px solid rgba(246, 217, 138, 0.34);
+  pointer-events: none;
+}
+
+.drop-zones {
+  display: none !important;
+}
+
+@media (min-width: 1024px) and (hover: hover) {
+  .drop-zones.drop-zones-active {
+    display: grid !important;
+    max-width: min(100%, 820px);
+    margin: var(--rummy-space-3) auto 0;
+    opacity: 0.72;
+  }
+
+  .drop-zones.drop-zones-active:focus-within,
+  .drop-zones.drop-zones-active:hover {
+    opacity: 1;
+  }
+
+  .drop-zone {
+    min-height: 36px;
+    padding: 8px 12px;
+    border-radius: var(--rummy-radius-sm);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
+.desktop-drawers details:not([open]) {
+  opacity: 0.78;
+}
+
+.desktop-drawers summary {
+  min-height: 42px;
+}
+
+.drawer-copy {
+  line-height: 1.35;
+}
+
+.game-surface {
+  overflow: hidden;
+}
+
+.opponent-seats,
+.table-zone,
+.table-meld-layer,
+.player-zone,
+.desktop-drawers {
+  min-width: 0;
+}
+
+.table-meld-layer .meld-grid {
+  align-content: start;
+}
+
+.table-meld-layer .meld-display {
+  overflow: hidden;
+}
+
+.human-area {
+  isolation: isolate;
+}
+
+.human-header {
+  min-width: 0;
+}
+
+.human-name,
+.ai-label span,
+.score-details {
+  min-width: 0;
+}
+
+.human-name,
+.ai-label b,
+.score-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hand-actions {
+  min-width: 0;
+}
+
+.hand-actions span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hand-scroll-wrap {
+  min-width: 0;
+}
+
+.hand-row {
+  touch-action: pan-x;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    --layout-edge: max(7px, env(safe-area-inset-left));
+    background-attachment: scroll;
+  }
+
+  .top-bar {
+    gap: 6px;
+  }
+
+  .header-right {
+    flex: 0 0 auto;
+  }
+
+  .message {
+    max-width: calc(100vw - 14px);
+  }
+
+  .game-surface {
+    border-radius: 20px 20px 0 0;
+  }
+
+  .pile-action-hint {
+    display: none;
+  }
+
+  .stock-area,
+  .discard-area {
+    justify-items: center;
+  }
+
+  .discard-area {
+    overflow: hidden;
+  }
+
+  .discard-row {
+    width: 100%;
+  }
+
+  .table-meld-layer .meld-display {
+    min-width: min(142px, 48vw);
+  }
+
+  .human-header {
+    min-height: 28px;
+  }
+
+  .hand-actions {
+    max-width: 44%;
+  }
+
+  .mobile-turn-actions {
+    grid-auto-rows: minmax(34px, auto);
+  }
+
+  .mobile-turn-actions .action-button {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .game-surface {
+    overflow: visible;
+  }
+
+  .table-meld-layer .meld-display {
+    flex: 1 1 168px;
+    max-width: 240px;
+  }
+
+  .desktop-drawers details {
+    min-width: 0;
+  }
+
+  .desktop-drawers .score-history {
+    max-height: 220px;
+    overflow: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .game-surface {
+    overflow: visible;
+  }
+
+  .desktop-drawers {
+    max-width: 100%;
+  }
+
+  .table-zone {
+    display: grid;
+    align-items: center;
+  }
+
+  .table-area {
+    align-items: stretch;
+  }
+
+  .stock-area,
+  .discard-area {
+    min-height: 158px;
+  }
+
+  .table-meld-layer {
+    min-height: 108px;
+  }
+
+  .human-area {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1500px) {
+  .desktop-drawers {
+    align-self: stretch;
+    align-content: center;
+  }
+
+  .opponent-seats {
+    align-content: center;
+  }
+}
+
+/* Real tabletop layout engine.
+   Cards and melds are protected game objects: they keep aspect ratio and
+   readable minimums. The board can scroll/pan, but cards cannot be squeezed. */
+
+.app-shell {
+  --game-card-w: clamp(64px, 5vw, 82px);
+  --game-card-ratio: 1.42;
+  --game-card-h: calc(var(--game-card-w) * var(--game-card-ratio));
+  --meld-card-w: clamp(42px, 3.2vw, 54px);
+  --meld-card-h: calc(var(--meld-card-w) * var(--game-card-ratio));
+  --table-board-min: 520px;
+}
+
+.card-table-board {
+  grid-area: board;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: visible;
+  z-index: 3;
+}
+
+.card-table-scroll {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto;
+  align-content: start;
+  gap: clamp(12px, 2vw, 18px);
+  width: 100%;
+  min-width: min(100%, var(--table-board-min));
+  overflow: visible;
+}
+
+.table-zone,
+.table-meld-layer {
+  width: 100%;
+  min-width: 0;
+  overflow: visible !important;
+}
+
+.table-area {
+  display: grid !important;
+  grid-template-columns: minmax(calc(var(--game-card-w) + 28px), 0.32fr) minmax(calc(var(--game-card-w) * 2.6), 0.68fr);
+  align-items: stretch;
+  justify-content: center;
+  gap: clamp(14px, 3vw, 32px);
+  width: min(100%, 720px);
+  min-height: calc(var(--game-card-h) + 54px);
+  margin: 0 auto;
+}
+
+.stock-area,
+.discard-area {
+  min-width: 0;
+  min-height: calc(var(--game-card-h) + 48px);
+  display: grid !important;
+  grid-template-rows: auto minmax(var(--game-card-h), 1fr) auto;
+  justify-items: center;
+  align-items: center;
+  overflow: visible !important;
+}
+
+.stock-area .card-back-face,
+.empty-stock,
+.discard-row .discard-card-wrap:first-child .playing-card {
+  width: var(--game-card-w) !important;
+  height: var(--game-card-h) !important;
+  min-width: var(--game-card-w) !important;
+  min-height: var(--game-card-h) !important;
+  aspect-ratio: 5 / 7.1;
+}
+
+.discard-row {
+  width: 100%;
+  min-height: var(--game-card-h);
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  padding: 8px 10px;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  scrollbar-width: none;
+}
+
+.discard-row .discard-card-wrap {
+  flex: 0 0 auto;
+}
+
+.discard-row .playing-card {
+  width: calc(var(--game-card-w) * 0.74) !important;
+  height: calc(var(--game-card-h) * 0.74) !important;
+  min-width: calc(var(--game-card-w) * 0.74) !important;
+  min-height: calc(var(--game-card-h) * 0.74) !important;
+  aspect-ratio: 5 / 7.1;
+  margin-left: calc(var(--game-card-w) * -0.22);
+}
+
+.discard-row .discard-card-wrap:first-child .playing-card {
+  margin-left: 0;
+}
+
+.table-meld-layer {
+  min-height: auto;
+}
+
+.table-meld-layer-empty {
+  opacity: 0.84;
+}
+
+.empty-meld-row {
+  min-height: 54px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed rgba(246, 217, 138, 0.22);
+  border-radius: var(--rummy-radius-md);
+  color: rgba(255, 247, 221, 0.54);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.table-meld-layer .meld-section {
+  height: auto !important;
+  min-height: 0;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.meld-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 184px), max-content));
+  align-items: start;
+  justify-content: center;
+  gap: clamp(10px, 1.6vw, 16px);
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 2px;
+}
+
+.meld-display {
+  width: max-content !important;
+  min-width: 0 !important;
+  max-width: min(100%, 360px);
+  height: auto !important;
+  min-height: calc(var(--meld-card-h) + 34px);
+  padding: 8px 10px;
+  overflow: visible !important;
+}
+
+.meld-cards {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  gap: 5px;
+  padding: 1px 2px 4px;
+  scrollbar-width: none;
+}
+
+.meld-cards .playing-card,
+.table-meld-layer.expanded .meld-cards .playing-card {
+  width: var(--meld-card-w) !important;
+  height: var(--meld-card-h) !important;
+  min-width: var(--meld-card-w) !important;
+  min-height: var(--meld-card-h) !important;
+  aspect-ratio: 5 / 7.1;
+  margin-left: 0 !important;
+}
+
+.flying-cards {
+  pointer-events: none;
+  z-index: 30;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    --game-card-w: 68px;
+    --meld-card-w: 42px;
+    --table-board-min: 520px;
+  }
+
+  .game-surface {
+    grid-template-areas:
+      "opponents"
+      "board"
+      "player" !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: minmax(44px, auto) minmax(0, 1fr) minmax(230px, 42dvh) !important;
+    overflow: hidden !important;
+  }
+
+  .card-table-board {
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+
+  .card-table-board::-webkit-scrollbar {
+    display: none;
+  }
+
+  .card-table-scroll {
+    width: max-content;
+    min-width: var(--table-board-min);
+    padding: 0 4px 8px;
+  }
+
+  .table-area {
+    width: min(100%, 500px);
+    grid-template-columns: 116px minmax(260px, 1fr);
+    gap: 14px;
+  }
+
+  .stock-area,
+  .discard-area {
+    min-height: calc(var(--game-card-h) + 46px);
+  }
+
+  .table-meld-toggle {
+    min-height: 32px;
+  }
+
+  .empty-meld-row {
+    min-height: 48px;
+  }
+
+  .meld-grid {
+    grid-template-columns: repeat(auto-fit, minmax(164px, max-content));
+    justify-content: start;
+  }
+
+  .meld-display {
+    max-width: 260px;
+  }
+
+  .player-zone {
+    grid-area: player;
+    overflow: hidden !important;
+  }
+}
+
+@media (max-width: 640px) and (max-height: 720px) {
+  .app-shell {
+    --game-card-w: 60px;
+    --meld-card-w: 36px;
+    --table-board-min: 480px;
+  }
+
+  .game-surface {
+    grid-template-rows: minmax(40px, auto) minmax(0, 1fr) minmax(198px, 40dvh) !important;
+  }
+
+  .table-area {
+    width: min(100%, 460px);
+    grid-template-columns: 100px minmax(240px, 1fr);
+  }
+}
+
+@media (max-width: 640px) and (orientation: landscape) {
+  .app-shell {
+    --game-card-w: 58px;
+    --meld-card-w: 34px;
+    --table-board-min: 560px;
+  }
+
+  .game-surface {
+    grid-template-areas:
+      "opponents board"
+      "player player" !important;
+    grid-template-columns: minmax(150px, 28vw) minmax(0, 1fr) !important;
+    grid-template-rows: minmax(0, 1fr) minmax(138px, 38dvh) !important;
+  }
+
+  .card-table-board {
+    max-height: 100%;
+  }
+}
+
+@media (min-width: 641px) {
+  .game-surface {
+    grid-template-areas:
+      "opponents board drawers"
+      "player player player" !important;
+    grid-template-rows: minmax(0, 1fr) auto !important;
+  }
+
+  .card-table-board {
+    align-self: center;
+    justify-self: stretch;
+  }
+
+  .card-table-scroll {
+    min-width: 0;
+  }
+
+  .table-area {
+    width: min(100%, 760px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .table-area {
+    width: min(100%, 860px);
+  }
+
+  .meld-grid {
+    grid-template-columns: repeat(auto-fit, minmax(188px, max-content));
+  }
+}
+
+@media (min-width: 1500px) {
+  .app-shell {
+    --game-card-w: 88px;
+    --meld-card-w: 54px;
+  }
+
+  .table-area {
+    width: min(100%, 960px);
+  }
+}
+
+/* Card rendering contract: gameplay containers may scroll, but cards keep a readable fixed ratio. */
+.app-shell {
+  --card-aspect: 1.42;
+  --hand-card-w: clamp(72px, 17vw, 92px);
+  --hand-card-min-w: 64px;
+  --table-card-min-w: 58px;
+  --meld-card-min-w: 38px;
+}
+
+.playing-card,
+.card-back-face {
+  --card-w: var(--game-card-w, 76px);
+  --card-min-w: var(--table-card-min-w, 58px);
+  inline-size: var(--card-w) !important;
+  block-size: calc(var(--card-w) * var(--card-aspect)) !important;
+  min-inline-size: var(--card-min-w) !important;
+  min-block-size: calc(var(--card-min-w) * var(--card-aspect)) !important;
+  aspect-ratio: 5 / 7.1 !important;
+  flex: 0 0 auto !important;
+  box-sizing: border-box;
+  contain: layout paint;
+}
+
+.playing-card {
+  touch-action: manipulation;
+  overflow: clip;
+}
+
+.card-back-face {
+  overflow: clip;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+}
+
+.playing-card-small,
+.card-back-face.playing-card-small {
+  --card-w: var(--meld-card-w, 50px);
+  --card-min-w: var(--meld-card-min-w, 38px);
+  border-radius: 8px;
+}
+
+.playing-card .card-corner {
+  font-size: var(--card-rank-size, clamp(15px, calc(var(--card-w) * 0.28), 22px)) !important;
+}
+
+.playing-card .card-center-suit {
+  font-size: calc(var(--card-rank-size, clamp(15px, calc(var(--card-w) * 0.28), 22px)) + 9px) !important;
+}
+
+.playing-card-small .card-corner,
+.meld-cards .playing-card .card-corner,
+.discard-row .discard-card-wrap:not(:first-child) .playing-card .card-corner {
+  font-size: clamp(10px, calc(var(--card-w) * 0.3), 15px) !important;
+}
+
+.playing-card-small .card-center-suit,
+.meld-cards .playing-card .card-center-suit,
+.discard-row .discard-card-wrap:not(:first-child) .playing-card .card-center-suit {
+  font-size: clamp(15px, calc(var(--card-w) * 0.48), 24px) !important;
+}
+
+.card-table-board,
+.card-table-scroll,
+.table-meld-layer,
+.meld-section,
+.meld-grid,
+.meld-display,
+.stock-area,
+.discard-area,
+.human-area,
+.hand-scroll-wrap {
+  min-width: 0;
+  overflow: visible !important;
+}
+
+.game-surface {
+  min-height: 0;
+}
+
+.table-area {
+  overflow: visible !important;
+}
+
+.stock-area .card-back-face,
+.stock-area .empty-stock,
+.discard-row .discard-card-wrap:first-child .playing-card {
+  --card-w: var(--game-card-w, 76px);
+  --card-min-w: var(--table-card-min-w, 58px);
+}
+
+.discard-row {
+  min-height: calc((var(--game-card-w, 76px) * var(--card-aspect)) + 30px) !important;
+  align-items: center !important;
+  overflow-x: auto !important;
+  overflow-y: clip !important;
+  overscroll-behavior-inline: contain;
+  scroll-padding-inline: 12px;
+  padding-block: 12px 10px !important;
+}
+
+.discard-row .discard-card-wrap {
+  position: relative;
+  flex: 0 0 auto !important;
+  min-inline-size: max-content;
+  padding-block-start: 12px;
+}
+
+.discard-row .playing-card {
+  --card-w: calc(var(--game-card-w, 76px) * 0.76);
+  --card-min-w: 44px;
+  margin-left: calc(var(--game-card-w, 76px) * -0.18) !important;
+}
+
+.discard-row .discard-card-wrap:first-child .playing-card {
+  margin-left: 0 !important;
+}
+
+.discard-row .discard-card-wrap:not(:first-child) .playing-card .card-corner-bottom {
+  opacity: 0;
+}
+
+.discard-row .top-label {
+  top: 0;
+}
+
+.meld-grid {
+  grid-auto-rows: max-content;
+  overflow: visible !important;
+}
+
+.meld-display {
+  min-block-size: calc(var(--meld-card-w, 50px) * var(--card-aspect) + 42px) !important;
+  overflow: visible !important;
+}
+
+.meld-cards {
+  max-inline-size: 100%;
+  min-block-size: calc(var(--meld-card-w, 50px) * var(--card-aspect) + 10px);
+  overflow-x: auto !important;
+  overflow-y: clip !important;
+  overscroll-behavior-inline: contain;
+}
+
+.meld-cards .playing-card,
+.table-meld-layer.expanded .meld-cards .playing-card {
+  --card-w: var(--meld-card-w, 50px);
+  --card-min-w: var(--meld-card-min-w, 38px);
+  margin-left: 0 !important;
+}
+
+.player-zone {
+  overflow: visible !important;
+}
+
+.hand-row {
+  --hand-card-overlap: clamp(22px, 7vw, 38px);
+  min-block-size: calc((var(--hand-card-w) * var(--card-aspect)) + 34px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  overflow-x: auto !important;
+  overflow-y: clip !important;
+  overscroll-behavior-inline: contain;
+  scroll-padding-inline: 18px;
+  padding: 20px max(18px, env(safe-area-inset-right)) 14px max(18px, env(safe-area-inset-left)) !important;
+}
+
+.human-area .hand-row .playing-card {
+  --card-w: var(--hand-card-w);
+  --card-min-w: var(--hand-card-min-w);
+  margin-left: calc(var(--hand-card-overlap) * -1) !important;
+  position: relative;
+  z-index: 1;
+}
+
+.human-area .hand-row .playing-card:first-child {
+  margin-left: 0 !important;
+}
+
+.human-area .hand-row .playing-card.selected {
+  z-index: 8;
+  transform: translateY(-14px) scale(1.025);
+}
+
+.human-area .hand-row .playing-card:not(.selected):hover:not(:disabled) {
+  z-index: 6;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    --game-card-w: 68px;
+    --hand-card-w: clamp(76px, 23vw, 94px);
+    --hand-card-min-w: 66px;
+    --meld-card-w: 44px;
+    --meld-card-min-w: 38px;
+  }
+
+  .game-surface {
+    overflow: clip !important;
+  }
+
+  .card-table-board {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .card-table-scroll {
+    overflow: visible !important;
+  }
+
+  .player-zone {
+    min-block-size: calc((var(--hand-card-w) * var(--card-aspect)) + 110px) !important;
+  }
+
+  .hand-row {
+    --hand-card-overlap: clamp(30px, 10vw, 44px);
+    justify-content: flex-start !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .app-shell {
+    --game-card-w: 62px;
+    --hand-card-w: clamp(70px, 24vw, 84px);
+    --hand-card-min-w: 62px;
+    --meld-card-w: 40px;
+  }
+}
+
+/* Tabletop surface map: stable game regions instead of stacked webpage sections. */
+.app-shell {
+  --table-gap: clamp(10px, 1.6vw, 18px);
+  --table-safe-pad: clamp(10px, 1.8vw, 22px);
+  --opponent-rail-h: clamp(76px, 10vh, 108px);
+  --player-hand-h: clamp(214px, 27vh, 292px);
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  overflow: clip;
+}
+
+.game-surface {
+  height: 100%;
+  min-height: 0;
+  display: grid !important;
+  grid-template-areas:
+    "opponents opponents opponents"
+    "board board drawers"
+    "player player player" !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(220px, 0.32fr) !important;
+  grid-template-rows: var(--opponent-rail-h) minmax(0, 1fr) minmax(var(--player-hand-h), auto) !important;
+  gap: var(--table-gap) !important;
+  padding: var(--table-safe-pad) !important;
+  overflow: clip !important;
+  align-items: stretch;
+}
+
+.opponent-seats {
+  grid-area: opponents !important;
+  min-width: 0;
+  min-height: 0;
+  display: grid !important;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 1fr);
+  align-items: stretch;
+  gap: clamp(8px, 1.2vw, 14px);
+  overflow-x: auto !important;
+  overflow-y: clip !important;
+  padding: 2px 2px 8px !important;
+  scroll-padding-inline: 12px;
+}
+
+.opponent-seats .ai-row {
+  min-width: 0;
+  height: 100%;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.opponent-seats .ai-cards {
+  justify-content: flex-end;
+  min-width: 74px;
+  overflow: clip;
+}
+
+.card-table-board {
+  grid-area: board !important;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  align-items: stretch;
+  overflow: auto !important;
+  border-radius: clamp(22px, 3vw, 36px);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.card-table-scroll {
+  min-width: min(100%, 760px);
+  min-height: min(100%, 430px);
+  width: 100%;
+  height: 100%;
+  display: grid !important;
+  grid-template-areas:
+    "melds piles";
+  grid-template-columns: minmax(320px, 1fr) minmax(250px, clamp(260px, 32%, 360px));
+  grid-template-rows: minmax(0, 1fr);
+  gap: clamp(12px, 1.6vw, 20px);
+  align-items: stretch;
+  padding: clamp(10px, 1.8vw, 20px);
+  overflow: visible !important;
+}
+
+.table-zone {
+  grid-area: piles !important;
+  min-width: 0;
+  min-height: 0;
+  height: auto !important;
+  display: grid !important;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-content: center;
+  overflow: visible !important;
+}
+
+.table-area {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0;
+  display: grid !important;
+  grid-template-columns: minmax(104px, 0.72fr) minmax(150px, 1fr) !important;
+  gap: clamp(12px, 1.5vw, 18px) !important;
+  align-items: stretch;
+  justify-content: stretch;
+  overflow: visible !important;
+}
+
+.stock-area,
+.discard-area {
+  min-width: 0;
+  min-height: calc((var(--game-card-w) * var(--card-aspect)) + 62px) !important;
+  display: grid;
+  grid-template-rows: auto minmax(calc(var(--game-card-w) * var(--card-aspect)), 1fr) auto;
+  align-items: center;
+  justify-items: center;
+  overflow: visible !important;
+}
+
+.discard-area {
+  justify-items: stretch;
+}
+
+.discard-row {
+  width: 100%;
+  justify-self: stretch;
+  align-self: center;
+}
+
+.drop-zones {
+  min-width: 0;
+  margin: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-self: end;
+}
+
+.drop-zone {
+  min-height: 42px;
+  display: grid;
+  place-items: center;
+}
+
+.table-meld-layer {
+  grid-area: melds !important;
+  min-width: 0;
+  min-height: 0;
+  height: auto !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
+  overflow: visible !important;
+}
+
+.table-meld-layer .meld-section {
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: visible !important;
+}
+
+.meld-grid {
+  min-height: 0;
+  max-height: none !important;
+  height: auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(178px, max-content));
+  grid-auto-rows: max-content;
+  align-content: start;
+  justify-content: start;
+  gap: clamp(10px, 1.4vw, 16px);
+  overflow: auto !important;
+  padding: 4px 4px 12px !important;
+  overscroll-behavior: contain;
+}
+
+.meld-display {
+  min-width: 178px !important;
+  max-width: 340px !important;
+  width: max-content !important;
+  align-self: start;
+}
+
+.meld-cards {
+  width: max-content;
+  max-width: min(100%, 310px);
+}
+
+.desktop-drawers {
+  grid-area: drawers !important;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  align-self: stretch;
+}
+
+.player-zone {
+  grid-area: player !important;
+  min-width: 0;
+  min-height: var(--player-hand-h) !important;
+  display: grid;
+  align-items: stretch;
+  overflow: visible !important;
+}
+
+.human-area {
+  min-height: 0 !important;
+  height: auto !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: clamp(8px, 1.1vw, 12px);
+  overflow: visible !important;
+}
+
+.human-header {
+  min-width: 0;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.hand-actions {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hand-scroll-wrap {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  align-items: stretch;
+  overflow: visible !important;
+}
+
+.hand-row {
+  align-self: stretch;
+  align-items: center !important;
+  border-radius: 20px;
+}
+
+.mobile-turn-actions {
+  align-self: end;
+}
+
+@media (min-width: 1280px) {
+  .game-surface {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(240px, 300px) !important;
+  }
+
+  .card-table-scroll {
+    grid-template-columns: minmax(420px, 1fr) minmax(290px, 360px);
+  }
+}
+
+@media (min-width: 1700px) {
+  .game-surface {
+    max-width: 1720px;
+    margin-inline: auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 1100px) {
+  .game-surface {
+    grid-template-areas:
+      "opponents"
+      "board"
+      "player" !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: var(--opponent-rail-h) minmax(0, 1fr) minmax(var(--player-hand-h), auto) !important;
+  }
+
+  .desktop-drawers {
+    display: none !important;
+  }
+
+  .card-table-scroll {
+    grid-template-columns: minmax(320px, 1fr) minmax(240px, 310px);
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    --table-safe-pad: 8px;
+    --opponent-rail-h: 66px;
+    --player-hand-h: clamp(238px, 36dvh, 316px);
+  }
+
+  .game-surface {
+    grid-template-rows: var(--opponent-rail-h) minmax(0, 1fr) minmax(var(--player-hand-h), auto) !important;
+    gap: 8px !important;
+  }
+
+  .opponent-seats {
+    grid-auto-columns: minmax(176px, 82vw);
+    padding-bottom: 4px !important;
+  }
+
+  .opponent-seats .ai-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .opponent-seats .ai-cards {
+    display: none;
+  }
+
+  .card-table-board {
+    border-radius: 22px;
+  }
+
+  .card-table-scroll {
+    min-width: 620px;
+    min-height: 390px;
+    grid-template-areas:
+      "melds piles";
+    grid-template-columns: minmax(340px, 1fr) 246px;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .table-area {
+    grid-template-columns: 92px 1fr !important;
+    gap: 10px !important;
+  }
+
+  .stock-area,
+  .discard-area {
+    min-height: calc((var(--game-card-w) * var(--card-aspect)) + 50px) !important;
+  }
+
+  .drop-zones {
+    gap: 8px;
+  }
+
+  .drop-zone {
+    min-height: 36px;
+    font-size: 10px;
+  }
+
+  .meld-grid {
+    grid-template-columns: repeat(auto-fill, minmax(154px, max-content));
+    gap: 8px;
+  }
+
+  .meld-display {
+    min-width: 154px !important;
+    max-width: 230px !important;
+  }
+
+  .human-area {
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    padding: 10px 10px calc(10px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .human-header {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .human-name {
+    min-width: 0;
+  }
+
+  .hand-actions {
+    justify-content: space-between;
+  }
+
+  .hand-actions > span {
+    flex: 1 1 100%;
+  }
+
+  .hand-actions .secondary-action {
+    display: none;
+  }
+
+  .mobile-turn-actions {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .mobile-turn-actions .action-button {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  .app-shell {
+    --opponent-rail-h: 54px;
+    --player-hand-h: clamp(150px, 42dvh, 210px);
+  }
+
+  .game-surface {
+    grid-template-areas:
+      "opponents board"
+      "player board" !important;
+    grid-template-columns: minmax(210px, 34vw) minmax(0, 1fr) !important;
+    grid-template-rows: var(--opponent-rail-h) minmax(var(--player-hand-h), 1fr) !important;
+  }
+
+  .card-table-scroll {
+    min-width: 560px;
+    min-height: 310px;
+  }
+}
+
+/* Bottom player area contract: info, hand, and actions occupy separate reserved rows. */
+.app-shell {
+  --hand-lift-space: 18px;
+  --hand-bottom-space: 12px;
+  --player-action-min-h: 52px;
+  --player-info-min-h: 48px;
+}
+
+.player-zone {
+  min-height: calc(
+    var(--player-info-min-h) +
+    (var(--hand-card-w) * var(--card-aspect)) +
+    var(--hand-lift-space) +
+    var(--hand-bottom-space) +
+    var(--player-action-min-h) +
+    34px
+  ) !important;
+  overflow: clip !important;
+}
+
+.human-area {
+  min-height: 100% !important;
+  display: grid !important;
+  grid-template-rows:
+    minmax(var(--player-info-min-h), auto)
+    minmax(calc((var(--hand-card-w) * var(--card-aspect)) + var(--hand-lift-space) + var(--hand-bottom-space)), 1fr)
+    auto !important;
+  gap: 10px !important;
+  overflow: clip !important;
+}
+
+.human-header {
+  grid-row: 1;
+  min-height: var(--player-info-min-h);
+  align-self: stretch;
+}
+
+.hand-actions {
+  justify-content: flex-end;
+}
+
+.hand-actions .action-button,
+.hand-actions .secondary-action,
+.hand-actions .light-action {
+  display: none !important;
+}
+
+.hand-scroll-wrap {
+  grid-row: 2;
+  min-height: calc((var(--hand-card-w) * var(--card-aspect)) + var(--hand-lift-space) + var(--hand-bottom-space)) !important;
+  align-self: stretch;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: clip !important;
+}
+
+.hand-scroll-wrap > div {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: clip;
+}
+
+.hand-helper {
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 4px 2px !important;
+}
+
+.hand-helper .action-button {
+  min-height: 30px;
+}
+
+.hand-row {
+  --hand-card-overlap: 0px;
+  min-height: calc((var(--hand-card-w) * var(--card-aspect)) + var(--hand-lift-space) + var(--hand-bottom-space)) !important;
+  max-height: calc((var(--hand-card-w) * var(--card-aspect)) + var(--hand-lift-space) + var(--hand-bottom-space)) !important;
+  height: calc((var(--hand-card-w) * var(--card-aspect)) + var(--hand-lift-space) + var(--hand-bottom-space)) !important;
+  align-self: stretch;
+  align-items: end !important;
+  gap: clamp(6px, 1.6vw, 12px) !important;
+  padding-block: var(--hand-lift-space) var(--hand-bottom-space) !important;
+  overflow-x: auto !important;
+  overflow-y: clip !important;
+  scroll-padding-inline: 18px;
+  contain: layout paint;
+}
+
+.human-area .hand-row .playing-card {
+  margin-left: 0 !important;
+  transform: none;
+  align-self: end;
+}
+
+.human-area .hand-row .playing-card:first-child {
+  margin-left: 0 !important;
+}
+
+.human-area .hand-row .playing-card.selected {
+  transform: translateY(calc(var(--hand-lift-space) * -0.78)) scale(1.02) !important;
+}
+
+.human-area .hand-row .playing-card.hint-ready:not(.selected),
+.human-area .hand-row .playing-card.hint-near:not(.selected),
+.human-area .hand-row .playing-card:hover:not(:disabled) {
+  transform: translateY(-3px) !important;
+}
+
+.mobile-turn-actions {
+  grid-row: 3;
+  min-height: var(--player-action-min-h);
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  align-items: stretch;
+  gap: 8px !important;
+  padding: 8px max(8px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)) !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+.mobile-organize-actions {
+  display: contents !important;
+}
+
+.mobile-turn-actions .action-button {
+  min-width: 0;
+  min-height: 44px !important;
+  width: 100%;
+  padding: 9px 10px !important;
+  white-space: normal;
+}
+
+.waiting-turn-pill {
+  grid-column: 1 / -1;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+}
+
+.turn-actions {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    --hand-lift-space: 16px;
+    --player-action-min-h: 100px;
+    --player-info-min-h: 44px;
+    --player-hand-h: calc(
+      var(--player-info-min-h) +
+      (var(--hand-card-w) * var(--card-aspect)) +
+      var(--hand-lift-space) +
+      var(--hand-bottom-space) +
+      var(--player-action-min-h) +
+      34px
+    );
+  }
+
+  .mobile-turn-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  .app-shell {
+    --hand-lift-space: 12px;
+    --player-action-min-h: 52px;
+    --player-info-min-h: 38px;
+    --player-hand-h: calc(
+      var(--player-info-min-h) +
+      (var(--hand-card-w) * var(--card-aspect)) +
+      var(--hand-lift-space) +
+      var(--hand-bottom-space) +
+      var(--player-action-min-h) +
+      24px
+    );
+  }
+
+  .mobile-turn-actions {
+    grid-template-columns: repeat(4, minmax(84px, 1fr)) !important;
+  }
+
+  .mobile-turn-actions .action-button {
+    min-height: 40px !important;
+    padding-block: 7px !important;
+  }
+}
+
+/* Mobile table correction: piles must be visible first; hand cards overlap within a reserved lane. */
+.human-area .hand-row {
+  --hand-card-overlap: clamp(24px, 7vw, 42px);
+  display: grid !important;
+  grid-auto-flow: column;
+  grid-auto-columns: calc(var(--hand-card-w) - var(--hand-card-overlap));
+  justify-content: start !important;
+  column-gap: 0 !important;
+  padding-inline: max(16px, env(safe-area-inset-left)) max(calc(var(--hand-card-overlap) + 18px), env(safe-area-inset-right)) !important;
+}
+
+.human-area .hand-row .playing-card {
+  justify-self: start;
+}
+
+.human-area .hand-row .playing-card:last-child {
+  margin-inline-end: var(--hand-card-overlap);
+}
+
+.stock-area {
+  position: relative;
+}
+
+.stock-area .card-back-face {
+  filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.36));
+}
+
+.stock-area.action-ready .card-back-face {
+  box-shadow:
+    0 0 0 2px rgba(255, 224, 130, 0.34),
+    0 0 26px rgba(255, 224, 130, 0.32),
+    0 16px 28px rgba(0, 0, 0, 0.34) !important;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    --game-card-w: 72px;
+    --meld-card-w: 42px;
+  }
+
+  .card-table-board {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .card-table-scroll {
+    width: 100%;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto;
+    grid-template-areas:
+      "piles"
+      "melds" !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto minmax(120px, 1fr) !important;
+    align-content: start;
+  }
+
+  .table-zone {
+    min-height: 0;
+    gap: 8px;
+    align-content: start;
+  }
+
+  .table-area {
+    grid-template-columns: minmax(96px, 0.72fr) minmax(0, 1fr) !important;
+    align-items: stretch;
+  }
+
+  .stock-area,
+  .discard-area {
+    min-height: 142px !important;
+    padding: 8px !important;
+  }
+
+  .stock-area .section-label,
+  .discard-area .section-label {
+    font-size: 9px;
+    white-space: nowrap;
+  }
+
+  .discard-row {
+    min-height: 104px !important;
+    padding: 8px !important;
+  }
+
+  .drop-zones {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .table-meld-layer {
+    min-height: 120px;
+    max-height: 180px;
+    overflow: clip !important;
+  }
+
+  .table-meld-toggle {
+    min-height: 30px;
+    margin-bottom: 6px;
+  }
+
+  .table-meld-layer .meld-section {
+    min-height: 0 !important;
+    overflow: clip !important;
+  }
+
+  .meld-grid {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-start;
+    justify-content: flex-start;
+    height: auto !important;
+    max-height: 136px !important;
+    overflow-x: auto !important;
+    overflow-y: clip !important;
+    padding: 2px 4px 8px !important;
+    scroll-snap-type: x proximity;
+  }
+
+  .meld-display {
+    flex: 0 0 auto !important;
+    min-width: 168px !important;
+    max-width: 218px !important;
+    scroll-snap-align: start;
+  }
+
+  .human-area .hand-row {
+    --hand-card-overlap: clamp(34px, 10vw, 48px);
+  }
+
+  .hand-helper span {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .app-shell {
+    --game-card-w: 66px;
+    --hand-card-w: clamp(72px, 23vw, 82px);
+  }
+
+  .stock-area,
+  .discard-area {
+    min-height: 132px !important;
+  }
+}
+
+/* Mobile overflow fix: the player section must never cover or crop the table. */
+@media (max-width: 760px) {
+  .app-shell {
+    height: auto !important;
+    min-height: 100dvh;
+    overflow-x: clip !important;
+    overflow-y: auto !important;
+  }
+
+  .game-surface,
+  .game-surface.has-table-melds,
+  .game-surface.no-table-melds {
+    height: auto !important;
+    min-height: 0 !important;
+    grid-template-areas:
+      "opponents"
+      "board"
+      "player" !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto !important;
+    align-items: start;
+    overflow: visible !important;
+  }
+
+  .opponent-seats {
+    min-height: 66px;
+  }
+
+  .card-table-board {
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .card-table-scroll {
+    height: auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column;
+    gap: 10px;
+    overflow: visible !important;
+  }
+
+  .table-zone {
+    order: 1;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .table-area {
+    min-height: 150px !important;
+  }
+
+  .stock-area,
+  .discard-area {
+    min-height: 146px !important;
+  }
+
+  .table-meld-layer {
+    order: 2;
+    height: auto !important;
+    min-height: 58px !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .table-meld-layer .meld-section {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .table-meld-layer-empty {
+    min-height: 58px !important;
+  }
+
+  .meld-grid {
+    max-height: none !important;
+  }
+
+  .player-zone {
+    height: auto !important;
+    min-height: calc(
+      var(--player-info-min-h) +
+      (var(--hand-card-w) * var(--card-aspect)) +
+      var(--hand-lift-space) +
+      var(--hand-bottom-space) +
+      var(--player-action-min-h) +
+      28px
+    ) !important;
+    overflow: visible !important;
+  }
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  .game-surface,
+  .game-surface.has-table-melds,
+  .game-surface.no-table-melds {
+    grid-template-areas:
+      "opponents"
+      "board"
+      "player" !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto !important;
+  }
+}
+
+/* Strict mobile gameplay layout reset: protected flow, no page-width expansion. */
+@media (max-width: 760px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+  }
+
+  .app-shell,
+  .top-bar,
+  .message,
+  .game-surface,
+  .opponent-seats,
+  .card-table-board,
+  .card-table-scroll,
+  .table-zone,
+  .table-meld-layer,
+  .table-area,
+  .player-zone,
+  .human-area {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+  }
+
+  .app-shell {
+    display: block !important;
+    min-height: 100dvh;
+  }
+
+  .game-surface,
+  .game-surface.has-table-melds,
+  .game-surface.no-table-melds {
+    display: flex !important;
+    flex-direction: column;
+    gap: 10px !important;
+    padding: 8px !important;
+    overflow: visible !important;
+  }
+
+  .opponent-seats {
+    order: 1;
+    flex: 0 0 auto;
+    display: flex !important;
+    gap: 8px;
+    min-height: 64px;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .opponent-seats .ai-row {
+    flex: 0 0 min(82vw, 360px);
+  }
+
+  .card-table-board {
+    order: 2;
+    flex: 0 0 auto;
+    display: block !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .card-table-scroll {
+    display: flex !important;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px !important;
+    overflow: visible !important;
+  }
+
+  .table-meld-layer {
+    order: 1;
+    flex: 0 0 auto;
+    display: block !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .table-meld-toggle {
+    width: 100%;
+    min-height: 34px !important;
+    margin: 0 0 6px !important;
+  }
+
+  .table-meld-layer-empty .empty-meld-row {
+    min-height: 34px !important;
+  }
+
+  .table-meld-layer .meld-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    padding: 6px !important;
+    overflow: visible !important;
+  }
+
+  .meld-grid {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    padding: 2px 2px 8px !important;
+    scroll-padding-inline: 8px;
+  }
+
+  .meld-display {
+    flex: 0 0 min(78vw, 230px) !important;
+    width: min(78vw, 230px) !important;
+    min-width: 0 !important;
+    max-width: min(78vw, 230px) !important;
+  }
+
+  .meld-cards {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+  }
+
+  .table-zone {
+    order: 2;
+    flex: 0 0 auto;
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+    overflow: visible !important;
+  }
+
+  .phase-draw .drop-zones {
+    display: none !important;
+  }
+
+  .drop-zones {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .table-area {
+    flex: 0 0 auto;
+    display: flex !important;
+    justify-content: center;
+    align-items: stretch;
+    gap: clamp(10px, 3vw, 16px) !important;
+    min-height: calc((var(--game-card-w) * var(--card-aspect)) + 58px) !important;
+    overflow: visible !important;
+  }
+
+  .stock-area,
+  .discard-area {
+    flex: 1 1 0;
+    min-width: 0 !important;
+    max-width: calc((100vw - 40px) / 2);
+    min-height: calc((var(--game-card-w) * var(--card-aspect)) + 58px) !important;
+    overflow: visible !important;
+  }
+
+  .stock-area .card-back-face,
+  .stock-area .empty-stock,
+  .discard-row .discard-card-wrap:first-child .playing-card {
+    --card-w: clamp(62px, 19vw, 76px);
+  }
+
+  .discard-row {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: calc((var(--game-card-w) * var(--card-aspect)) + 20px) !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+  }
+
+  .player-zone {
+    order: 3;
+    flex: 0 0 auto;
+    position: static !important;
+    inset: auto !important;
+    transform: none !important;
+    overflow: visible !important;
+  }
+
+  .human-area {
+    position: static !important;
+    transform: none !important;
+    display: grid !important;
+    grid-template-rows: auto auto auto !important;
+    gap: 8px !important;
+    overflow: visible !important;
+  }
+
+  .hand-scroll-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .hand-scroll-wrap > div {
+    overflow: visible !important;
+  }
+
+  .hand-row {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    padding-top: var(--hand-lift-space) !important;
+    padding-bottom: var(--hand-bottom-space) !important;
+  }
+
+  .mobile-turn-actions {
+    width: 100% !important;
+    max-width: 100% !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    overflow: visible !important;
+  }
+}
+
+/* Mobile single-screen table: no page scroll during active play. */
+@media (max-width: 600px) {
+  :root {
+    --mobile-card-w: clamp(48px, 15vw, 70px);
+    --mobile-card-h: calc(var(--mobile-card-w) * 1.4);
+    --mobile-hand-card-w: clamp(64px, 19vw, 82px);
+    --mobile-hand-card-h: calc(var(--mobile-hand-card-w) * 1.4);
+    --mobile-gap: clamp(6px, 2vw, 10px);
+  }
+
+  html,
+  body,
+  #root {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  body {
+    overscroll-behavior: none;
+  }
+
+  .app-shell {
+    --game-card-w: var(--mobile-card-w);
+    --hand-card-w: var(--mobile-hand-card-w);
+    --meld-card-w: clamp(34px, 10vw, 42px);
+    --hand-lift-space: 12px;
+    --hand-bottom-space: 6px;
+    --player-info-min-h: 34px;
+    --player-action-min-h: 88px;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-rows: 64px 38px minmax(0, 1fr) !important;
+    gap: 6px;
+    padding: 8px max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    overflow: hidden !important;
+  }
+
+  .top-bar {
+    min-height: 0 !important;
+    height: 64px !important;
+    padding: 8px 12px !important;
+    border-radius: 24px !important;
+    overflow: hidden !important;
+  }
+
+  .title {
+    font-size: clamp(34px, 11vw, 48px) !important;
+    line-height: 0.95 !important;
+    white-space: nowrap;
+  }
+
+  .top-actions .action-button {
+    min-height: 42px !important;
+    padding: 8px 14px !important;
+  }
+
+  .header-score-panel {
+    display: none !important;
+  }
+
+  .message {
+    min-height: 38px !important;
+    height: 38px !important;
+    margin: 0 !important;
+    padding: 7px 12px !important;
+    font-size: 13px !important;
+    line-height: 1.1 !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .game-surface,
+  .game-surface.has-table-melds,
+  .game-surface.no-table-melds {
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    display: grid !important;
+    grid-template-areas:
+      "opponents"
+      "board"
+      "player" !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 58px minmax(210px, 1fr) minmax(236px, 0.96fr) !important;
+    gap: var(--mobile-gap) !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .opponent-seats {
+    grid-area: opponents !important;
+    order: initial;
+    min-height: 0 !important;
+    height: 58px !important;
+    display: flex !important;
+    align-items: stretch;
+    gap: 8px !important;
+    padding: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .opponent-seats .ai-row {
+    flex: 0 0 min(78vw, 320px) !important;
+    height: 58px !important;
+    min-height: 0 !important;
+    padding: 6px 8px !important;
+    border-radius: 16px !important;
+  }
+
+  .opponent-seats .ai-label {
+    gap: 8px !important;
+  }
+
+  .opponent-seats .ai-label img,
+  .opponent-seats .ai-label > div[title] {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .opponent-seats .ai-label b {
+    font-size: 14px !important;
+  }
+
+  .opponent-seats .ai-label small {
+    font-size: 11px !important;
+  }
+
+  .card-table-board {
+    grid-area: board !important;
+    order: initial;
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    display: block !important;
+    padding: 0 !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+  }
+
+  .card-table-scroll {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-areas:
+      "melds"
+      "piles" !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: minmax(52px, 0.55fr) minmax(130px, 1fr) !important;
+    gap: var(--mobile-gap) !important;
+    padding: 8px !important;
+    overflow: hidden !important;
+  }
+
+  .table-meld-layer {
+    grid-area: melds !important;
+    order: initial;
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    display: grid !important;
+    grid-template-rows: 28px minmax(0, 1fr);
+    gap: 4px;
+    overflow: hidden !important;
+  }
+
+  .table-meld-toggle {
+    min-height: 0 !important;
+    height: 28px !important;
+    margin: 0 !important;
+    padding: 4px 8px !important;
+    border-radius: 14px !important;
+    font-size: 12px !important;
+  }
+
+  .table-meld-toggle small {
+    font-size: 10px !important;
+  }
+
+  .table-meld-layer-empty .empty-meld-row {
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 4px !important;
+    font-size: 11px !important;
+  }
+
+  .table-meld-layer .meld-section {
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 4px !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
+  }
+
+  .table-meld-layer .meld-section .section-label {
+    display: none !important;
+  }
+
+  .meld-grid {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+    padding: 0 2px 4px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .meld-display {
+    flex: 0 0 min(72vw, 220px) !important;
+    width: min(72vw, 220px) !important;
+    min-width: 0 !important;
+    max-width: min(72vw, 220px) !important;
+    min-height: 0 !important;
+    padding: 5px 6px !important;
+    border-radius: 12px !important;
+  }
+
+  .meld-title {
+    margin-bottom: 3px !important;
+    font-size: 9px !important;
+    line-height: 1 !important;
+  }
+
+  .meld-cards {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    gap: 3px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .table-zone {
+    grid-area: piles !important;
+    order: initial;
+    min-height: 0 !important;
+    height: 100% !important;
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 6px !important;
+    overflow: hidden !important;
+  }
+
+  .drop-zones {
+    display: none !important;
+  }
+
+  .table-area {
+    min-height: 0 !important;
+    height: 100% !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr) !important;
+    gap: var(--mobile-gap) !important;
+    align-items: stretch;
+    overflow: hidden !important;
+  }
+
+  .stock-area,
+  .discard-area {
+    min-height: 0 !important;
+    height: 100% !important;
+    max-width: none !important;
+    padding: 6px !important;
+    display: grid !important;
+    grid-template-rows: 18px minmax(0, 1fr) 16px;
+    align-items: center;
+    justify-items: center;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+  }
+
+  .stock-area .section-label,
+  .discard-area .section-label {
+    align-self: start;
+    font-size: 8.5px !important;
+    line-height: 1 !important;
+    letter-spacing: 0.04em !important;
+    white-space: nowrap;
+  }
+
+  .pile-action-hint {
+    align-self: end;
+    min-height: 0 !important;
+    font-size: 9px !important;
+    line-height: 1 !important;
+  }
+
+  .stock-area .card-back-face,
+  .stock-area .empty-stock,
+  .discard-row .discard-card-wrap:first-child .playing-card {
+    --card-w: var(--mobile-card-w);
+  }
+
+  .discard-row {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 8px 4px 2px !important;
+    align-items: center !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .discard-row .discard-card-wrap {
+    padding-top: 8px !important;
+  }
+
+  .discard-row .top-label {
+    top: 0 !important;
+    font-size: 8px !important;
+  }
+
+  .player-zone {
+    grid-area: player !important;
+    order: initial;
+    position: static !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .human-area {
+    height: 100% !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-rows: 44px minmax(0, 1fr) auto !important;
+    gap: 6px !important;
+    padding: 8px !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+  }
+
+  .human-header {
+    min-height: 0 !important;
+    height: 44px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    overflow: hidden !important;
+  }
+
+  .human-name {
+    min-width: 0;
+    gap: 8px !important;
+    font-size: 14px !important;
+    line-height: 1.05 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .human-name img,
+  .human-name > div[title] {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .hand-actions {
+    display: none !important;
+  }
+
+  .hand-scroll-wrap {
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .hand-scroll-wrap > div {
+    min-height: 0 !important;
+    height: 100% !important;
+    display: grid !important;
+    grid-template-rows: 0 minmax(0, 1fr);
+    overflow: hidden !important;
+  }
+
+  .hand-helper {
+    display: none !important;
+  }
+
+  .hand-row {
+    --hand-card-overlap: clamp(30px, 9vw, 44px);
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: grid !important;
+    grid-auto-flow: column;
+    grid-auto-columns: calc(var(--mobile-hand-card-w) - var(--hand-card-overlap));
+    align-items: center !important;
+    justify-content: start !important;
+    padding: 10px max(calc(var(--hand-card-overlap) + 14px), env(safe-area-inset-right)) 6px max(12px, env(safe-area-inset-left)) !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    border-radius: 14px !important;
+  }
+
+  .human-area .hand-row .playing-card {
+    --card-w: var(--mobile-hand-card-w);
+    align-self: center !important;
+    margin: 0 !important;
+  }
+
+  .human-area .hand-row .playing-card.selected {
+    transform: translateY(-8px) scale(1.015) !important;
+  }
+
+  .mobile-turn-actions {
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    padding: 0 0 max(0px, env(safe-area-inset-bottom)) !important;
+    overflow: visible !important;
+  }
+
+  .mobile-turn-actions .action-button {
+    min-height: 38px !important;
+    padding: 7px 8px !important;
+    border-radius: 14px !important;
+    font-size: 13px !important;
+    line-height: 1.05 !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .app-shell {
+    grid-template-rows: 56px 34px minmax(0, 1fr) !important;
+    --mobile-card-w: clamp(46px, 14vw, 62px);
+    --mobile-hand-card-w: clamp(60px, 18vw, 74px);
+    --player-action-min-h: 78px;
+  }
+
+  .top-bar {
+    height: 56px !important;
+  }
+
+  .title {
+    font-size: clamp(30px, 10vw, 42px) !important;
+  }
+
+  .message {
+    height: 34px !important;
+    min-height: 34px !important;
+    font-size: 12px !important;
+  }
+
+  .game-surface,
+  .game-surface.has-table-melds,
+  .game-surface.no-table-melds {
+    grid-template-rows: 52px minmax(188px, 1fr) minmax(214px, 0.96fr) !important;
+  }
+
+  .mobile-turn-actions .action-button {
+    min-height: 34px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* Portrait mobile final table composition: fixed viewport, compact header avatars, piles-first board. */
+@media (max-width: 600px) and (orientation: portrait) {
+  :root {
+    --mobile-card-w: clamp(46px, 13.5vw, 58px);
+    --mobile-hand-card-w: clamp(54px, 15.5vw, 66px);
+    --mobile-gap: clamp(5px, 1.7vw, 8px);
+  }
+
+  .app-shell {
+    grid-template-rows: 92px 30px minmax(0, 1fr) !important;
+    gap: 5px !important;
+    padding: 7px max(7px, env(safe-area-inset-right)) max(7px, env(safe-area-inset-bottom)) max(7px, env(safe-area-inset-left)) !important;
+  }
+
+  .top-bar {
+    height: 92px !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 44px 34px;
+    gap: 4px 8px;
+    align-items: center;
+    padding: 8px 10px !important;
+    border-radius: 20px !important;
+  }
+
+  .title {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: clamp(30px, 10vw, 44px) !important;
+    line-height: 1 !important;
+  }
+
+  .header-right {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+  }
+
+  .top-actions .action-button {
+    min-height: 36px !important;
+    padding: 7px 14px !important;
+    border-radius: 999px !important;
+    font-size: 14px !important;
+  }
+
+  .mobile-header-players {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .mobile-header-player {
+    min-width: 0;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px 3px 4px;
+    border: 1px solid rgba(246, 217, 138, 0.22);
+    border-radius: 999px;
+    background: rgba(1, 16, 11, 0.58);
+    color: rgba(255, 247, 221, 0.9);
+    overflow: hidden;
+  }
+
+  .mobile-header-player.active {
+    border-color: rgba(246, 217, 138, 0.72);
+    box-shadow: inset 0 0 0 1px rgba(246, 217, 138, 0.16), 0 0 16px rgba(246, 217, 138, 0.14);
+  }
+
+  .mobile-header-player span {
+    min-width: 0;
+    display: grid;
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobile-header-player small {
+    margin-top: 2px;
+    color: rgba(255, 247, 221, 0.66);
+    font-size: 9px;
+    font-weight: 800;
+  }
+
+  .message {
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 5px 10px !important;
+    font-size: 11px !important;
+    border-radius: 15px !important;
+  }
+
+  .game-surface,
+  .game-surface.has-table-melds,
+  .game-surface.no-table-melds {
+    grid-template-areas:
+      "board"
+      "player" !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: minmax(0, 0.54fr) minmax(0, 0.46fr) !important;
+    gap: 6px !important;
+  }
+
+  .opponent-seats {
+    display: none !important;
+  }
+
+  .card-table-board {
+    border-radius: 16px !important;
+  }
+
+  .card-table-scroll {
+    grid-template-areas:
+      "piles"
+      "melds" !important;
+    grid-template-rows: minmax(112px, 1fr) minmax(46px, 0.42fr) !important;
+    padding: 7px !important;
+    gap: 6px !important;
+  }
+
+  .table-area {
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr) !important;
+    gap: 7px !important;
+  }
+
+  .stock-area,
+  .discard-area {
+    grid-template-rows: 15px minmax(0, 1fr) 12px;
+    padding: 5px !important;
+    border-radius: 13px !important;
+  }
+
+  .stock-area .section-label,
+  .discard-area .section-label {
+    font-size: 7.5px !important;
+  }
+
+  .pile-action-hint {
+    font-size: 7.5px !important;
+  }
+
+  .discard-row {
+    padding: 5px 2px 0 !important;
+  }
+
+  .table-meld-layer {
+    grid-template-rows: 24px minmax(0, 1fr);
+    gap: 3px;
+  }
+
+  .table-meld-toggle {
+    height: 24px !important;
+    min-height: 24px !important;
+    padding: 3px 7px !important;
+    font-size: 11px !important;
+  }
+
+  .table-meld-toggle small {
+    font-size: 9px !important;
+  }
+
+  .empty-meld-row,
+  .table-meld-layer-empty .empty-meld-row {
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 3px !important;
+    font-size: 10px !important;
+    border-radius: 11px !important;
+  }
+
+  .meld-display {
+    flex-basis: min(66vw, 196px) !important;
+    width: min(66vw, 196px) !important;
+    max-width: min(66vw, 196px) !important;
+    padding: 4px 5px !important;
+  }
+
+  .player-zone {
+    min-height: 0 !important;
+  }
+
+  .human-area {
+    grid-template-rows: minmax(0, 1fr) 20px auto !important;
+    gap: 5px !important;
+    padding: 7px !important;
+    border-radius: 16px !important;
+  }
+
+  .human-header {
+    display: none !important;
+  }
+
+  .hand-scroll-wrap {
+    grid-row: 1;
+  }
+
+  .hand-row {
+    --hand-card-overlap: clamp(28px, 8.5vw, 38px);
+    grid-auto-columns: calc(var(--mobile-hand-card-w) - var(--hand-card-overlap));
+    align-items: center !important;
+    padding: 7px max(calc(var(--hand-card-overlap) + 10px), env(safe-area-inset-right)) 4px max(10px, env(safe-area-inset-left)) !important;
+  }
+
+  .mobile-hand-stats {
+    grid-row: 2;
+    min-height: 20px;
+    display: grid;
+    place-items: center;
+    padding: 2px 8px;
+    border: 1px solid rgba(246, 217, 138, 0.18);
+    border-radius: 999px;
+    background: rgba(1, 16, 11, 0.5);
+    color: rgba(255, 247, 221, 0.78);
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .mobile-turn-actions {
+    grid-row: 3;
+    gap: 6px !important;
+  }
+
+  .mobile-turn-actions .action-button {
+    min-height: 32px !important;
+    padding: 6px 7px !important;
+    border-radius: 12px !important;
+    font-size: 12px !important;
   }
 }

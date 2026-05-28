@@ -31,7 +31,7 @@ export function HandCardRow({ cards, hints, selectedIds, disabled, onSelect, onC
         ) : null}
       </div>
 
-      <div className="hand-row">
+      <div className="hand-row" aria-label="Your cards">
         {cards.map((card) => (
           <CardView
             key={card.id}

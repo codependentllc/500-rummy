@@ -30,6 +30,7 @@ export type PlayerConfig = {
   name: string;
   avatar: string;
   fallback: string;
+  nameEdited?: boolean;
 };
 
 export type ScoreRow = {

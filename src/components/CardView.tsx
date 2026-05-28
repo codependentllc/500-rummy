@@ -1,4 +1,4 @@
-import type { DragEventHandler, MouseEventHandler } from "react";
+import type { CSSProperties, DragEventHandler, MouseEventHandler } from "react";
 import { cardValue } from "../game/scoring";
 import { label } from "../game/melds";
 import type { Card } from "../game/types";
@@ -28,19 +28,17 @@ export function CardView({
   onDrop,
   hint = ""
 }: Props) {
-  const size = small ? { w: 50, h: 70, rank: 15 } : { w: 76, h: 108, rank: 21 };
+  const rankSize = small ? 15 : 21;
+  const cardStyle = {
+    "--card-rank-size": `${rankSize}px`,
+    cursor: disabled ? "default" : "pointer"
+  } as CSSProperties;
 
   if (faceDown) {
     return (
       <div
-        className="card-back-face"
-        style={{
-          width: size.w,
-          height: size.h,
-          borderRadius: small ? 7 : 9,
-          border: "2px solid #fff",
-          flexShrink: 0
-        }}
+        className={small ? "card-back-face playing-card-small" : "card-back-face"}
+        style={cardStyle}
       />
     );
   }
@@ -66,17 +64,14 @@ export function CardView({
       onDragOver={onDragOver}
       onDrop={onDrop}
       onClick={onClick}
+      aria-pressed={selected || undefined}
+      aria-label={`${label(card)}, ${cardValue(card)} points${selected ? ", selected" : ""}${hint === "ready" ? ", ready for a meld" : hint === "near" ? ", near a meld" : ""}`}
       title={`${label(card)}: ${cardValue(card)} points`}
-      style={{
-        width: size.w,
-        height: size.h,
-        cursor: disabled ? "default" : "pointer",
-        flexShrink: 0,
-      }}
+      style={cardStyle}
     >
-      <div className="card-corner card-corner-top" style={{ fontSize: size.rank }}>{card.rank}<span>{card.suit}</span></div>
-      <div className="card-center-suit" style={{ fontSize: size.rank + 9 }}>{card.suit}</div>
-      <div className="card-corner card-corner-bottom" style={{ fontSize: size.rank }}>{card.rank}<span>{card.suit}</span></div>
+      <div className="card-corner card-corner-top">{card.rank}<span>{card.suit}</span></div>
+      <div className="card-center-suit">{card.suit}</div>
+      <div className="card-corner card-corner-bottom">{card.rank}<span>{card.suit}</span></div>
       {queenSpades ? <div className="queen-spades-accent">40</div> : null}
     </button>
   );

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { makeDeck, hasDuplicateCards } from "../game/deck";
+import { RANKS, SUITS } from "../game/constants";
 import { immediatelyUsable } from "../game/discard";
 import { groupHandByMelds, isRun, isSet } from "../game/melds";
 import { cardValue } from "../game/scoring";
@@ -17,6 +18,8 @@ describe("500 Rummy rules", () => {
     const deck = makeDeck();
     expect(deck).toHaveLength(52);
     expect(hasDuplicateCards(deck)).toBe(false);
+    expect(new Set(deck.map((card) => card.id))).toEqual(new Set(SUITS.flatMap((suit) => RANKS.map((rank) => `${rank}${suit}`))));
+    expect(SUITS.every((suit) => deck.filter((card) => card.suit === suit).length === 13)).toBe(true);
   });
 
   it("deals seven cards to every player", () => {

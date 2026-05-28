@@ -71,10 +71,15 @@ export function EndHandModal({ state, onNextHand, onNewGame, onExit }: Props) {
 
   return (
     <div className="modal-backdrop">
-      <div className={state.winner ? "end-modal scoring-modal winner-modal" : "end-modal scoring-modal"}>
+      <div
+        className={state.winner ? "end-modal scoring-modal winner-modal" : "end-modal scoring-modal"}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="end-hand-title"
+      >
         <div className="score-modal-header">
           <span>{state.winner ? "Game Over" : "Hand Complete"}</span>
-          <h2>{state.winner ? `${state.winner.name} Wins` : "End of Hand Scoring"}</h2>
+          <h2 id="end-hand-title">{state.winner ? `${state.winner.name} Wins` : "End of Hand Scoring"}</h2>
           {queenRows.length ? <p>Queen of Spades counted as 40 points.</p> : <p>Melds add points. Cards left in hand subtract points.</p>}
         </div>
 
