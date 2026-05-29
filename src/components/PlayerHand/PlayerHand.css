@@ -1,0 +1,126 @@
+.hand-scroll-wrap {
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: thin;
+}
+
+.hand-row {
+  width: max-content;
+  min-width: 100%;
+  overflow: visible;
+}
+
+@media (max-width: 767px) {
+  .player-zone {
+    width: 100%;
+    align-self: end;
+    overflow: visible !important;
+  }
+
+  .human-area {
+    height: 100%;
+    max-height: 100%;
+    display: grid;
+    grid-template-rows: auto minmax(96px, 1fr) auto;
+    gap: 5px;
+    margin: 0 !important;
+    padding: 8px !important;
+    border-radius: 18px !important;
+    overflow: visible !important;
+  }
+
+  .human-header {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .human-name {
+    min-width: 0;
+    font-size: 12px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .human-name img,
+  .human-name > div[title] {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .hand-actions {
+    display: flex;
+    gap: 4px;
+  }
+
+  .hand-actions > span {
+    max-width: 122px;
+    min-height: 28px;
+    padding: 4px 7px !important;
+    font-size: 0 !important;
+  }
+
+  .hand-actions > span::before {
+    content: attr(data-mobile-label);
+    font-size: 10px;
+  }
+
+  .hand-actions .action-button {
+    min-height: 32px;
+    padding: 5px 8px !important;
+    font-size: 10px !important;
+    border-radius: 10px !important;
+  }
+
+  .hand-helper {
+    display: none !important;
+  }
+
+  .hand-scroll-wrap {
+    min-height: 104px;
+    display: flex;
+    align-items: center;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    padding: 12px 4px 3px;
+  }
+
+  .hand-row {
+    min-height: 92px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 14px !important;
+  }
+
+  .human-area .hand-row .playing-card {
+    width: clamp(50px, 14.5vw, 64px) !important;
+    height: clamp(70px, 20.3vw, 90px) !important;
+    margin-left: clamp(-28px, -7vw, -16px) !important;
+  }
+
+  .human-area .hand-row .playing-card.selected {
+    transform: translateY(-10px) !important;
+  }
+
+  .mobile-turn-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    flex-shrink: 0;
+  }
+
+  .mobile-turn-actions .action-button,
+  .waiting-turn-pill {
+    min-height: 40px !important;
+    border-radius: 12px !important;
+    font-size: 12px !important;
+  }
+
+  .turn-actions {
+    display: none !important;
+  }
+}

@@ -1,6 +1,7 @@
-import type { DragEvent, KeyboardEvent } from "react";
+import type { CSSProperties, DragEvent, KeyboardEvent } from "react";
 import { CardView } from "./CardView";
 import type { GameState } from "../game/types";
+import "./TableArea/TableArea.css";
 
 type Props = {
   state: GameState;
@@ -15,7 +16,7 @@ type Props = {
 };
 
 export function TableArea({ state, disabled, onDrawStock, onDrawDiscard, onDiscardSelected, onDropToDiscardPile, onPlayMeld, onDropDiscard, allowDrop }: Props) {
-  const visibleDiscard = [...state.discard].reverse();
+  const visibleDiscard = state.discard.slice(-7).reverse();
   const canDrawStock = !disabled && state.turn === 0 && !state.drawn && !state.handOver;
   const canDiscardToPile = !disabled && state.turn === 0 && state.drawn && !state.handOver;
 
@@ -54,7 +55,7 @@ export function TableArea({ state, disabled, onDrawStock, onDrawDiscard, onDisca
             {visibleDiscard.map((card, visibleIndex) => {
               const realIndex = state.discard.length - 1 - visibleIndex;
               return (
-                <div key={card.id} className="discard-card-wrap">
+                <div key={card.id} className={visibleIndex === 0 ? "discard-card-wrap top-discard-card" : "discard-card-wrap discard-history-card"} style={{ "--discard-depth": visibleIndex } as CSSProperties}>
                   <CardView
                     card={card}
                     small={visibleIndex > 0}

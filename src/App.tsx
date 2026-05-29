@@ -17,18 +17,18 @@ import { DrawStockAnimation } from "./components/DrawStockAnimation";
 import { EndHandModal } from "./components/EndHandModal";
 import { FlyingCards } from "./components/FlyingCards";
 import { HandCardRow } from "./components/HandCardRow";
+import { Header } from "./components/Header/Header";
 import { MeldDisplay } from "./components/MeldDisplay";
 import { ScoreHistoryTimeline } from "./components/ScoreHistoryTimeline";
-import { ScorePanel } from "./components/ScorePanel";
-import { SetupScreen } from "./components/SetupScreen";
-import { TableArea } from "./components/TableArea";
 import "./styles.css";
+import { WelcomeScreen } from "./components/WelcomeScreen/WelcomeScreen";
+import { TableArea } from "./components/TableArea";
 import type { Player } from "./game/types";
 import { useViewportCategory } from "./hooks/useViewportCategory";
 import { DesktopGameView, MobileGameView, TabletGameView } from "./views/GameViews";
 
 const defaultConfigs: PlayerConfig[] = [
-  { name: "You", avatar: AVATARS[0].src, fallback: AVATARS[0].fallback },
+  { name: AVATARS[0].name, avatar: AVATARS[0].src, fallback: AVATARS[0].fallback },
   { name: AVATARS[1].name, avatar: AVATARS[1].src, fallback: AVATARS[1].fallback },
   { name: AVATARS[2].name, avatar: AVATARS[2].src, fallback: AVATARS[2].fallback },
   { name: AVATARS[3].name, avatar: AVATARS[3].src, fallback: AVATARS[3].fallback }
@@ -415,22 +415,12 @@ export default function App() {
   }
 
   if (!started) {
-    return <SetupScreen count={count} setCount={setCount} configs={configs} setConfigs={setConfigs} tableTheme={tableTheme} setTableTheme={setTableTheme} cardBack={cardBack} setCardBack={setCardBack} onStart={startConfiguredGame} />;
+    return <WelcomeScreen count={count} setCount={setCount} configs={configs} setConfigs={setConfigs} tableTheme={tableTheme} setTableTheme={setTableTheme} cardBack={cardBack} setCardBack={setCardBack} onStart={startConfiguredGame} />;
   }
 
   return (
     <div className={`app-shell table-theme-${tableTheme} card-back-${cardBack}`}>
-      <motion.div className="top-bar" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
-        <div className="title"><span>500</span> Rummy</div>
-        <div className="header-right">
-          <div className="header-score-panel">
-            <ScorePanel players={state.players} turn={state.turn} handOver={state.handOver} />
-          </div>
-          <div className="top-actions">
-            <ActionButton disabled={isAnimatingMeld || isDealing} onClick={() => resetGame(null)} style={{ background: "#ffe082", color: "#1a472a", padding: "6px 10px" }}>New</ActionButton>
-          </div>
-        </div>
-      </motion.div>
+      <Header players={state.players} turn={state.turn} handOver={state.handOver} disabled={isAnimatingMeld || isDealing} onNewGame={() => resetGame(null)} />
 
       <motion.div
         key={state.message}
@@ -443,7 +433,7 @@ export default function App() {
       </motion.div>
 
       <motion.div
-        className={isDealing ? "game-surface dealing-hidden" : "game-surface"}
+        className={`${isDealing ? "game-surface dealing-hidden" : "game-surface"} ${tableMelds.length ? "has-table-melds" : "no-table-melds"}`}
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: isDealing ? 0 : 1, y: 0 }}
         transition={{ duration: 0.36 }}
