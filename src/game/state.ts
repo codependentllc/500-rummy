@@ -5,17 +5,47 @@ import { makeDeck } from "./deck";
 import { sortCards } from "./melds";
 import type { GameState, Player, PlayerConfig, ScoreHistoryEntry } from "./types";
 
+function avatarForConfig(config: PlayerConfig | undefined, index: number, usedIds: Set<string>) {
+  if (config?.avatarProfile) {
+    usedIds.add(config.avatarProfile.id);
+    return config.avatarProfile;
+  }
+
+  const configured = AVATARS.find((avatar) => avatar.id === config?.avatarId);
+  if (configured) {
+    usedIds.add(configured.id);
+    return configured;
+  }
+
+  const available = AVATARS.filter((avatar) => !usedIds.has(avatar.id));
+  const pool = available.length ? available : AVATARS;
+  const avatar = pool[index > 0 ? Math.floor(Math.random() * pool.length) : index % pool.length];
+  usedIds.add(avatar.id);
+  return avatar;
+}
+
 export function createPlayers(count: number, configs: PlayerConfig[] = []): Player[] {
-  return Array.from({ length: count }, (_, index) => ({
-    id: index,
-    name: configs[index]?.name?.trim() || (index === 0 ? "You" : `Computer ${index}`),
-    avatar: configs[index]?.avatar || AVATARS[index % AVATARS.length].src,
-    fallback: configs[index]?.fallback || AVATARS[index % AVATARS.length].fallback,
-    isAI: index > 0,
-    hand: [],
-    melds: [],
-    score: 0
-  }));
+  const usedAvatarIds = new Set<string>();
+
+  return Array.from({ length: count }, (_, index) => {
+    const config = configs[index];
+    const avatar = avatarForConfig(config, index, usedAvatarIds);
+
+    return {
+      id: index,
+      avatarId: avatar.id,
+      avatarName: avatar.name,
+      avatarBio: avatar.bio,
+      avatarProfile: avatar,
+      name: config?.name?.trim() || (index === 0 ? "You" : avatar.name),
+      avatar: config?.avatar || "",
+      fallback: config?.fallback || avatar.image,
+      isAI: index > 0,
+      hand: [],
+      melds: [],
+      score: 0
+    };
+  });
 }
 
 export function newGame(count = 2, oldPlayers: Player[] | null = null, configs: PlayerConfig[] = [], scoreHistory: ScoreHistoryEntry[] = []): GameState {

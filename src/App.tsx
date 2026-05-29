@@ -3,7 +3,7 @@ import { AVATARS } from "./data/avatars";
 import { allTableMelds, canHumanAct, discardSelectedCard, drawFromStock, layOffToFirstValidMeld, layOffToMeld, pickDiscardAt, playSelectedMeld, runAiTurn, selectedCards, startNewHand, toggleSelectedCard, selectOnlyCard } from "./game/engine";
 import { canLay, meldType, sortCards } from "./game/melds";
 import { points } from "./game/scoring";
-import type { Card, GameState, PlayerConfig } from "./game/types";
+import type { Avatar, Card, GameState, PlayerConfig } from "./game/types";
 import { newGame } from "./game/state";
 import { DiscardViewer } from "./components/DiscardViewer";
 import { MvpCard } from "./components/MvpCard";
@@ -11,10 +11,10 @@ import { movedBeyondThreshold, pointInElement, pointerPoint, type Point } from "
 import "./styles.css";
 
 const defaultConfigs: PlayerConfig[] = [
-  { name: "You", avatar: AVATARS[0].src, fallback: "Y" },
-  { name: "Marcus", avatar: AVATARS[1].src, fallback: "M" },
-  { name: "Sofia", avatar: AVATARS[2].src, fallback: "S" },
-  { name: "Leo", avatar: AVATARS[3].src, fallback: "L" }
+  { name: "You", avatarId: AVATARS[0].id, avatarName: AVATARS[0].name, avatarBio: AVATARS[0].bio, avatarProfile: AVATARS[0], avatar: "", fallback: AVATARS[0].image },
+  { name: "", avatar: "", fallback: "" },
+  { name: "", avatar: "", fallback: "" },
+  { name: "", avatar: "", fallback: "" }
 ];
 
 type DragState =
@@ -30,6 +30,8 @@ export type CardBackStyle = "red" | "blue" | "gold" | "black" | "green" | "purpl
 
 export default function App() {
   const [playerCount, setPlayerCount] = useState(2);
+  const [setupStep, setSetupStep] = useState<"welcome" | "avatar">("welcome");
+  const [selectedAvatarId, setSelectedAvatarId] = useState(AVATARS[0].id);
   const [started, setStarted] = useState(false);
   const [state, setState] = useState<GameState>(() => newGame(2, null, defaultConfigs));
   const [discardOpen, setDiscardOpen] = useState(false);
@@ -50,6 +52,7 @@ export default function App() {
   const canMeld = humanTurn && state.drawn && selected.length >= 3 && Boolean(meldType(selected));
   const canLayOff = humanTurn && state.drawn && selected.length === 1 && melds.some((meld) => canLay(selected[0], meld));
   const canDiscard = humanTurn && state.drawn && selected.length === 1;
+  const selectedAvatar = AVATARS.find((avatar) => avatar.id === selectedAvatarId) ?? AVATARS[0];
 
   useEffect(() => {
     if (!started || !currentPlayer?.isAI || state.handOver || aiBusy.current) return;
@@ -123,21 +126,30 @@ export default function App() {
     };
   }, [dragState, state.drawn]);
 
+  function playerConfigsForAvatar(avatar: Avatar): PlayerConfig[] {
+    return [
+      { name: "You", avatarId: avatar.id, avatarName: avatar.name, avatarBio: avatar.bio, avatarProfile: avatar, avatar: "", fallback: avatar.image },
+      ...Array.from({ length: 3 }, () => ({ name: "", avatar: "", fallback: "" }))
+    ];
+  }
+
   function startGame() {
-    setState(startNewHand(playerCount, null, defaultConfigs));
+    const configs = playerConfigsForAvatar(selectedAvatar);
+    setState(startNewHand(playerCount, null, configs));
     setStarted(true);
     setDiscardOpen(false);
   }
 
   function returnToSetup() {
     setStarted(false);
+    setSetupStep("welcome");
     setDiscardOpen(false);
     setDragState(null);
     setGhost(null);
   }
 
   function nextHand() {
-    setState((previous) => startNewHand(playerCount, previous.players, defaultConfigs, previous));
+    setState((previous) => startNewHand(playerCount, previous.players, playerConfigsForAvatar(selectedAvatar), previous));
     setDiscardOpen(false);
   }
 
@@ -152,35 +164,69 @@ export default function App() {
     setDiscardOpen(false);
   }
 
-  function playerInitial(config: { fallback?: string; name: string }) {
-    return (config.fallback || config.name.slice(0, 1)).toUpperCase();
+  function playerAvatar(player: { fallback?: string; name: string }) {
+    return player.fallback || player.name.slice(0, 1).toUpperCase();
   }
 
   return (
     <div id="app">
       {!started ? (
         <section id="setup" className="screen active">
-          <div>
-            <h1>
-              500
-              <br />
-              Rummy
-            </h1>
-            <p className="setup-subtitle">Mobile-first MVP</p>
-          </div>
-          <div className="setup-card">
-            <div className="label">Players</div>
-            <div className="counts">
-              {[2, 3, 4].map((count) => (
-                <button key={count} className={playerCount === count ? "count active" : "count"} onClick={() => setPlayerCount(count)}>
-                  {count}
+          {setupStep === "welcome" ? (
+            <>
+              <div>
+                <h1>
+                  500
+                  <br />
+                  Rummy
+                </h1>
+                <p className="setup-subtitle">Mobile-first MVP</p>
+              </div>
+              <div className="setup-card">
+                <div className="label">Players</div>
+                <div className="counts">
+                  {[2, 3, 4].map((count) => (
+                    <button key={count} className={playerCount === count ? "count active" : "count"} onClick={() => setPlayerCount(count)}>
+                      {count}
+                    </button>
+                  ))}
+                </div>
+                <button className="start" onClick={() => setSetupStep("avatar")}>
+                  Choose Avatar
                 </button>
-              ))}
+              </div>
+            </>
+          ) : (
+            <div className="setup-card avatar-setup-card">
+              <div className="avatar-setup-head">
+                <button className="new" onClick={() => setSetupStep("welcome")}>Back</button>
+                <div>
+                  <div className="label">Choose Avatar</div>
+                  <h2>{selectedAvatar.name}</h2>
+                  <p>{selectedAvatar.bio}</p>
+                </div>
+                <div className="avatar avatar-large">{selectedAvatar.image}</div>
+              </div>
+
+              <div className="avatar-grid" aria-label="Avatar choices">
+                {AVATARS.map((avatar) => (
+                  <button
+                    key={avatar.id}
+                    className={avatar.id === selectedAvatarId ? "avatar-option selected" : "avatar-option"}
+                    onClick={() => setSelectedAvatarId(avatar.id)}
+                    aria-label={`Choose ${avatar.name}`}
+                  >
+                    <span>{avatar.image}</span>
+                    <b>{avatar.name}</b>
+                  </button>
+                ))}
+              </div>
+
+              <button className="start" onClick={startGame}>
+                Start Game
+              </button>
             </div>
-            <button className="start" onClick={startGame}>
-              Deal Cards
-            </button>
-          </div>
+          )}
         </section>
       ) : (
         <section id="game" className="screen active">
@@ -194,7 +240,7 @@ export default function App() {
             <div className="players">
               {state.players.map((player) => (
                 <div key={player.id} className={state.turn === player.id && !state.handOver ? "player active" : "player"}>
-                  <div className="avatar">{playerInitial(player)}</div>
+                  <div className="avatar" title={player.avatarName || player.name}>{playerAvatar(player)}</div>
                   <div>
                     <div className="pname">{player.name}</div>
                     <div className="pscore">
@@ -304,7 +350,10 @@ export default function App() {
               <h2>{state.winner ? `${state.winner.name} Wins` : "Hand Complete"}</h2>
               {(state.scoring ?? []).map((row) => (
                 <div key={row.playerId} className="score-row">
-                  <b>{row.name}</b>
+                  <span className="score-player-label">
+                    <span className="avatar score-row-avatar">{row.fallback || row.name.slice(0, 1)}</span>
+                    <b>{row.name}</b>
+                  </span>
                   <span>
                     {row.net >= 0 ? "+" : ""}
                     {row.net} · {row.total}

@@ -2,6 +2,16 @@ export type Suit = "♠" | "♥" | "♦" | "♣";
 export type Rank = "A" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "J" | "Q" | "K";
 export type MeldType = "set" | "run";
 
+export interface Avatar {
+  id: string;
+  name: string;
+  image: string;
+  bio?: string;
+  src?: string;
+  fallback?: string;
+  role?: string;
+}
+
 export type Card = {
   id: string;
   rank: Rank;
@@ -23,6 +33,10 @@ export type MeldContribution = {
 
 export type Player = {
   id: number;
+  avatarId?: string;
+  avatarName?: string;
+  avatarBio?: string;
+  avatarProfile?: Avatar;
   name: string;
   avatar: string;
   fallback: string;
@@ -33,7 +47,11 @@ export type Player = {
 };
 
 export type PlayerConfig = {
-  name: string;
+  name?: string;
+  avatarId?: string;
+  avatarName?: string;
+  avatarBio?: string;
+  avatarProfile?: Avatar;
   avatar: string;
   fallback: string;
 };
@@ -41,6 +59,10 @@ export type PlayerConfig = {
 export type ScoreRow = {
   playerId: number;
   name: string;
+  avatarId?: string;
+  avatarName?: string;
+  avatarBio?: string;
+  avatarProfile?: Avatar;
   avatar: string;
   fallback: string;
   meldedCards: Card[];

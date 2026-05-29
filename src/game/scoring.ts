@@ -32,6 +32,10 @@ export function scoreHand(state: GameState, outPlayerId: number): GameState {
     return {
       playerId: player.id,
       name: player.name,
+      avatarId: player.avatarId,
+      avatarName: player.avatarName,
+      avatarBio: player.avatarBio,
+      avatarProfile: player.avatarProfile,
       avatar: player.avatar,
       fallback: player.fallback,
       meldedCards,
