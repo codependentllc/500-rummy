@@ -8921,3 +8921,122 @@ body {
     height: 340px;
   }
 }
+/* Dedicated viewport shells: one game layout per form factor. */
+.game-surface,
+.game-surface.has-table-melds,
+.game-surface.no-table-melds {
+  display: block !important;
+}
+
+.mobile-game-view,
+.tablet-game-view,
+.desktop-game-view {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.mobile-game-view {
+  display: grid !important;
+  grid-template-areas:
+    "piles"
+    "melds"
+    "player" !important;
+  grid-template-rows: minmax(118px, 0.9fr) minmax(78px, 0.62fr) auto !important;
+  gap: 6px !important;
+}
+
+.tablet-game-view {
+  display: grid !important;
+  grid-template-areas:
+    "opponents"
+    "piles"
+    "melds"
+    "player" !important;
+  grid-template-rows: auto minmax(150px, 0.74fr) minmax(110px, 0.58fr) auto !important;
+  gap: var(--table-gap) !important;
+}
+
+.desktop-game-view {
+  display: grid !important;
+  grid-template-areas:
+    "opponents opponents drawers"
+    "piles melds drawers"
+    "player player player" !important;
+  grid-template-columns: minmax(300px, 0.86fr) minmax(360px, 1.14fr) minmax(230px, 300px) !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  gap: var(--table-gap) !important;
+}
+
+.mobile-game-view .table-zone,
+.tablet-game-view .table-zone,
+.desktop-game-view .table-zone {
+  grid-area: piles !important;
+}
+
+.mobile-game-view .table-meld-layer,
+.tablet-game-view .table-meld-layer,
+.desktop-game-view .table-meld-layer {
+  grid-area: melds !important;
+}
+
+.tablet-game-view .opponent-seats,
+.desktop-game-view .opponent-seats {
+  grid-area: opponents !important;
+}
+
+.desktop-game-view .desktop-drawers {
+  grid-area: drawers !important;
+  display: block !important;
+}
+
+.mobile-game-view .player-zone,
+.tablet-game-view .player-zone,
+.desktop-game-view .player-zone {
+  grid-area: player !important;
+}
+
+.mobile-game-view .table-meld-layer {
+  min-height: 0 !important;
+}
+
+.mobile-game-view .player-zone {
+  width: 100% !important;
+}
+
+@media (max-width: 767px) {
+  .app-shell {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+  }
+
+  .mobile-game-view .table-zone,
+  .mobile-game-view .table-meld-layer,
+  .mobile-game-view .player-zone {
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .mobile-game-view .table-area {
+    width: 100% !important;
+  }
+}
+
+.pwa-update-toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 120;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 168, 67, 0.5);
+  background: rgba(8, 24, 16, 0.94);
+  color: #d4a843;
+  font-weight: 900;
+  transform: translateX(-50%);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.34);
+}

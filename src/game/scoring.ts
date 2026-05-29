@@ -1,5 +1,5 @@
 import { TARGET_SCORE } from "./constants";
-import type { Card, GameState, Player, ScoreRow } from "./types";
+import type { Card, GameState, Meld, Player, ScoreRow } from "./types";
 
 export function cardValue(card: Card): number {
   if (card.rank === "Q" && card.suit === "♠") return 40;
@@ -12,16 +12,29 @@ export function points(cards: Card[]): number {
   return cards.reduce((sum, card) => sum + cardValue(card), 0);
 }
 
+function meldContributions(meld: Meld): Array<{ playerId: number; cards: Card[] }> {
+  return meld.contributions?.length ? meld.contributions : [{ playerId: meld.ownerId, cards: meld.cards }];
+}
+
+export function meldedCardsForPlayer(state: GameState, playerId: number): Card[] {
+  return state.players
+    .flatMap((player) => player.melds)
+    .flatMap((meld) => meldContributions(meld))
+    .filter((contribution) => contribution.playerId === playerId)
+    .flatMap((contribution) => contribution.cards);
+}
+
 export function scoreHand(state: GameState, outPlayerId: number): GameState {
   const scoring: ScoreRow[] = state.players.map((player) => {
-    const table = points(player.melds.flatMap((meld) => meld.cards));
+    const meldedCards = meldedCardsForPlayer(state, player.id);
+    const table = points(meldedCards);
     const hand = points(player.hand);
     return {
       playerId: player.id,
       name: player.name,
       avatar: player.avatar,
       fallback: player.fallback,
-      meldedCards: player.melds.flatMap((meld) => meld.cards),
+      meldedCards,
       handCards: player.hand,
       table,
       hand,
