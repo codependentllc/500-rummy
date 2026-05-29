@@ -5,10 +5,15 @@ import { makeDeck } from "./deck";
 import { sortCards } from "./melds";
 import type { GameState, Player, PlayerConfig, ScoreHistoryEntry } from "./types";
 
+function avatarNameForConfig(config: PlayerConfig | undefined, index: number) {
+  const avatar = AVATARS.find((item) => item.src === config?.avatar && item.fallback === config?.fallback) || AVATARS[index % AVATARS.length];
+  return avatar.name;
+}
+
 export function createPlayers(count: number, configs: PlayerConfig[] = []): Player[] {
   return Array.from({ length: count }, (_, index) => ({
     id: index,
-    name: configs[index]?.name?.trim() || (index === 0 ? "You" : `Computer ${index}`),
+    name: configs[index]?.name?.trim() || (index === 0 ? "You" : avatarNameForConfig(configs[index], index)),
     avatar: configs[index]?.avatar || AVATARS[index % AVATARS.length].src,
     fallback: configs[index]?.fallback || AVATARS[index % AVATARS.length].fallback,
     isAI: index > 0,

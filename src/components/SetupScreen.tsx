@@ -82,6 +82,13 @@ function cardBackWindow(selectedIndex: number) {
   });
 }
 
+function isAutoCpuName(name: string | undefined, playerIndex: number) {
+  const trimmed = name?.trim() || "";
+  if (!trimmed) return true;
+  if (trimmed === `Computer ${playerIndex}` || trimmed === `CPU ${playerIndex}`) return true;
+  return AVATARS.some((avatar) => avatar.name === trimmed);
+}
+
 export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, setTableTheme, cardBack, setCardBack, onStart }: Props) {
   const [actionMenu, setActionMenu] = useState<"lobby" | "instructions" | null>(null);
   const [showTrailer, setShowTrailer] = useState(false);
@@ -100,7 +107,12 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
 
   function selectAvatar(playerIndex: number, avatarIndex: number) {
     const avatar = AVATARS[wrapIndex(avatarIndex, AVATARS.length)];
-    updatePlayer(playerIndex, { avatar: avatar.src, fallback: avatar.fallback });
+    const currentName = configs[playerIndex]?.name;
+    updatePlayer(playerIndex, {
+      avatar: avatar.src,
+      fallback: avatar.fallback,
+      ...(playerIndex > 0 && !configs[playerIndex]?.nameEdited && isAutoCpuName(currentName, playerIndex) ? { name: avatar.name } : {})
+    });
   }
 
   function moveAvatar(playerIndex: number, direction: -1 | 1) {
@@ -371,8 +383,8 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
                 <div className="player-config-main">
                   <input
                     value={player.name || ""}
-                    onChange={(event) => updatePlayer(index, { name: event.target.value })}
-                    placeholder={index === 0 ? "Your name" : `Computer ${index} name`}
+                    onChange={(event) => updatePlayer(index, { name: event.target.value, nameEdited: true })}
+                    placeholder={index === 0 ? "Your name" : "Player name"}
                   />
                 </div>
               </motion.div>

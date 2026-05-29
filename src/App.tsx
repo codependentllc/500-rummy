@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { AVATARS } from "./data/avatars";
 import { aiTurn } from "./game/ai";
@@ -27,9 +27,9 @@ import type { Player } from "./game/types";
 
 const defaultConfigs: PlayerConfig[] = [
   { name: "You", avatar: AVATARS[0].src, fallback: AVATARS[0].fallback },
-  { name: "Computer 1", avatar: AVATARS[1].src, fallback: AVATARS[1].fallback },
-  { name: "Computer 2", avatar: AVATARS[2].src, fallback: AVATARS[2].fallback },
-  { name: "Computer 3", avatar: AVATARS[3].src, fallback: AVATARS[3].fallback }
+  { name: AVATARS[1].name, avatar: AVATARS[1].src, fallback: AVATARS[1].fallback },
+  { name: AVATARS[2].name, avatar: AVATARS[2].src, fallback: AVATARS[2].fallback },
+  { name: AVATARS[3].name, avatar: AVATARS[3].src, fallback: AVATARS[3].fallback }
 ];
 
 export type TableTheme = "classic" | "casino" | "wood" | "luxury" | "neon" | "coffee";
@@ -41,7 +41,6 @@ export default function App() {
   const [tableTheme, setTableTheme] = useState<TableTheme>("classic");
   const [cardBack, setCardBack] = useState<CardBackStyle>("red");
   const [started, setStarted] = useState(false);
-  const [meldTrayExpanded, setMeldTrayExpanded] = useState(false);
   const [state, setState] = useState<GameState>(() => newGame(2, null, defaultConfigs));
   const [flyingCards, setFlyingCards] = useState<Card[]>([]);
   const [flyingMeldType, setFlyingMeldType] = useState<"set" | "run" | "layoff" | undefined>();
@@ -58,6 +57,15 @@ export default function App() {
   const tableMeldEntries = state.players.flatMap((player) => player.melds.map((meld) => ({ player, meld })));
   const layoffTargetCount = tableMeldEntries.filter(({ meld }) => selectedCards.length === 1 && state.turn === 0 && state.drawn && canLay(selectedCards[0], meld)).length;
   const handHints = useMemo(() => cardHints(human.hand), [human.hand]);
+  const handDensityClass = human.hand.length >= 12 ? "hand-many" : human.hand.length >= 9 ? "hand-medium" : "hand-few";
+  const handLayoutStyle = {
+    "--hand-count": human.hand.length,
+    "--selected-count": selectedCards.length
+  } as CSSProperties;
+  const isErrorMessage = /must|Cannot|valid|Invalid/i.test(state.message);
+  const messageClass = isErrorMessage ? "message error" : "message";
+  const turnClass = state.turn === 0 ? "turn-human" : "turn-opponent";
+  const phaseClass = state.handOver ? "phase-over" : state.drawn ? "phase-play" : "phase-draw";
 
   useEffect(() => {
     if (!started || !current?.isAI || state.handOver || isAnimatingMeld || isDealing) return;
@@ -398,6 +406,18 @@ export default function App() {
     <div className={`app-shell table-theme-${tableTheme} card-back-${cardBack}`}>
       <motion.div className="top-bar" initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
         <div className="title"><span>500</span> Rummy</div>
+        <div className="mobile-header-players" aria-label="Players">
+          {state.players.slice(1, 2).map((player) => (
+            <div key={player.id} className={state.turn === player.id ? "mobile-header-player active" : "mobile-header-player"}>
+              <AvatarPhoto src={player.avatar} alt={player.name} fallback={player.fallback || "🤖"} size={28} />
+              <span>{player.name}<small>{player.score} • {player.hand.length}</small></span>
+            </div>
+          ))}
+          <div className={state.turn === 0 ? "mobile-header-player active" : "mobile-header-player"}>
+            <AvatarPhoto src={human.avatar} alt={human.name} fallback={human.fallback || "🧑"} size={28} />
+            <span>{human.name}<small>{human.score} • {human.hand.length}</small></span>
+          </div>
+        </div>
         <div className="header-right">
           <div className="header-score-panel">
             <ScorePanel players={state.players} turn={state.turn} handOver={state.handOver} />
@@ -410,7 +430,9 @@ export default function App() {
 
       <motion.div
         key={state.message}
-        className={state.message.match(/must|Cannot|valid/i) ? "message error" : "message"}
+        className={messageClass}
+        role="status"
+        aria-live="polite"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.22 }}
@@ -419,51 +441,57 @@ export default function App() {
       </motion.div>
 
       <motion.div
-        className={isDealing ? "game-surface dealing-hidden" : "game-surface"}
+        className={`${isDealing ? "game-surface dealing-hidden" : "game-surface"} ${tableMelds.length ? "has-table-melds" : "no-table-melds"} ${turnClass} ${phaseClass}`}
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: isDealing ? 0 : 1, y: 0 }}
         transition={{ duration: 0.36 }}
       >
-        <section className="table-zone" aria-label="Card table">
-          <TableArea
-            state={state}
-            onDrawStock={drawStock}
-            onDrawDiscard={drawDiscard}
-            onDiscardSelected={discardSelected}
-            onDropToDiscardPile={dropToDiscardPile}
-            onPlayMeld={playMeld}
-            onDropDiscard={dropDiscard}
-            allowDrop={allowDrop}
-            disabled={isAnimatingMeld || isDealing}
-          />
-        </section>
+        <section className="card-table-board" aria-label="Card table">
+          <div className="card-table-scroll">
+            <section className="table-zone" aria-label="Stock and discard piles">
+              <TableArea
+                state={state}
+                onDrawStock={drawStock}
+                onDrawDiscard={drawDiscard}
+                onDiscardSelected={discardSelected}
+                onDropToDiscardPile={dropToDiscardPile}
+                onPlayMeld={playMeld}
+                onDropDiscard={dropDiscard}
+                allowDrop={allowDrop}
+                disabled={isAnimatingMeld || isDealing}
+              />
+            </section>
 
-        <FlyingCards cards={flyingCards} type={flyingMeldType} />
+            <FlyingCards cards={flyingCards} type={flyingMeldType} />
 
-        {tableMelds.length ? (
-          <div className={meldTrayExpanded ? "table-meld-layer expanded" : "table-meld-layer"}>
-            <button type="button" className="table-meld-toggle" onClick={() => setMeldTrayExpanded((expanded) => !expanded)} aria-expanded={meldTrayExpanded}>
-              <span>Table Melds</span>
-              <small>{tableMelds.length} groups{layoffTargetCount ? ` · ${layoffTargetCount} layoff` : ""}</small>
-            </button>
-            <div className="meld-section">
-              <div className="section-label">TABLE MELDS</div>
-              <div className="meld-grid">
-                {tableMeldEntries.map(({ player, meld }) => (
-                  <MeldDisplay
-                    key={meld.id}
-                    meld={meld}
-                    playerName={player.name}
-                    canLayoffCard={selectedCards.length === 1 && state.turn === 0 && state.drawn && canLay(selectedCards[0], meld)}
-                    onLayoff={layoff}
-                    allowDrop={allowDrop}
-                    disabled={isAnimatingMeld || isDealing}
-                  />
-                ))}
+            <div className={tableMelds.length ? "table-meld-layer" : "table-meld-layer table-meld-layer-empty"}>
+              <div className="table-meld-toggle" role="heading" aria-level={2}>
+                <span>Table Melds</span>
+                <small>{tableMelds.length ? `${tableMelds.length} groups${layoffTargetCount ? ` · ${layoffTargetCount} layoff` : ""}` : "No melds yet"}</small>
               </div>
+              {tableMelds.length ? (
+                <div className="meld-section">
+                  <div className="section-label">TABLE MELDS</div>
+                  <div className="meld-grid">
+                    {tableMeldEntries.map(({ player, meld }) => (
+                      <MeldDisplay
+                        key={meld.id}
+                        meld={meld}
+                        playerName={player.name}
+                        canLayoffCard={selectedCards.length === 1 && state.turn === 0 && state.drawn && canLay(selectedCards[0], meld)}
+                        onLayoff={layoff}
+                        allowDrop={allowDrop}
+                        disabled={isAnimatingMeld || isDealing}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="empty-meld-row">Played melds will appear here.</div>
+              )}
             </div>
           </div>
-        ) : null}
+        </section>
 
         <div className={`opponent-seats seats-${state.players.length - 1}`} aria-label="Opponent seats">
           {state.players.slice(1).map((player, index) => (
@@ -512,7 +540,8 @@ export default function App() {
 
         <section className="player-zone" aria-label="Your hand">
           <motion.div
-            className={state.turn === 0 && !state.handOver ? "human-area active" : "human-area"}
+            className={`${state.turn === 0 && !state.handOver ? "human-area active" : "human-area"} ${handDensityClass}`}
+            style={handLayoutStyle}
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.25 }}
@@ -525,8 +554,6 @@ export default function App() {
               </div>
               <div className="hand-actions">
                 <span data-mobile-label={`${human.score} · ${human.hand.length} cards · ${selectedCards.length} selected`}>{human.score} score · {human.hand.length} cards · {selectedCards.length} selected · {points(selectedCards)} pts</span>
-                <ActionButton className="secondary-action" disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandByMelds} style={{ padding: "6px 10px", fontSize: 12 }}>Group Melds</ActionButton>
-                <ActionButton className="secondary-action light-action" disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandBySuit} style={{ padding: "6px 10px", fontSize: 12 }}>Sort Suit</ActionButton>
               </div>
             </div>
 
@@ -544,7 +571,15 @@ export default function App() {
               />
             </div>
 
+            <div className="mobile-hand-stats" aria-label="Hand status">
+              {human.score} • {human.hand.length} cards • {selectedCards.length} selected
+            </div>
+
             <div className="mobile-turn-actions" aria-label="Turn actions">
+              <div className="mobile-organize-actions" aria-label="Organize hand">
+                <ActionButton className="secondary-action" disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandByMelds}>Group Melds</ActionButton>
+                <ActionButton className="secondary-action light-action" disabled={state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing} onClick={sortHandBySuit}>Sort Suit</ActionButton>
+              </div>
               {state.turn === 0 && !state.drawn && !state.handOver ? (
                 <>
                   <ActionButton className="secondary-action" disabled={isAnimatingMeld || isDealing} onClick={drawStock}>Draw Stock</ActionButton>
