@@ -1,4 +1,4 @@
-import type { DragEvent } from "react";
+import type { DragEvent, PointerEvent } from "react";
 import { CardView } from "./CardView";
 import { ActionButton } from "./ActionButton";
 import type { Card } from "../game/types";
@@ -12,10 +12,11 @@ type Props = {
   onCardClick: (id: string) => void;
   onCardDrag: (event: DragEvent<HTMLButtonElement>, id: string) => void;
   onCardDrop: (event: DragEvent<HTMLButtonElement>, id: string) => void;
+  onCardPointerDown?: (event: PointerEvent<HTMLButtonElement>, id: string) => void;
   allowDrop: (event: DragEvent) => void;
 };
 
-export function HandCardRow({ cards, hints, selectedIds, disabled, onSelect, onCardClick, onCardDrag, onCardDrop, allowDrop }: Props) {
+export function HandCardRow({ cards, hints, selectedIds, disabled, onSelect, onCardClick, onCardDrag, onCardDrop, onCardPointerDown, allowDrop }: Props) {
   const readyCards = Object.entries(hints)
     .filter(([, kind]) => kind === "ready")
     .map(([id]) => id);
@@ -43,6 +44,7 @@ export function HandCardRow({ cards, hints, selectedIds, disabled, onSelect, onC
             onDragStart={(event) => onCardDrag(event, card.id)}
             onDragOver={allowDrop}
             onDrop={(event) => onCardDrop(event, card.id)}
+            onPointerDown={onCardPointerDown ? (event) => onCardPointerDown(event, card.id) : undefined}
           />
         ))}
       </div>

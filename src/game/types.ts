@@ -1,6 +1,7 @@
 export type Suit = "♠" | "♥" | "♦" | "♣";
 export type Rank = "A" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "J" | "Q" | "K";
 export type MeldType = "set" | "run";
+export type TurnPhase = "draw" | "play" | "ai" | "handOver";
 
 export type Card = {
   id: string;
@@ -69,3 +70,22 @@ export type GameState = {
   scoreHistory: ScoreHistoryEntry[];
   winner: Player | null;
 };
+
+export type DragState =
+  | {
+      type: "stock";
+      startX: number;
+      startY: number;
+      x: number;
+      y: number;
+      dragging: boolean;
+    }
+  | {
+      type: "hand-card";
+      cardId: string;
+      startX: number;
+      startY: number;
+      x: number;
+      y: number;
+      dragging: boolean;
+    };

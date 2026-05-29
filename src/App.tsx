@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AVATARS } from "./data/avatars";
 import { aiTurn } from "./game/ai";
@@ -7,11 +7,12 @@ import { removeCards } from "./game/deck";
 import { canLay, cardHints, groupHandByMelds, label, meldType, sortCards } from "./game/melds";
 import { points, scoreHand } from "./game/scoring";
 import { moveCardById, newGame } from "./game/state";
-import type { Card, GameState, PlayerConfig } from "./game/types";
+import type { Card, DragState, GameState, PlayerConfig, TurnPhase } from "./game/types";
 import { ActionButton } from "./components/ActionButton";
 import { AvatarPhoto } from "./components/AvatarPhoto";
 import { CardView } from "./components/CardView";
 import { DealSequence } from "./components/DealSequence";
+import { DiscardViewer } from "./components/DiscardViewer";
 import { DiscardPickupAnimation } from "./components/DiscardPickupAnimation";
 import { DrawStockAnimation } from "./components/DrawStockAnimation";
 import { EndHandModal } from "./components/EndHandModal";
@@ -26,6 +27,7 @@ import "./styles.css";
 import type { Player } from "./game/types";
 import { useViewportCategory } from "./hooks/useViewportCategory";
 import { DesktopGameView, MobileGameView, TabletGameView } from "./views/GameViews";
+import { movedBeyondThreshold, pointInElement, pointerPoint } from "./utils/pointerDrag";
 
 const defaultConfigs: PlayerConfig[] = [
   { name: "You", avatar: AVATARS[0].src, fallback: AVATARS[0].fallback },
@@ -54,6 +56,11 @@ export default function App() {
   const [pendingStockCard, setPendingStockCard] = useState<Card | null>(null);
   const [pendingDiscardPickup, setPendingDiscardPickup] = useState<Card[]>([]);
   const [updateReady, setUpdateReady] = useState(false);
+  const [discardViewerOpen, setDiscardViewerOpen] = useState(false);
+  const [dragState, setDragState] = useState<DragState | null>(null);
+  const [dragTarget, setDragTarget] = useState<"hand" | "discard" | null>(null);
+  const handDropRef = useRef<HTMLDivElement | null>(null);
+  const discardPileRef = useRef<HTMLDivElement | null>(null);
 
   const human = state.players[0];
   const current = state.players[state.turn];
@@ -62,6 +69,8 @@ export default function App() {
   const tableMeldEntries = state.players.flatMap((player) => player.melds.map((meld) => ({ player, meld })));
   const layoffTargetCount = tableMeldEntries.filter(({ meld }) => selectedCards.length === 1 && state.turn === 0 && state.drawn && canLay(selectedCards[0], meld)).length;
   const handHints = useMemo(() => cardHints(human.hand), [human.hand]);
+  const turnPhase: TurnPhase = state.handOver ? "handOver" : state.turn !== 0 ? "ai" : state.drawn ? "play" : "draw";
+  const draggedCard = dragState?.type === "hand-card" ? human.hand.find((card) => card.id === dragState.cardId) : null;
 
   useEffect(() => {
     if (!started || !current?.isAI || state.handOver || isAnimatingMeld || isDealing) return;
@@ -77,6 +86,64 @@ export default function App() {
     window.addEventListener("pwa:update-ready", handleUpdateReady);
     return () => window.removeEventListener("pwa:update-ready", handleUpdateReady);
   }, []);
+
+  useEffect(() => {
+    if (!dragState) return;
+    const activeDrag = dragState;
+
+    function handlePointerMove(event: PointerEvent) {
+      const point = pointerPoint(event);
+      const start = { x: activeDrag.startX, y: activeDrag.startY };
+      const dragging = activeDrag.dragging || movedBeyondThreshold(start, point);
+
+      setDragState((currentDrag) => {
+        if (!currentDrag) return currentDrag;
+        return { ...currentDrag, x: point.x, y: point.y, dragging };
+      });
+
+      if (!dragging) return;
+
+      if (activeDrag.type === "stock") {
+        setDragTarget(pointInElement(handDropRef.current, point) ? "hand" : null);
+      } else {
+        setDragTarget(pointInElement(discardPileRef.current, point) ? "discard" : null);
+      }
+    }
+
+    function handlePointerUp(event: PointerEvent) {
+      const point = pointerPoint(event);
+      const start = { x: activeDrag.startX, y: activeDrag.startY };
+      const dragged = activeDrag.dragging || movedBeyondThreshold(start, point);
+
+      if (!dragged) {
+        if (activeDrag.type === "hand-card") toggleCard(activeDrag.cardId);
+        setDragState(null);
+        setDragTarget(null);
+        return;
+      }
+
+      if (activeDrag.type === "stock" && pointInElement(handDropRef.current, point)) {
+        drawStock();
+      }
+
+      if (activeDrag.type === "hand-card" && pointInElement(discardPileRef.current, point)) {
+        discardCardById(activeDrag.cardId);
+      }
+
+      setDragState(null);
+      setDragTarget(null);
+    }
+
+    window.addEventListener("pointermove", handlePointerMove, { passive: false });
+    window.addEventListener("pointerup", handlePointerUp, { passive: false });
+    window.addEventListener("pointercancel", handlePointerUp, { passive: false });
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointercancel", handlePointerUp);
+    };
+  }, [dragState, human.hand, state.drawn, state.handOver, state.turn, isAnimatingMeld, isDealing]);
 
   function setMessage(message: string) {
     setState((prev) => ({ ...prev, message }));
@@ -190,6 +257,11 @@ export default function App() {
       setPendingDiscardPickup(pickup);
       return { ...prev, discard, message: `Picking up ${pickup.map(label).join(", ")}…` };
     });
+  }
+
+  function openDiscardViewer() {
+    if (state.turn !== 0 || state.drawn || state.handOver || !state.discard.length || isAnimatingMeld || isDealing) return;
+    setDiscardViewerOpen(true);
   }
 
   function finishDiscardPickup() {
@@ -364,6 +436,35 @@ export default function App() {
     event.dataTransfer.setData("text/plain", `hand:${cardId}`);
   }
 
+  function handleStockPointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    if (turnPhase !== "draw" || isAnimatingMeld || isDealing || pendingStockCard || pendingDiscardPickup.length) return;
+    event.preventDefault();
+    const point = pointerPoint(event);
+    setDragState({
+      type: "stock",
+      startX: point.x,
+      startY: point.y,
+      x: point.x,
+      y: point.y,
+      dragging: false
+    });
+  }
+
+  function handleHandCardPointerDown(event: React.PointerEvent<HTMLButtonElement>, cardId: string) {
+    if (state.turn !== 0 || state.handOver || isAnimatingMeld || isDealing) return;
+    event.preventDefault();
+    const point = pointerPoint(event);
+    setDragState({
+      type: "hand-card",
+      cardId,
+      startX: point.x,
+      startY: point.y,
+      x: point.x,
+      y: point.y,
+      dragging: false
+    });
+  }
+
   function dropOnHandCard(event: React.DragEvent<HTMLButtonElement>, targetId: string) {
     event.preventDefault();
     if (isAnimatingMeld || isDealing) return;
@@ -456,10 +557,14 @@ export default function App() {
                   state={state}
                   onDrawStock={drawStock}
                   onDrawDiscard={drawDiscard}
+                  onOpenDiscardViewer={openDiscardViewer}
                   onDiscardSelected={discardSelected}
                   onDropToDiscardPile={dropToDiscardPile}
                   onPlayMeld={playMeld}
                   onDropDiscard={dropDiscard}
+                  onStockPointerDown={handleStockPointerDown}
+                  discardPileRef={discardPileRef}
+                  dragTarget={dragTarget}
                   allowDrop={allowDrop}
                   disabled={isAnimatingMeld || isDealing}
                 />
@@ -564,7 +669,12 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="hand-scroll-wrap" onDragOver={allowDrop} onDrop={dropDiscard}>
+                <div
+                  ref={handDropRef}
+                  className={dragTarget === "hand" ? "hand-scroll-wrap drop-ready" : "hand-scroll-wrap"}
+                  onDragOver={allowDrop}
+                  onDrop={dropDiscard}
+                >
                   <HandCardRow
                     cards={human.hand}
                     hints={handHints}
@@ -574,24 +684,16 @@ export default function App() {
                     onCardClick={toggleCard}
                     onCardDrag={dragCard}
                     onCardDrop={dropOnHandCard}
+                    onCardPointerDown={handleHandCardPointerDown}
                     allowDrop={allowDrop}
                   />
                 </div>
 
                 <div className="mobile-turn-actions" aria-label="Turn actions">
-                  {state.turn === 0 && !state.drawn && !state.handOver ? (
-                    <>
-                      <ActionButton className="secondary-action" disabled={isAnimatingMeld || isDealing} onClick={drawStock}>Draw Stock</ActionButton>
-                      {state.discard.length ? <ActionButton className="primary-action" disabled={isAnimatingMeld || isDealing} onClick={() => drawDiscard(state.discard.length - 1)}>Pick Discard</ActionButton> : null}
-                    </>
-                  ) : null}
-                  {state.turn === 0 && state.drawn && !state.handOver ? (
-                    <>
-                      <ActionButton className="primary-action" disabled={isAnimatingMeld || isDealing} onClick={playMeld}>Meld</ActionButton>
-                      <ActionButton className="secondary-action" disabled={isAnimatingMeld || isDealing} onClick={layoffSelected}>Lay Off</ActionButton>
-                      <ActionButton className="danger-action" disabled={isAnimatingMeld || isDealing} onClick={discardSelected}>Discard</ActionButton>
-                    </>
-                  ) : null}
+                  <ActionButton className="secondary-action draw-action" disabled={turnPhase !== "draw" || isAnimatingMeld || isDealing} onClick={drawStock}>Draw</ActionButton>
+                  <ActionButton className="primary-action" disabled={turnPhase !== "play" || selectedCards.length < 3 || isAnimatingMeld || isDealing} onClick={playMeld}>Meld</ActionButton>
+                  <ActionButton className="secondary-action layoff-action" disabled={turnPhase !== "play" || selectedCards.length !== 1 || !tableMelds.some((meld) => canLay(selectedCards[0], meld)) || isAnimatingMeld || isDealing} onClick={layoffSelected}>Lay Off</ActionButton>
+                  <ActionButton className="danger-action" disabled={turnPhase !== "play" || selectedCards.length !== 1 || isAnimatingMeld || isDealing} onClick={discardSelected}>Discard</ActionButton>
                   {state.turn !== 0 && !state.handOver ? <span className="waiting-turn-pill">Waiting for {current.name}</span> : null}
                 </div>
 
@@ -614,6 +716,23 @@ export default function App() {
       {isDealing ? <DealSequence key={dealKey} playerCount={state.players.length} onComplete={() => setIsDealing(false)} /> : null}
       {pendingStockCard ? <DrawStockAnimation onComplete={finishDrawStock} /> : null}
       {pendingDiscardPickup.length ? <DiscardPickupAnimation cards={pendingDiscardPickup} onComplete={finishDiscardPickup} /> : null}
+
+      <DiscardViewer
+        state={state}
+        open={discardViewerOpen}
+        disabled={isAnimatingMeld || isDealing}
+        onClose={() => setDiscardViewerOpen(false)}
+        onPick={(index) => {
+          drawDiscard(index);
+          setDiscardViewerOpen(false);
+        }}
+      />
+
+      {dragState?.dragging ? (
+        <div className="drag-ghost" style={{ left: dragState.x, top: dragState.y }}>
+          {dragState.type === "stock" ? <div className="card-back-face drag-card-back" /> : draggedCard ? <CardView card={draggedCard} disabled /> : null}
+        </div>
+      ) : null}
 
       <EndHandModal
         state={state}

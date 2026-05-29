@@ -1,4 +1,4 @@
-import type { DragEventHandler, MouseEventHandler } from "react";
+import type { DragEventHandler, MouseEventHandler, PointerEventHandler } from "react";
 import { cardValue } from "../game/scoring";
 import { label } from "../game/melds";
 import type { Card } from "../game/types";
@@ -14,6 +14,7 @@ type Props = {
   onDragStart?: DragEventHandler<HTMLButtonElement>;
   onDragOver?: DragEventHandler<HTMLButtonElement>;
   onDrop?: DragEventHandler<HTMLButtonElement>;
+  onPointerDown?: PointerEventHandler<HTMLButtonElement>;
 };
 
 export function CardView({
@@ -26,6 +27,7 @@ export function CardView({
   onDragStart,
   onDragOver,
   onDrop,
+  onPointerDown,
   hint = ""
 }: Props) {
   const size = small ? { w: 50, h: 70, rank: 15 } : { w: 76, h: 108, rank: 21 };
@@ -65,6 +67,7 @@ export function CardView({
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDrop={onDrop}
+      onPointerDown={onPointerDown}
       onClick={onClick}
       title={`${label(card)}: ${cardValue(card)} points`}
       style={{
