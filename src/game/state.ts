@@ -8,8 +8,11 @@ import type { GameState, Player, PlayerConfig, ScoreHistoryEntry } from "./types
 export function createPlayers(count: number, configs: PlayerConfig[] = []): Player[] {
   return Array.from({ length: count }, (_, index) => ({
     id: index,
+    profileId: configs[index]?.id,
+    characterId: configs[index]?.characterId || AVATARS[index % AVATARS.length].id,
+    cardBackThemeId: configs[index]?.cardBackThemeId,
     name: configs[index]?.name?.trim() || (index === 0 ? "You" : `Computer ${index}`),
-    avatar: configs[index]?.avatar || AVATARS[index % AVATARS.length].src,
+    avatar: configs[index]?.avatar || AVATARS[index % AVATARS.length].avatar,
     fallback: configs[index]?.fallback || AVATARS[index % AVATARS.length].fallback,
     isAI: index > 0,
     hand: [],

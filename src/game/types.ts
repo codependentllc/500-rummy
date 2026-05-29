@@ -1,6 +1,33 @@
 export type Suit = "♠" | "♥" | "♦" | "♣";
 export type Rank = "A" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "J" | "Q" | "K";
 export type MeldType = "set" | "run";
+export type TurnPhase = "draw" | "play" | "ai" | "handOver";
+export type CharacterId = string;
+export type CardBackThemeId = string;
+
+export type PlayerProfile = {
+  id: string;
+  displayName: string;
+  characterId: CharacterId;
+  cardBackThemeId: CardBackThemeId;
+  soundEnabled: boolean;
+};
+
+export type CharacterOption = {
+  id: CharacterId;
+  name: string;
+  avatar: string;
+  src?: string;
+  fallback: string;
+  role?: string;
+  description?: string;
+};
+
+export type GameSettings = {
+  playerCount: number;
+  cardBackThemeId: CardBackThemeId;
+  soundEnabled: boolean;
+};
 
 export type Card = {
   id: string;
@@ -23,6 +50,9 @@ export type MeldContribution = {
 
 export type Player = {
   id: number;
+  profileId?: string;
+  characterId?: CharacterId;
+  cardBackThemeId?: CardBackThemeId;
   name: string;
   avatar: string;
   fallback: string;
@@ -33,9 +63,14 @@ export type Player = {
 };
 
 export type PlayerConfig = {
+  id?: string;
+  displayName?: string;
   name: string;
+  characterId?: CharacterId;
   avatar: string;
   fallback: string;
+  cardBackThemeId?: CardBackThemeId;
+  soundEnabled?: boolean;
 };
 
 export type ScoreRow = {
@@ -69,3 +104,22 @@ export type GameState = {
   scoreHistory: ScoreHistoryEntry[];
   winner: Player | null;
 };
+
+export type DragState =
+  | {
+      type: "stock";
+      startX: number;
+      startY: number;
+      x: number;
+      y: number;
+      dragging: boolean;
+    }
+  | {
+      type: "hand-card";
+      cardId: string;
+      startX: number;
+      startY: number;
+      x: number;
+      y: number;
+      dragging: boolean;
+    };

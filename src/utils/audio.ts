@@ -1,6 +1,12 @@
 const audioCache = new Map<string, HTMLAudioElement>();
+let soundEnabled = true;
+
+export function setGlobalSoundEnabled(enabled: boolean) {
+  soundEnabled = enabled;
+}
 
 export function playSound(src: string, volume = 0.55) {
+  if (!soundEnabled) return;
   if (typeof window === "undefined") return;
 
   const cached = audioCache.get(src);
