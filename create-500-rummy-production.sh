@@ -1108,9 +1108,9 @@ import "./styles.css";
 
 const defaultConfigs: PlayerConfig[] = [
   { name: "You", avatar: AVATARS[0].src, fallback: AVATARS[0].fallback },
-  { name: "Computer 1", avatar: AVATARS[1].src, fallback: AVATARS[1].fallback },
-  { name: "Computer 2", avatar: AVATARS[2].src, fallback: AVATARS[2].fallback },
-  { name: "Computer 3", avatar: AVATARS[3].src, fallback: AVATARS[3].fallback }
+  { name: AVATARS[1].name, avatar: AVATARS[1].src, fallback: AVATARS[1].fallback },
+  { name: AVATARS[2].name, avatar: AVATARS[2].src, fallback: AVATARS[2].fallback },
+  { name: AVATARS[3].name, avatar: AVATARS[3].src, fallback: AVATARS[3].fallback }
 ];
 
 export default function App() {

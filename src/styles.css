@@ -825,8 +825,10 @@ body {
   justify-content: center;
   gap: clamp(20px, 5vw, 56px);
   align-items: flex-start;
-  margin: 0 auto 8px;
-  min-height: 128px;
+  margin: 0 auto 12px;
+  min-height: clamp(168px, 22dvh, 240px);
+  height: auto;
+  overflow: visible;
 }
 
 .section-label {
@@ -7465,7 +7467,7 @@ body {
 
   .meld-section {
     min-height: 0;
-    max-height: 98px;
+    /* max-height: 98px; */
     margin: 7px 0 0;
     overflow: hidden;
   }
@@ -7531,7 +7533,7 @@ body {
     width: 100%;
     max-width: none;
     min-height: 39px;
-    max-height: 39px;
+    /* max-height: 39px; */
     margin: 0;
     padding: 5px 6px;
     overflow: hidden;
@@ -7544,7 +7546,7 @@ body {
 
   .table-meld-layer.expanded .meld-section {
     min-height: 110px;
-    max-height: 110px;
+    /* max-height: 110px; */
     overflow: hidden;
   }
 
@@ -8520,15 +8522,15 @@ body {
 
   .table-meld-layer.expanded .meld-section {
     min-height: 90px;
-    max-height: 90px;
+    /* max-height: 90px; */
   }
 
   .meld-grid {
-    height: 24px;
+    /* height: 24px; */
   }
 
   .table-meld-layer.expanded .meld-grid {
-    height: 78px;
+    /* height: 78px; */
   }
 
   .player-zone {
@@ -8657,11 +8659,11 @@ body {
     }
 
     .meld-grid {
-      height: 27px;
+      /* height: 27px; */
     }
 
     .table-meld-layer.expanded .meld-grid {
-      height: 76px;
+      /* height: 76px; */
     }
 
     .human-header {
@@ -8920,4 +8922,19 @@ body {
     width: 340px;
     height: 340px;
   }
+}
+.pwa-update-toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 120;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 168, 67, 0.5);
+  background: rgba(8, 24, 16, 0.94);
+  color: #d4a843;
+  font-weight: 900;
+  transform: translateX(-50%);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.34);
 }

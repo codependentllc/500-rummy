@@ -1,0 +1,6 @@
+@media (max-width: 767px) {
+  .action-button {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+}

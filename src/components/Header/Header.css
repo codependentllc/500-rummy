@@ -1,0 +1,154 @@
+.game-header {
+  position: relative;
+  width: min(1220px, calc(100% - 24px));
+}
+
+.game-header-brand {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.game-header-menu {
+  display: none;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid rgba(242, 207, 117, 0.22);
+  border-radius: 999px;
+  background: rgba(4, 14, 8, 0.48);
+  color: #ffe8a3;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mobile-header-chips {
+  display: none;
+}
+
+.game-header-mobile-menu {
+  display: none;
+}
+
+.turn-mini-chip {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  max-width: 160px;
+  padding: 6px 10px;
+  border: 1px solid rgba(158, 228, 147, 0.22);
+  border-radius: 999px;
+  background: rgba(4, 15, 9, 0.42);
+  color: rgba(216, 243, 220, 0.86);
+  font-size: 12px;
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.new-game-action {
+  padding: 6px 12px !important;
+  background: #ffe082 !important;
+  color: #1a472a !important;
+}
+
+@media (max-width: 767px) {
+  .game-header {
+    width: calc(100% - 12px);
+    min-height: 48px;
+    padding: 6px 8px !important;
+    border-radius: 16px !important;
+    gap: 7px;
+  }
+
+  .game-header-menu {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .game-header .title {
+    font-size: clamp(18px, 6vw, 25px) !important;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .mobile-header-chips {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    overflow: hidden;
+  }
+
+  .mobile-player-chip {
+    min-width: 0;
+    display: grid;
+    align-content: center;
+    gap: 0;
+    max-width: 72px;
+    min-height: 34px;
+    padding: 4px 7px;
+    border: 1px solid rgba(255, 224, 130, 0.14);
+    border-radius: 999px;
+    background: rgba(4, 15, 9, 0.48);
+  }
+
+  .mobile-player-chip.active {
+    border-color: rgba(255, 224, 130, 0.58);
+    box-shadow: 0 0 18px rgba(255, 224, 130, 0.14);
+  }
+
+  .mobile-player-chip b,
+  .mobile-player-chip small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobile-player-chip b {
+    color: #fff8dc;
+    font-size: 10px;
+    line-height: 1.1;
+  }
+
+  .mobile-player-chip small {
+    color: rgba(216, 243, 220, 0.76);
+    font-size: 9px;
+    font-weight: 900;
+    line-height: 1.05;
+  }
+
+  .game-header .header-right {
+    display: none !important;
+  }
+
+  .game-header-mobile-menu {
+    position: absolute;
+    left: 10px;
+    top: calc(100% + 6px);
+    z-index: 20;
+    display: grid;
+    min-width: 148px;
+    padding: 7px;
+    border: 1px solid rgba(255, 224, 130, 0.24);
+    border-radius: 14px;
+    background: rgba(4, 15, 9, 0.94);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(16px);
+  }
+
+  .game-header-mobile-menu button {
+    min-height: 40px;
+    border: 1px solid rgba(255, 224, 130, 0.34);
+    border-radius: 10px;
+    background: rgba(255, 224, 130, 0.12);
+    color: #ffe8a3;
+    font-weight: 900;
+  }
+}

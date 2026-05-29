@@ -13,6 +13,12 @@ export type Meld = {
   ownerId: number;
   type: MeldType;
   cards: Card[];
+  contributions?: MeldContribution[];
+};
+
+export type MeldContribution = {
+  playerId: number;
+  cards: Card[];
 };
 
 export type Player = {
@@ -30,6 +36,7 @@ export type PlayerConfig = {
   name: string;
   avatar: string;
   fallback: string;
+  nameEdited?: boolean;
 };
 
 export type ScoreRow = {

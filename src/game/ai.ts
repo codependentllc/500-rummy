@@ -45,7 +45,7 @@ export function aiTurn(state: GameState): GameState {
     if (!type) break;
 
     ai.hand = removeCards(ai.hand, meld.map((card) => card.id));
-    ai.melds = [...ai.melds, { id: makeId(), ownerId: ai.id, type, cards: sortCards(meld) }];
+    ai.melds = [...ai.melds, { id: makeId(), ownerId: ai.id, type, cards: sortCards(meld), contributions: [{ playerId: ai.id, cards: sortCards(meld) }] }];
     log.push(`${ai.name} melded.`);
     meld = possibleMelds(ai.hand)[0];
   }
