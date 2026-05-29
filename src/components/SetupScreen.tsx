@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { AVATARS } from "../data/avatars";
 import type { CardBackStyle, TableTheme } from "../App";
 import type { PlayerConfig } from "../game/types";
+import { useViewportCategory } from "../hooks/useViewportCategory";
 import { ActionButton } from "./ActionButton";
 import { AvatarPhoto } from "./AvatarPhoto";
 import { BuriedDiscardTutorial } from "./BuriedDiscardTutorial";
@@ -15,6 +16,7 @@ import { OnlineLobbyScreen } from "./OnlineLobbyScreen";
 import { QueenDiscardWarningAnimation } from "./QueenDiscardWarningAnimation";
 import { QueenSpadesAnimation } from "./QueenSpadesAnimation";
 import { WaitingRoomAnimation } from "./WaitingRoomAnimation";
+import "./PlayerSelector/PlayerSelector.css";
 
 type Props = {
   count: number;
@@ -52,8 +54,8 @@ function wrapIndex(index: number, length: number) {
   return ((index % length) + length) % length;
 }
 
-function avatarWindow(selectedIndex: number) {
-  const offsets = AVATARS.length > 4 ? [-2, -1, 0, 1, 2] : AVATARS.map((_, index) => index - selectedIndex);
+function avatarWindow(selectedIndex: number, visibleCount: number) {
+  const offsets = visibleCount === 1 ? [0] : visibleCount === 2 ? [0, 1] : [-1, 0, 1];
   const seen = new Set<string>();
 
   return offsets
@@ -93,6 +95,7 @@ function playerCountWindow(selectedCount: number) {
 }
 
 export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, setTableTheme, cardBack, setCardBack, onStart }: Props) {
+  const viewport = useViewportCategory();
   const [actionMenu, setActionMenu] = useState<"lobby" | "instructions" | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showTrailer, setShowTrailer] = useState(false);
@@ -134,6 +137,7 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
 
   const activeThemeIndex = Math.max(0, TABLE_THEMES.findIndex((theme) => theme.id === tableTheme));
   const activeCardBackIndex = Math.max(0, CARD_BACKS.findIndex((back) => back.id === cardBack));
+  const visibleAvatarCount = viewport === "mobile" ? 1 : viewport === "tablet" ? 2 : 3;
 
   function moveTableTheme(direction: -1 | 1) {
     setTableTheme(TABLE_THEMES[wrapIndex(activeThemeIndex + direction, TABLE_THEMES.length)].id);
@@ -414,27 +418,31 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
                   <button type="button" className="avatar-carousel-nav" aria-label="Previous avatar" onClick={() => moveAvatar(index, -1)}>
                     ‹
                   </button>
-                  <div className="avatar-carousel-track">
-                  {avatarWindow(Math.max(0, AVATARS.findIndex((avatar) => avatar.src === player.avatar))).map(({ avatar, offset }) => (
-                    <motion.button
-                      key={avatar.id}
-                      type="button"
-                      title={`${avatar.name} - ${avatar.role}`}
-                      aria-label={`Choose ${avatar.name}, ${avatar.role}`}
-                      onClick={() => selectAvatar(index, AVATARS.findIndex((item) => item.id === avatar.id))}
-                      className={player.avatar === avatar.src ? "avatar-choice selected" : "avatar-choice"}
-                      data-offset={offset}
-                      whileHover={{ y: -3, scale: offset === 0 ? 1.04 : 1.02 }}
-                      whileTap={{ scale: 0.94 }}
-                      transition={{ type: "spring", stiffness: 480, damping: 28 }}
-                    >
-                      <AvatarPhoto src={avatar.src} alt={avatar.name} fallback={avatar.fallback} size={46} />
-                      <small>
-                        <b>{avatar.name}</b>
-                        <em>{avatar.role}</em>
-                      </small>
-                    </motion.button>
-                  ))}
+                  <div
+                    className="avatar-carousel-track"
+                    onTouchStart={(event) => setSwipeStart(event.changedTouches[0]?.clientX ?? null)}
+                    onTouchEnd={(event) => finishSwipe(event, () => moveAvatar(index, -1), () => moveAvatar(index, 1))}
+                  >
+                    {avatarWindow(Math.max(0, AVATARS.findIndex((avatar) => avatar.src === player.avatar)), visibleAvatarCount).map(({ avatar, offset }) => (
+                      <motion.button
+                        key={avatar.id}
+                        type="button"
+                        title={`${avatar.name} - ${avatar.role}`}
+                        aria-label={`Choose ${avatar.name}, ${avatar.role}`}
+                        onClick={() => selectAvatar(index, AVATARS.findIndex((item) => item.id === avatar.id))}
+                        className={player.avatar === avatar.src ? "avatar-choice selected" : "avatar-choice"}
+                        data-offset={offset}
+                        whileHover={{ y: -3, scale: offset === 0 ? 1.04 : 1.02 }}
+                        whileTap={{ scale: 0.94 }}
+                        transition={{ type: "spring", stiffness: 480, damping: 28 }}
+                      >
+                        <AvatarPhoto src={avatar.src} alt={avatar.name} fallback={avatar.fallback} size={46} />
+                        <small>
+                          <b>{avatar.name}</b>
+                          <em>{avatar.role}</em>
+                        </small>
+                      </motion.button>
+                    ))}
                   </div>
                   <button type="button" className="avatar-carousel-nav" aria-label="Next avatar" onClick={() => moveAvatar(index, 1)}>
                     ›

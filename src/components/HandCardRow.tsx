@@ -22,7 +22,7 @@ export function HandCardRow({ cards, hints, selectedIds, disabled, onSelect, onC
     .map(([id]) => id);
 
   return (
-    <div>
+    <div className="hand-card-row-shell">
       <div className="hand-helper">
         <span>Drag cards onto other cards to reorder.</span>
         {readyCards.length >= 3 ? (

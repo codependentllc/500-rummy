@@ -231,8 +231,8 @@
   .tablet-game-view .human-area .hand-row {
     min-height: 116px !important;
     align-items: flex-end !important;
-    justify-content: flex-start !important;
-    padding: 8px 18px 4px 42px !important;
+    justify-content: center !important;
+    padding: 8px 24px 4px !important;
   }
 
   .tablet-game-view .human-area .hand-row .playing-card {

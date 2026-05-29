@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AVATARS } from "./data/avatars";
 import { aiTurn } from "./game/ai";
@@ -39,6 +39,7 @@ export type CardBackStyle = "red" | "blue" | "gold" | "black" | "green" | "purpl
 
 export default function App() {
   const viewport = useViewportCategory();
+  const handScrollRef = useRef<HTMLDivElement | null>(null);
   const [count, setCount] = useState(2);
   const [configs, setConfigs] = useState<PlayerConfig[]>(defaultConfigs);
   const [tableTheme, setTableTheme] = useState<TableTheme>("classic");
@@ -62,6 +63,21 @@ export default function App() {
   const tableMeldEntries = state.players.flatMap((player) => player.melds.map((meld) => ({ player, meld })));
   const layoffTargetCount = tableMeldEntries.filter(({ meld }) => selectedCards.length === 1 && state.turn === 0 && state.drawn && canLay(selectedCards[0], meld)).length;
   const handHints = useMemo(() => cardHints(human.hand), [human.hand]);
+
+  useLayoutEffect(() => {
+    const scroller = handScrollRef.current;
+    if (!scroller) return;
+
+    const centerHand = () => {
+      scroller.scrollLeft = Math.max(0, (scroller.scrollWidth - scroller.clientWidth) / 2);
+    };
+
+    centerHand();
+
+    const resizeObserver = new ResizeObserver(centerHand);
+    resizeObserver.observe(scroller);
+    return () => resizeObserver.disconnect();
+  }, [human.hand, viewport]);
 
   useEffect(() => {
     if (!started || !current?.isAI || state.handOver || isAnimatingMeld || isDealing) return;
@@ -554,7 +570,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="hand-scroll-wrap" onDragOver={allowDrop} onDrop={dropDiscard}>
+                <div ref={handScrollRef} className="hand-scroll-wrap" onDragOver={allowDrop} onDrop={dropDiscard}>
                   <HandCardRow
                     cards={human.hand}
                     hints={handHints}

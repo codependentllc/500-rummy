@@ -29,9 +29,8 @@ export function TableArea({ state, disabled, onDrawStock, onDrawDiscard, onDisca
   return (
     <>
       <div className="table-area">
-        <div className={canDrawStock ? "stock-area action-ready" : "stock-area"}>
-          <div className="section-label">{canDrawStock ? "DRAW FROM STOCK" : `STOCK (${state.stock.length})`}</div>
-          <div onClick={canDrawStock ? onDrawStock : undefined} style={{ cursor: canDrawStock ? "pointer" : "default" }}>
+        <div className={canDrawStock ? "stock-area action-ready" : "stock-area"} aria-label={`Stock pile, ${state.stock.length} cards`}>
+          <div onClick={canDrawStock ? onDrawStock : undefined} style={{ cursor: canDrawStock ? "pointer" : "default" }} aria-label={canDrawStock ? "Draw from stock" : undefined}>
             {state.stock.length ? (
               <CardView card={{ id: "back", rank: "A", suit: "♠" }} faceDown />
             ) : (
@@ -44,13 +43,12 @@ export function TableArea({ state, disabled, onDrawStock, onDrawDiscard, onDisca
           className={canDiscardToPile ? "discard-area discard-ready" : "discard-area"}
           role={canDiscardToPile ? "button" : undefined}
           tabIndex={canDiscardToPile ? 0 : undefined}
-          aria-label={canDiscardToPile ? "Discard selected card to pile" : undefined}
+          aria-label={canDiscardToPile ? "Discard selected card to pile" : "Discard pile"}
           onClick={canDiscardToPile ? onDiscardSelected : undefined}
           onKeyDown={handleDiscardKey}
           onDragOver={canDiscardToPile ? allowDrop : undefined}
           onDrop={canDiscardToPile ? onDropToDiscardPile : undefined}
         >
-          <div className="section-label">{canDiscardToPile ? "DISCARD SELECTED CARD" : "DISCARD PILE"}</div>
           <div className="discard-row">
             {visibleDiscard.map((card, visibleIndex) => {
               const realIndex = state.discard.length - 1 - visibleIndex;

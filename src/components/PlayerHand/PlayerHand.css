@@ -1,13 +1,25 @@
 .hand-scroll-wrap {
+  width: 100%;
   min-width: 0;
+  display: grid;
+  justify-items: center;
   overflow-x: auto;
   overflow-y: visible;
   scrollbar-width: thin;
 }
 
-.hand-row {
-  width: max-content;
-  min-width: 100%;
+.hand-card-row-shell {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+}
+
+.hand-card-row-shell > .hand-row {
+  width: fit-content;
+  min-width: 0;
+  margin-inline: auto;
+  justify-content: center;
   overflow: visible;
 }
 
@@ -82,17 +94,24 @@
 
   .hand-scroll-wrap {
     min-height: 104px;
-    display: flex;
+    display: grid;
     align-items: center;
+    justify-items: center;
     overflow-x: auto !important;
     overflow-y: visible !important;
     padding: 12px 4px 3px;
   }
 
-  .hand-row {
+  .hand-card-row-shell {
+    display: grid;
+    justify-items: center;
+  }
+
+  .hand-card-row-shell > .hand-row {
     min-height: 92px !important;
     align-items: center !important;
     justify-content: center !important;
+    justify-self: center !important;
     padding: 0 14px !important;
   }
 
