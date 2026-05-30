@@ -49,7 +49,7 @@ export function drawStock(state: GameState): GameState {
   const stock = [...state.stock];
   const card = stock.pop()!;
   const players = state.players.map((player, index) => (index === 0 ? { ...player, hand: sortCards([...player.hand, card]) } : player));
-  return { ...state, stock, players, drawn: true, message: `Drew ${card.rank}${card.suit}.` };
+  return { ...state, stock, players, drawn: true, message: "Drew from stock." };
 }
 
 export function immediatelyUsable(card: Card, hand: Card[], melds: Meld[], pickup: Card[] = []) {
@@ -62,7 +62,8 @@ export function immediatelyUsable(card: Card, hand: Card[], melds: Meld[], picku
 }
 
 export function canPickDiscardAt(state: GameState, index: number) {
-  return state.turn === 0 && !state.drawn && !state.handOver && immediatelyUsable(state.discard[index], state.players[0].hand, tableMelds(state), state.discard.slice(index));
+  const card = state.discard[index];
+  return Boolean(card) && state.turn === 0 && !state.drawn && !state.handOver && immediatelyUsable(card, state.players[0].hand, tableMelds(state), state.discard.slice(index));
 }
 
 export function pickupDiscardAt(state: GameState, index: number): GameState {
@@ -70,7 +71,7 @@ export function pickupDiscardAt(state: GameState, index: number): GameState {
   const pickup = state.discard.slice(index);
   const discard = state.discard.slice(0, index);
   const players = state.players.map((player, playerIndex) => (playerIndex === 0 ? { ...player, hand: sortCards([...player.hand, ...pickup]) } : player));
-  return { ...state, discard, players, drawn: true, selected: [], message: `Picked up ${pickup.map((card) => `${card.rank}${card.suit}`).join(", ")}.` };
+  return { ...state, discard, players, drawn: true, selected: [], message: "Picked up discard." };
 }
 
 export function scoreHand(state: GameState): GameState {

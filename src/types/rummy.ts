@@ -90,6 +90,14 @@ export interface GameState {
 
 export type ScoreRow = Pick<Player, "id" | "name" | "avatarName" | "avatarImage" | "score">;
 
-export type DragState =
-  | { type: "stock"; startX: number; startY: number; dragging: boolean }
-  | { type: "card"; card: Card; startX: number; startY: number; dragging: boolean };
+export type DragSource =
+  | { type: "stock" }
+  | { type: "discard"; discardIndex?: number }
+  | { type: "handCard"; card: Card; cardId: string };
+
+export interface DragState {
+  source: DragSource;
+  isDragging: boolean;
+  startX: number;
+  startY: number;
+}

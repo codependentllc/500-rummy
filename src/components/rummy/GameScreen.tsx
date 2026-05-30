@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { canLay, meldType, points, sortCards } from "@/games/rummy/rules";
-import { discardSelected, drawStock, layBest, layOff, pickupDiscardAt, playSelectedMeld, selectOnly, selectedCards, tableMelds, toggleSelected } from "@/games/rummy/engine";
-import type { Card, DragState, GameState } from "@/types/rummy";
+import { canPickDiscardAt, discardSelected, drawStock, layBest, layOff, pickupDiscardAt, playSelectedMeld, selectOnly, selectedCards, tableMelds, toggleSelected } from "@/games/rummy/engine";
+import type { Card, DragSource, DragState, GameState } from "@/types/rummy";
 import { AvatarImage } from "./AvatarImage";
 import { BrandHeader } from "./BrandHeader";
 import { CardView } from "./CardView";
@@ -35,6 +35,7 @@ export function GameScreen({ game, tableThemeClass, cardBackClass, setGame, onNe
   const handRef = useRef<HTMLDivElement>(null);
   const discardRef = useRef<HTMLButtonElement>(null);
   const discardPreviewRef = useRef<HTMLDivElement>(null);
+  const suppressDiscardClick = useRef(false);
   const selected = selectedCards(game);
   const melds = useMemo(() => tableMelds(game), [game]);
   const human = game.players[0];
@@ -52,24 +53,44 @@ export function GameScreen({ game, tableThemeClass, cardBackClass, setGame, onNe
     if (!drag) return;
     const onMove = (event: PointerEvent) => {
       const moved = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) > 8;
-      if (!drag.dragging && !moved) return;
-      if (drag.type === "card" && !game.drawn) return;
-      setDrag((current) => current ? { ...current, dragging: true } : current);
-      if (drag.type === "stock") {
+      if (!drag.isDragging && !moved) return;
+      if (drag.source.type === "handCard" && !game.drawn) return;
+      setDrag((current) => current ? { ...current, isDragging: true } : current);
+      if (drag.source.type === "stock") {
         setGhost({ type: "stock", x: event.clientX, y: event.clientY });
         setDropTarget(isOver(handRef.current, event.clientX, event.clientY) ? "hand" : null);
+      } else if (drag.source.type === "discard") {
+        const topDiscard = game.discard.at(-1);
+        if (topDiscard) setGhost({ type: "card", card: topDiscard, x: event.clientX, y: event.clientY });
+        setDropTarget(isOver(handRef.current, event.clientX, event.clientY) ? "hand" : null);
       } else {
-        setGame((current) => selectOnly(current, drag.card.id));
-        setGhost({ type: "card", card: drag.card, x: event.clientX, y: event.clientY });
+        const cardId = drag.source.cardId;
+        setGame((current) => selectOnly(current, cardId));
+        setGhost({ type: "card", card: drag.source.card, x: event.clientX, y: event.clientY });
         setDropTarget(isOver(discardRef.current, event.clientX, event.clientY) ? "discard" : null);
       }
     };
     const onEnd = (event: PointerEvent) => {
-      if (!drag.dragging) {
-        if (drag.type === "card") setGame((current) => toggleSelected(current, drag.card.id));
-      } else if (drag.type === "stock" && isOver(handRef.current, event.clientX, event.clientY)) {
+      if (!drag.isDragging) {
+        if (drag.source.type === "handCard") {
+          const cardId = drag.source.cardId;
+          setGame((current) => toggleSelected(current, cardId));
+        }
+      } else if (drag.source.type === "stock" && isOver(handRef.current, event.clientX, event.clientY)) {
         setGame(drawStock);
-      } else if (drag.type === "card" && isOver(discardRef.current, event.clientX, event.clientY)) {
+      } else if (drag.source.type === "discard") {
+        suppressDiscardClick.current = true;
+        if (isOver(handRef.current, event.clientX, event.clientY)) {
+          const topIndex = game.discard.length - 1;
+          if (canPickDiscardAt(game, topIndex)) {
+            setGame((current) => pickupDiscardAt(current, current.discard.length - 1));
+          } else if (game.discard.some((_, index) => canPickDiscardAt(game, index))) {
+            setDiscardOpen(true);
+          } else {
+            setGame((current) => ({ ...current, message: "That discard must be immediately usable." }));
+          }
+        }
+      } else if (drag.source.type === "handCard" && isOver(discardRef.current, event.clientX, event.clientY)) {
         setGame(discardSelected);
       }
       setDrag(null);
@@ -86,10 +107,10 @@ export function GameScreen({ game, tableThemeClass, cardBackClass, setGame, onNe
     };
   }, [drag, game.drawn, setGame]);
 
-  const startDrag = (type: "stock" | "card", event: ReactPointerEvent, card?: Card) => {
-    if (type === "stock" && !canDraw) return;
-    if (type === "card" && (!isHumanTurn || !card)) return;
-    setDrag(type === "stock" ? { type, startX: event.clientX, startY: event.clientY, dragging: false } : { type, card: card!, startX: event.clientX, startY: event.clientY, dragging: false });
+  const startDrag = (source: DragSource, event: ReactPointerEvent) => {
+    if ((source.type === "stock" || source.type === "discard") && !canDraw) return;
+    if (source.type === "handCard" && !isHumanTurn) return;
+    setDrag({ source, startX: event.clientX, startY: event.clientY, isDragging: false });
   };
 
   return (
@@ -110,10 +131,10 @@ export function GameScreen({ game, tableThemeClass, cardBackClass, setGame, onNe
 
       <main className="table">
         <div className="piles">
-          <button className={`pile ${canDraw ? "action" : ""}`} type="button" onPointerDown={(event) => startDrag("stock", event)}>
+          <button className={`pile ${canDraw ? "action" : ""}`} type="button" onPointerDown={(event) => startDrag({ type: "stock" }, event)}>
             <div className="label">Stock</div><div className="back" /><div className="stock-count">{game.stock.length}</div><div className="hint">Drag to hand</div>
           </button>
-          <button ref={discardRef} className={`pile ${dropTarget === "discard" ? "drop-ready" : canDraw ? "action" : ""}`} type="button" onClick={() => canDraw && game.discard.length && setDiscardOpen(true)}>
+          <button ref={discardRef} className={`pile ${dropTarget === "discard" ? "drop-ready" : canDraw ? "action" : ""}`} type="button" onPointerDown={(event) => startDrag({ type: "discard" }, event)} onClick={() => { if (suppressDiscardClick.current) { suppressDiscardClick.current = false; return; } if (canDraw && game.discard.length) setDiscardOpen(true); }}>
             <div className="label">Discard</div>
             <div ref={discardPreviewRef} className="discard-preview">
               {game.discard.map((card, index) => <CardView key={card.id} card={card} preview style={{ "--rot": `${(index % 5 - 2) * 1.6}deg`, zIndex: index } as CSSProperties} />)}
@@ -146,7 +167,7 @@ export function GameScreen({ game, tableThemeClass, cardBackClass, setGame, onNe
           <span>{points(human.hand)} pts · {human.hand.length} cards{game.selected.length ? ` · ${game.selected.length} selected` : ""}</span>
         </div>
         <div ref={handRef} className={`hand ${dropTarget === "hand" ? "drop-ready" : ""}`}>
-          {sortCards(human.hand).map((card) => <div key={card.id} className={`hand-card ${game.selected.includes(card.id) ? "selected" : ""}`} onPointerDown={(event) => startDrag("card", event, card)}><CardView card={card} /></div>)}
+          {sortCards(human.hand).map((card) => <div key={card.id} className={`hand-card ${game.selected.includes(card.id) ? "selected" : ""}`} onPointerDown={(event) => startDrag({ type: "handCard", card, cardId: card.id }, event)}><CardView card={card} /></div>)}
         </div>
         <div className="actions">
           <button className="action draw" type="button" disabled={!canDraw} onClick={() => setGame(drawStock)}>Draw</button>
