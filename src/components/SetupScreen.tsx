@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type TouchEvent } from "react";
 import { motion } from "framer-motion";
 import { AVATARS } from "../data/avatars";
 import type { CardBackStyle, TableTheme } from "../App";
@@ -76,14 +76,25 @@ function themeWindow(selectedIndex: number) {
 }
 
 function cardBackWindow(selectedIndex: number) {
-  return [-1, 0, 1, 2].map((offset) => {
+  return [-1, 0, 1].map((offset) => {
     const index = wrapIndex(selectedIndex + offset, CARD_BACKS.length);
     return { back: CARD_BACKS[index], offset };
   });
 }
 
+const PLAYER_COUNTS = [2, 3, 4];
+
+function playerCountWindow(selectedCount: number) {
+  const selectedIndex = Math.max(0, PLAYER_COUNTS.findIndex((playerCount) => playerCount === selectedCount));
+  return [-1, 0, 1].map((offset) => {
+    const index = wrapIndex(selectedIndex + offset, PLAYER_COUNTS.length);
+    return { playerCount: PLAYER_COUNTS[index], offset };
+  });
+}
+
 export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, setTableTheme, cardBack, setCardBack, onStart }: Props) {
   const [actionMenu, setActionMenu] = useState<"lobby" | "instructions" | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showTrailer, setShowTrailer] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showLayoff, setShowLayoff] = useState(false);
@@ -93,14 +104,26 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
   const [showWaitingRoom, setShowWaitingRoom] = useState(false);
   const [showQueenWarning, setShowQueenWarning] = useState(false);
   const [showQueenSpades, setShowQueenSpades] = useState(false);
+  const [swipeStart, setSwipeStart] = useState<number | null>(null);
 
   function updatePlayer(index: number, patch: Partial<PlayerConfig>) {
     setConfigs((prev) => prev.map((player, i) => (i === index ? { ...player, ...patch } : player)));
   }
 
+  function isAutoName(playerIndex: number, name: string | undefined) {
+    if (!name) return true;
+    if (name === `Computer ${playerIndex}` || name === `Player ${playerIndex + 1}` || name === "You") return true;
+    return AVATARS.some((avatar) => avatar.name === name);
+  }
+
   function selectAvatar(playerIndex: number, avatarIndex: number) {
     const avatar = AVATARS[wrapIndex(avatarIndex, AVATARS.length)];
-    updatePlayer(playerIndex, { avatar: avatar.src, fallback: avatar.fallback });
+    const player = configs[playerIndex];
+    updatePlayer(playerIndex, {
+      avatar: avatar.src,
+      fallback: avatar.fallback,
+      ...(!player?.nameEdited && isAutoName(playerIndex, player?.name) ? { name: avatar.name } : {})
+    });
   }
 
   function moveAvatar(playerIndex: number, direction: -1 | 1) {
@@ -120,6 +143,22 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
     setCardBack(CARD_BACKS[wrapIndex(activeCardBackIndex + direction, CARD_BACKS.length)].id);
   }
 
+  function movePlayerCount(direction: -1 | 1) {
+    const activePlayerIndex = Math.max(0, PLAYER_COUNTS.findIndex((playerCount) => playerCount === count));
+    setCount(PLAYER_COUNTS[wrapIndex(activePlayerIndex + direction, PLAYER_COUNTS.length)]);
+  }
+
+  function finishSwipe(event: TouchEvent, onPrevious: () => void, onNext: () => void) {
+    if (swipeStart === null) return;
+    const swipeEnd = event.changedTouches[0]?.clientX ?? swipeStart;
+    const delta = swipeEnd - swipeStart;
+    setSwipeStart(null);
+
+    if (Math.abs(delta) < 34) return;
+    if (delta > 0) onPrevious();
+    else onNext();
+  }
+
   return (
     <div className={`setup-page table-theme-${tableTheme} card-back-${cardBack}`}>
       <MenuLoopBackground />
@@ -129,6 +168,26 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
       >
+        <div className="welcome-mobile-nav">
+          <button type="button" className="welcome-menu-button" aria-label="Open setup menu" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}>
+            ☰
+          </button>
+          <strong>500 Rummy</strong>
+          <button type="button" className="welcome-deal-button" onClick={onStart}>
+            Deal
+          </button>
+        </div>
+
+        {mobileMenuOpen ? (
+          <div className="welcome-mobile-menu" aria-label="Setup menu">
+            <button type="button" onClick={() => { setShowTrailer(true); setMobileMenuOpen(false); }}>Trailer</button>
+            <button type="button" onClick={() => { setShowLobby(true); setMobileMenuOpen(false); }}>Lobby</button>
+            <button type="button" onClick={() => { setShowTutorial(true); setMobileMenuOpen(false); }}>Instructions</button>
+            <button type="button" onClick={() => setMobileMenuOpen(false)}>Settings</button>
+            <button type="button" onClick={() => setMobileMenuOpen(false)}>About</button>
+          </div>
+        ) : null}
+
         <motion.div className="setup-logo" initial={{ scale: 0.85, rotate: -8 }} animate={{ scale: 1, rotate: 0 }} transition={{ delay: 0.12, type: "spring", stiffness: 260, damping: 18 }}>🃏</motion.div>
         <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16, duration: 0.42 }}>500 Rummy</motion.h1>
         <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22, duration: 0.38 }}>Choose names and fictional photo avatars, then deal.</motion.p>
@@ -210,27 +269,33 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
           <div className="setup-count-row">
             <motion.div className="setup-section" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.34, duration: 0.35 }}>
               <b>Players</b>
-              <div className="player-count-row">
-                {[2, 3, 4].map((number) => (
-                  <ActionButton
-                    key={number}
-                    onClick={() => setCount(number)}
-                    style={{
-                      flex: 1,
-                      minHeight: 42,
-                      background: count === number
-                        ? "linear-gradient(145deg, #fff2b0 0%, #d8a941 42%, #6d4b12 100%)"
-                        : "linear-gradient(145deg, rgba(255, 248, 220, 0.96), rgba(180, 210, 178, 0.92))",
-                      color: count === number ? "#102817" : "#1a472a",
-                      border: count === number ? "1px solid rgba(255, 224, 130, 0.86)" : "1px solid rgba(255, 224, 130, 0.34)",
-                      borderRadius: 12,
-                      boxShadow: count === number ? "0 0 20px rgba(255, 224, 130, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.45)" : "inset 0 1px 0 rgba(255, 255, 255, 0.52), 0 8px 18px rgba(0, 0, 0, 0.12)",
-                      textShadow: count === number ? "0 1px 0 rgba(255, 255, 255, 0.26)" : "none"
-                    }}
-                  >
-                    {number}
-                  </ActionButton>
-                ))}
+              <div className="selection-carousel player-count-carousel" aria-label="Player count selection">
+                <button type="button" className="selection-carousel-nav" aria-label="Previous player count" onClick={() => movePlayerCount(-1)}>
+                  ‹
+                </button>
+                <div
+                  className="player-count-track"
+                  onTouchStart={(event) => setSwipeStart(event.changedTouches[0]?.clientX ?? null)}
+                  onTouchEnd={(event) => finishSwipe(event, () => movePlayerCount(-1), () => movePlayerCount(1))}
+                >
+                  {playerCountWindow(count).map(({ playerCount, offset }) => (
+                    <motion.button
+                      key={`${playerCount}-${offset}`}
+                      type="button"
+                      className={playerCount === count ? "selection-carousel-card player-count-card selected" : "selection-carousel-card player-count-card"}
+                      data-offset={offset}
+                      onClick={() => setCount(playerCount)}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.985 }}
+                    >
+                      <strong>{playerCount}</strong>
+                      <span>{playerCount} Players</span>
+                    </motion.button>
+                  ))}
+                </div>
+                <button type="button" className="selection-carousel-nav" aria-label="Next player count" onClick={() => movePlayerCount(1)}>
+                  ›
+                </button>
               </div>
             </motion.div>
           </div>
@@ -242,7 +307,11 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
                 <button type="button" className="selection-carousel-nav" aria-label="Previous table theme" onClick={() => moveTableTheme(-1)}>
                   ‹
                 </button>
-                <div className="theme-carousel-track">
+                <div
+                  className="theme-carousel-track"
+                  onTouchStart={(event) => setSwipeStart(event.changedTouches[0]?.clientX ?? null)}
+                  onTouchEnd={(event) => finishSwipe(event, () => moveTableTheme(-1), () => moveTableTheme(1))}
+                >
                   {themeWindow(activeThemeIndex).map(({ theme, offset }) => (
                     <motion.button
                       key={`${theme.id}-${offset}`}
@@ -291,7 +360,11 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
                 <button type="button" className="selection-carousel-nav" aria-label="Previous card back" onClick={() => moveCardBack(-1)}>
                   ‹
                 </button>
-                <div className="card-back-carousel-track">
+                <div
+                  className="card-back-carousel-track"
+                  onTouchStart={(event) => setSwipeStart(event.changedTouches[0]?.clientX ?? null)}
+                  onTouchEnd={(event) => finishSwipe(event, () => moveCardBack(-1), () => moveCardBack(1))}
+                >
                   {cardBackWindow(activeCardBackIndex).map(({ back, offset }) => (
                     <motion.button
                       key={`${back.id}-${offset}`}
@@ -371,7 +444,7 @@ export function SetupScreen({ count, setCount, configs, setConfigs, tableTheme, 
                 <div className="player-config-main">
                   <input
                     value={player.name || ""}
-                    onChange={(event) => updatePlayer(index, { name: event.target.value })}
+                    onChange={(event) => updatePlayer(index, { name: event.target.value, nameEdited: true })}
                     placeholder={index === 0 ? "Your name" : `Computer ${index} name`}
                   />
                 </div>

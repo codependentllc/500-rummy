@@ -2,6 +2,7 @@ import type { DragEvent } from "react";
 import { CardView } from "./CardView";
 import { ActionButton } from "./ActionButton";
 import type { Card } from "../game/types";
+import "./PlayerHand/PlayerHand.css";
 
 type Props = {
   cards: Card[];

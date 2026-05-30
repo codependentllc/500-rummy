@@ -1,4 +1,8 @@
 import type { ReactNode } from "react";
+<<<<<<< HEAD
+=======
+import "./GameViews.css";
+>>>>>>> 716698cfb4adddecea997426b7a2830ba241f978
 
 type Props = {
   table: ReactNode;

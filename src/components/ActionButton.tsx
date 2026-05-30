@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { motion, type HTMLMotionProps } from "framer-motion";
+import "./ActionBar/ActionBar.css";
 
 type Props = HTMLMotionProps<"button"> & {
   children: ReactNode;
