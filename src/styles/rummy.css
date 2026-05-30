@@ -374,6 +374,15 @@ h1 {
   margin: auto 0 4px;
 }
 
+.welcome-logo {
+  width: min(184px, 52vw);
+  height: 124px;
+  display: block;
+  margin: 0 auto 12px;
+  object-fit: contain;
+  filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.46));
+}
+
 .setup-actions {
   width: 100%;
   display: grid;

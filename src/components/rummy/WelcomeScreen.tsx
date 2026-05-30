@@ -9,6 +9,7 @@ export function WelcomeScreen({ onContinue }: Props) {
     <section id="welcome" className="screen active">
       <BrandHeader />
       <div className="welcome-copy">
+        <img className="welcome-logo" src="/art/500-rummy-logo-raccoon-new.png" alt="500 Rummy" />
         <h1>500 Rummy</h1>
         <p className="sub">Build melds, lay off cards, and race to 500.</p>
       </div>
