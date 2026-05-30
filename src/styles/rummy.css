@@ -72,7 +72,7 @@ button:disabled {
 }
 
 #welcome,
-#setup {
+.setup-flow-screen {
   position: relative;
   flex-direction: column;
   align-items: center;
@@ -80,6 +80,11 @@ button:disabled {
   gap: 12px;
   padding: 84px 20px 20px;
   text-align: center;
+}
+
+.setup-flow-screen {
+  justify-content: flex-start;
+  overflow-y: auto;
 }
 
 h1 {
@@ -277,7 +282,7 @@ h1 {
   margin: 12px 0;
 }
 
-#setup .setup-card {
+.setup-scroll-card {
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -362,6 +367,93 @@ h1 {
   color: var(--cream);
   font-size: 11px;
   font-weight: 800;
+}
+
+.welcome-copy {
+  max-width: 320px;
+  margin: auto 0 4px;
+}
+
+.setup-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(86px, 0.34fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.setup-back {
+  min-height: 56px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.32);
+  color: var(--gold2);
+  font-weight: 900;
+}
+
+.picker-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.picker-option {
+  min-width: 0;
+  min-height: 126px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  padding: 10px 7px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.24);
+  text-align: center;
+}
+
+.picker-option.selected {
+  border-color: rgba(255, 226, 160, 0.82);
+  box-shadow: 0 0 0 2px rgba(215, 168, 74, 0.12), 0 0 20px rgba(215, 168, 74, 0.24);
+}
+
+.picker-option b {
+  color: var(--gold2);
+  font-size: 12px;
+}
+
+.picker-option small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.2;
+}
+
+.theme-swatch {
+  width: 76px;
+  height: 42px;
+  display: block;
+  border: 1px solid rgba(255, 226, 160, 0.3);
+  border-radius: 13px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+.theme-classic-green .theme-swatch {
+  background: radial-gradient(circle, #2a7541, #092617);
+}
+
+.theme-royal-gold .theme-swatch {
+  background: radial-gradient(circle, #806023, #231906);
+}
+
+.theme-midnight-casino .theme-swatch {
+  background: radial-gradient(circle, #204864, #07151f);
+}
+
+.theme-riverboat .theme-swatch {
+  background: radial-gradient(circle, #7a3029, #250c0a);
+}
+
+.back-preview {
+  width: 44px;
+  height: 64px;
 }
 
 .count,
@@ -670,6 +762,60 @@ h1 {
 .back {
   border: 2px solid rgba(255, 226, 160, 0.3);
   background: repeating-linear-gradient(45deg, #7a1717 0 5px, #5b1010 5px 10px);
+}
+
+.theme-royal-gold .table {
+  background:
+    radial-gradient(circle at 50% 35%, rgba(202, 163, 76, 0.48), transparent 46%),
+    repeating-linear-gradient(35deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 6px),
+    linear-gradient(#5d471b, #1e1608);
+}
+
+.theme-midnight-casino .table {
+  background:
+    radial-gradient(circle at 50% 35%, rgba(49, 112, 148, 0.46), transparent 46%),
+    repeating-linear-gradient(35deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 6px),
+    linear-gradient(#123246, #06131c);
+}
+
+.theme-riverboat .table {
+  background:
+    radial-gradient(circle at 50% 35%, rgba(165, 68, 56, 0.44), transparent 46%),
+    repeating-linear-gradient(35deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 6px),
+    linear-gradient(#642a25, #210b0a);
+}
+
+.back.back-burgundy-diamond,
+.back-burgundy-diamond .back {
+  background: repeating-linear-gradient(45deg, #7a1717 0 5px, #5b1010 5px 10px);
+}
+
+.back.back-emerald-fan,
+.back-emerald-fan .back {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 226, 160, 0.18), transparent 24%),
+    repeating-radial-gradient(circle at 50% 105%, #236344 0 7px, #0e3625 7px 14px);
+}
+
+.back.back-gold-trim,
+.back-gold-trim .back {
+  border-color: rgba(255, 226, 160, 0.74);
+  background:
+    linear-gradient(135deg, transparent 18%, rgba(255, 226, 160, 0.22) 18% 21%, transparent 21% 79%, rgba(255, 226, 160, 0.22) 79% 82%, transparent 82%),
+    #211909;
+  box-shadow: inset 0 0 0 4px #94712b, 0 7px 16px rgba(0, 0, 0, 0.45);
+}
+
+.back.back-midnight-pattern,
+.back-midnight-pattern .back {
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 226, 160, 0.16) 0 2px, transparent 2px 8px),
+    repeating-linear-gradient(-45deg, #102d4e 0 5px, #07182b 5px 10px);
+}
+
+.back-gold-trim .back {
+  border-color: rgba(255, 226, 160, 0.74);
+  box-shadow: inset 0 0 0 4px #94712b, 0 7px 16px rgba(0, 0, 0, 0.45);
 }
 
 .stock-count {

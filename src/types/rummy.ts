@@ -4,7 +4,7 @@ export const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q
 export type Suit = (typeof SUITS)[number];
 export type Rank = (typeof RANKS)[number];
 export type MeldType = "set" | "run";
-export type ScreenState = "welcome" | "setup" | "game";
+export type SetupStep = "welcome" | "player" | "opponents" | "tableTheme" | "cardBack" | "game";
 
 export interface AvatarOption {
   id: string;
@@ -17,6 +17,39 @@ export interface AvatarOption {
 export interface SeatConfig {
   name: string;
   avatarId: string;
+}
+
+export interface PlayerSetup {
+  avatarId: string;
+  displayName: string;
+}
+
+export interface OpponentSetup {
+  id: number;
+  avatarId: string;
+  displayName: string;
+}
+
+export interface TableTheme {
+  id: string;
+  name: string;
+  className: string;
+  description: string;
+}
+
+export interface CardBackStyle {
+  id: string;
+  name: string;
+  className: string;
+  description: string;
+}
+
+export interface GameSetupState {
+  player: PlayerSetup;
+  opponentCount: number;
+  opponents: OpponentSetup[];
+  tableThemeId: string;
+  cardBackId: string;
 }
 
 export interface Card {

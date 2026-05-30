@@ -1,28 +1,18 @@
-import { AvatarCarousel } from "./AvatarCarousel";
 import { BrandHeader } from "./BrandHeader";
 
 type Props = {
-  avatarId: string;
-  playerName: string;
-  onAvatarChange: (id: string) => void;
-  onNameChange: (name: string) => void;
   onContinue: () => void;
 };
 
-export function WelcomeScreen({ avatarId, playerName, onAvatarChange, onNameChange, onContinue }: Props) {
+export function WelcomeScreen({ onContinue }: Props) {
   return (
     <section id="welcome" className="screen active">
       <BrandHeader />
-      <div><h1>500 Rummy</h1><p className="sub">Choose your avatar</p></div>
-      <div className="avatar-card-wrap">
-        <div className="label">Fictional Players</div>
-        <AvatarCarousel selectedId={avatarId} onChange={onAvatarChange} />
-        <div className="name-editor">
-          <label htmlFor="playerName">Player Name</label>
-          <input id="playerName" maxLength={18} value={playerName} onChange={(event) => onNameChange(event.target.value)} />
-        </div>
+      <div className="welcome-copy">
+        <h1>500 Rummy</h1>
+        <p className="sub">Build melds, lay off cards, and race to 500.</p>
       </div>
-      <button className="start" type="button" onClick={onContinue}>Continue</button>
+      <button className="start" type="button" onClick={onContinue}>Start</button>
     </section>
   );
 }

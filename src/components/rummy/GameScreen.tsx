@@ -12,6 +12,8 @@ import { ScoreModal } from "./ScoreModal";
 
 type Props = {
   game: GameState;
+  tableThemeClass: string;
+  cardBackClass: string;
   setGame: (update: (game: GameState) => GameState) => void;
   onNewGame: () => void;
   onNextHand: () => void;
@@ -25,7 +27,7 @@ function isOver(element: HTMLElement | null, x: number, y: number) {
   return x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
 }
 
-export function GameScreen({ game, setGame, onNewGame, onNextHand }: Props) {
+export function GameScreen({ game, tableThemeClass, cardBackClass, setGame, onNewGame, onNextHand }: Props) {
   const [discardOpen, setDiscardOpen] = useState(false);
   const [drag, setDrag] = useState<DragState | null>(null);
   const [ghost, setGhost] = useState<Ghost | null>(null);
@@ -91,7 +93,7 @@ export function GameScreen({ game, setGame, onNewGame, onNextHand }: Props) {
   };
 
   return (
-    <section id="game" className="screen active">
+    <section id="game" className={`screen active ${tableThemeClass} ${cardBackClass}`}>
       <header className="top">
         <div className="top-row"><BrandHeader compact /><button className="new" type="button" onClick={onNewGame}>New</button></div>
         <div className="players">
