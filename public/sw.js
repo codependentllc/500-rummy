@@ -1,4 +1,4 @@
-const CACHE_VERSION = "500-rummy-v1";
+const CACHE_VERSION = "500-rummy-mvp-v2";
 const APP_SHELL = [
   "/",
   "/manifest.webmanifest",
@@ -9,7 +9,19 @@ const APP_SHELL = [
   "/icons/maskable/icon-192.png",
   "/icons/maskable/icon-512.png",
   "/art/500-rummy-logo-raccoon-new.png",
-  "/backgrounds/rummy-cinematic-table.png"
+  "/backgrounds/rummy-cinematic-table.png",
+  "/avatars/mara-vale.webp",
+  "/avatars/cal-brooks.webp",
+  "/avatars/iris-quinn.webp",
+  "/avatars/dante-rios.webp",
+  "/avatars/sofia-lee.webp",
+  "/avatars/jax-cole.webp",
+  "/avatars/vera-moon.webp",
+  "/avatars/theo-banks.webp",
+  "/avatars/lena-hart.webp",
+  "/avatars/rafi-cruz.webp",
+  "/avatars/owen-pike.webp",
+  "/avatars/dahlia-west.webp"
 ];
 
 self.addEventListener("install", (event) => {
