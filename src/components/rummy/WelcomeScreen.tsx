@@ -1,4 +1,5 @@
 import { AvatarCarousel } from "./AvatarCarousel";
+import { BrandHeader } from "./BrandHeader";
 
 type Props = {
   avatarId: string;
@@ -11,7 +12,8 @@ type Props = {
 export function WelcomeScreen({ avatarId, playerName, onAvatarChange, onNameChange, onContinue }: Props) {
   return (
     <section id="welcome" className="screen active">
-      <div><h1>500<br />Rummy</h1><p className="sub">Choose your avatar</p></div>
+      <BrandHeader />
+      <div><h1>500 Rummy</h1><p className="sub">Choose your avatar</p></div>
       <div className="avatar-card-wrap">
         <div className="label">Fictional Players</div>
         <AvatarCarousel selectedId={avatarId} onChange={onAvatarChange} />

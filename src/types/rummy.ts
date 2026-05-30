@@ -14,6 +14,11 @@ export interface AvatarOption {
   color: string;
 }
 
+export interface SeatConfig {
+  name: string;
+  avatarId: string;
+}
+
 export interface Card {
   id: string;
   rank: Rank;

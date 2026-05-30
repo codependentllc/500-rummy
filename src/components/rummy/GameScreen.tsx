@@ -5,6 +5,7 @@ import { canLay, meldType, points, sortCards } from "@/games/rummy/rules";
 import { discardSelected, drawStock, layBest, layOff, pickupDiscardAt, playSelectedMeld, selectOnly, selectedCards, tableMelds, toggleSelected } from "@/games/rummy/engine";
 import type { Card, DragState, GameState } from "@/types/rummy";
 import { AvatarImage } from "./AvatarImage";
+import { BrandHeader } from "./BrandHeader";
 import { CardView } from "./CardView";
 import { DiscardViewer } from "./DiscardViewer";
 import { ScoreModal } from "./ScoreModal";
@@ -92,7 +93,7 @@ export function GameScreen({ game, setGame, onNewGame, onNextHand }: Props) {
   return (
     <section id="game" className="screen active">
       <header className="top">
-        <div className="top-row"><div className="title">500 Rummy</div><button className="new" type="button" onClick={onNewGame}>New</button></div>
+        <div className="top-row"><BrandHeader compact /><button className="new" type="button" onClick={onNewGame}>New</button></div>
         <div className="players">
           {game.players.map((player) => (
             <div key={player.id} className={`player ${game.turn === player.id && !game.handOver ? "active" : ""}`}>

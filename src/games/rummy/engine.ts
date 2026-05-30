@@ -1,6 +1,6 @@
 import { AVATARS } from "../../data/avatars";
 import { canLay, combinations, meldType, points, removeCards, sortCards } from "./rules";
-import { RANKS, SUITS, type AvatarOption, type Card, type GameState, type Meld, type Player } from "../../types/rummy";
+import { RANKS, SUITS, type AvatarOption, type Card, type GameState, type Meld, type Player, type SeatConfig } from "../../types/rummy";
 
 function makeDeck() {
   const deck = SUITS.flatMap((suit) => RANKS.map((rank) => ({ id: `${rank}${suit}${crypto.randomUUID()}`, rank, suit })));
@@ -11,20 +11,16 @@ function makeDeck() {
   return deck;
 }
 
-function shuffledAvatars(excludeId: string) {
-  return AVATARS.filter((avatar) => avatar.id !== excludeId).sort(() => Math.random() - 0.5);
-}
-
 function playerFromAvatar(id: number, avatar: AvatarOption, name: string, score = 0): Player {
   return { id, name, avatarId: avatar.id, avatarName: avatar.name, avatarImage: avatar.image, avatarColor: avatar.color, score, hand: [], melds: [], isAI: id > 0 };
 }
 
-export function createGame(playerCount: number, humanAvatar: AvatarOption, displayName: string, scores: number[] = []): GameState {
+export function createGame(playerCount: number, seats: SeatConfig[], scores: number[] = []): GameState {
   const stock = makeDeck();
-  const aiAvatars = shuffledAvatars(humanAvatar.id);
   const players = Array.from({ length: playerCount }, (_, index) => {
-    const avatar = index === 0 ? humanAvatar : aiAvatars[index - 1];
-    return playerFromAvatar(index, avatar, index === 0 ? displayName : avatar.name, scores[index] ?? 0);
+    const config = seats[index];
+    const avatar = AVATARS.find((option) => option.id === config?.avatarId) ?? AVATARS[index % AVATARS.length];
+    return playerFromAvatar(index, avatar, config?.name.trim() || avatar.name, scores[index] ?? 0);
   });
   for (let round = 0; round < 7; round += 1) players.forEach((player) => player.hand.push(stock.pop()!));
   players.forEach((player) => (player.hand = sortCards(player.hand)));
