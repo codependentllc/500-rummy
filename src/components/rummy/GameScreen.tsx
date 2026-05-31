@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
-import { canLay, meldType, points, sortCards } from "@/games/rummy/rules";
+import { canLay, findBestMeldGroups, groupHandByMelds, meldType, points, sortByRank, sortBySuit } from "@/games/rummy/rules";
 import { canPickDiscardAt, discardSelected, drawStock, layBest, layOff, pickupDiscardAt, playSelectedMeld, selectOnly, selectedCards, tableMelds, toggleSelected } from "@/games/rummy/engine";
 import type { Card, DragSource, DragState, GameState } from "@/types/rummy";
 import { AvatarImage } from "./AvatarImage";
@@ -20,6 +20,7 @@ type Props = {
 };
 
 type Ghost = { type: "stock"; x: number; y: number } | { type: "card"; card: Card; x: number; y: number };
+type HandOrder = "suit" | "rank" | "melds";
 
 function isOver(element: HTMLElement | null, x: number, y: number) {
   if (!element) return false;
@@ -32,6 +33,7 @@ export function GameScreen({ game, tableThemeClass, cardBackClass, setGame, onNe
   const [drag, setDrag] = useState<DragState | null>(null);
   const [ghost, setGhost] = useState<Ghost | null>(null);
   const [dropTarget, setDropTarget] = useState<"hand" | "discard" | null>(null);
+  const [handOrder, setHandOrder] = useState<HandOrder>("suit");
   const handRef = useRef<HTMLDivElement>(null);
   const discardRef = useRef<HTMLButtonElement>(null);
   const discardPreviewRef = useRef<HTMLDivElement>(null);
@@ -44,6 +46,9 @@ export function GameScreen({ game, tableThemeClass, cardBackClass, setGame, onNe
   const canMeld = isHumanTurn && game.drawn && selected.length >= 3 && Boolean(meldType(selected));
   const canLayOff = isHumanTurn && game.drawn && selected.length === 1 && melds.some((meld) => canLay(selected[0], meld));
   const canDiscard = isHumanTurn && game.drawn && selected.length === 1;
+  const orderedHand = useMemo(() => handOrder === "rank" ? sortByRank(human.hand) : handOrder === "melds" ? groupHandByMelds(human.hand) : sortBySuit(human.hand), [handOrder, human.hand]);
+  const groupedMeldIds = useMemo(() => new Set(handOrder === "melds" ? findBestMeldGroups(human.hand).flatMap((group) => group.map((card) => card.id)) : []), [handOrder, human.hand]);
+  const handDensity = human.hand.length >= 17 ? "ultra-compact" : human.hand.length >= 11 ? "compact" : "normal";
 
   useEffect(() => {
     if (discardPreviewRef.current) discardPreviewRef.current.scrollLeft = discardPreviewRef.current.scrollWidth;
@@ -166,8 +171,13 @@ export function GameScreen({ game, tableThemeClass, cardBackClass, setGame, onNe
           <span>{isHumanTurn ? game.drawn ? "Your Hand — meld, lay off, or drag to discard" : "Your Hand — draw first" : "Your Hand"}</span>
           <span>{points(human.hand)} pts · {human.hand.length} cards{game.selected.length ? ` · ${game.selected.length} selected` : ""}</span>
         </div>
-        <div ref={handRef} className={`hand ${dropTarget === "hand" ? "drop-ready" : ""}`}>
-          {sortCards(human.hand).map((card) => <div key={card.id} className={`hand-card ${game.selected.includes(card.id) ? "selected" : ""}`} onPointerDown={(event) => startDrag({ type: "handCard", card, cardId: card.id }, event)}><CardView card={card} /></div>)}
+        <div className="hand-tools" aria-label="Hand sorting">
+          <button className={handOrder === "suit" ? "active" : ""} type="button" onClick={() => setHandOrder("suit")}>Suit</button>
+          <button className={handOrder === "rank" ? "active" : ""} type="button" onClick={() => setHandOrder("rank")}>Rank</button>
+          <button className={handOrder === "melds" ? "active" : ""} type="button" onClick={() => setHandOrder("melds")}>Group</button>
+        </div>
+        <div ref={handRef} className={`hand hand-${handDensity} ${dropTarget === "hand" ? "drop-ready" : ""}`}>
+          {orderedHand.map((card) => <div key={card.id} className={`hand-card ${game.selected.includes(card.id) ? "selected" : ""} ${groupedMeldIds.has(card.id) ? "meld-candidate" : ""}`} onPointerDown={(event) => startDrag({ type: "handCard", card, cardId: card.id }, event)}><CardView card={card} /></div>)}
         </div>
         <div className="actions">
           <button className="action draw" type="button" disabled={!canDraw} onClick={() => setGame(drawStock)}>Draw</button>
@@ -178,7 +188,7 @@ export function GameScreen({ game, tableThemeClass, cardBackClass, setGame, onNe
       </section>
 
       <DiscardViewer game={game} open={discardOpen} onClose={() => setDiscardOpen(false)} onPick={(index) => { setGame((current) => pickupDiscardAt(current, index)); setDiscardOpen(false); }} />
-      <ScoreModal game={game} onNextHand={onNextHand} />
+      <ScoreModal game={game} onNextHand={onNextHand} onNewGame={onNewGame} />
       {ghost ? <div className="drag-ghost" style={{ left: ghost.x, top: ghost.y }}>{ghost.type === "stock" ? <div className="back" /> : <CardView card={ghost.card} />}</div> : null}
     </section>
   );

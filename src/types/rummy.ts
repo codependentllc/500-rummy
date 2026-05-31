@@ -4,6 +4,7 @@ export const RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q
 export type Suit = (typeof SUITS)[number];
 export type Rank = (typeof RANKS)[number];
 export type MeldType = "set" | "run";
+export type ComputerDifficulty = "easy" | "normal" | "hard";
 export type SetupStep = "welcome" | "player" | "opponents" | "tableTheme" | "cardBack" | "game";
 
 export interface AvatarOption {
@@ -50,6 +51,7 @@ export interface GameSetupState {
   opponents: OpponentSetup[];
   tableThemeId: string;
   cardBackId: string;
+  difficulty: ComputerDifficulty;
 }
 
 export interface Card {
@@ -86,6 +88,15 @@ export interface GameState {
   selected: string[];
   message: string;
   handOver: boolean;
+  difficulty: ComputerDifficulty;
+  scoreResult?: ScoreResult;
+}
+
+export interface ScoreResult {
+  handScores: Record<number, number>;
+  totalScores: Record<number, number>;
+  winnerId?: number;
+  isGameOver: boolean;
 }
 
 export type ScoreRow = Pick<Player, "id" | "name" | "avatarName" | "avatarImage" | "score">;
