@@ -11,7 +11,7 @@ export function points(cards: Card[]) {
   return cards.reduce((sum, card) => sum + cardValue(card), 0);
 }
 
-function rankValue(rank: Rank, aceHigh = false) {
+export function rankValue(rank: Rank, aceHigh = false) {
   if (rank === "A") return aceHigh ? 14 : 1;
   if (rank === "J") return 11;
   if (rank === "Q") return 12;
@@ -20,7 +20,15 @@ function rankValue(rank: Rank, aceHigh = false) {
 }
 
 export function sortCards(cards: Card[]) {
+  return sortBySuit(cards);
+}
+
+export function sortBySuit(cards: Card[]) {
   return [...cards].sort((a, b) => SUITS.indexOf(a.suit) - SUITS.indexOf(b.suit) || rankValue(a.rank) - rankValue(b.rank));
+}
+
+export function sortByRank(cards: Card[]) {
+  return [...cards].sort((a, b) => rankValue(a.rank) - rankValue(b.rank) || SUITS.indexOf(a.suit) - SUITS.indexOf(b.suit));
 }
 
 export function isSet(cards: Card[]) {
@@ -78,4 +86,21 @@ export function possibleMelds(hand: Card[]) {
 
 export function removeCards(cards: Card[], ids: string[]) {
   return cards.filter((card) => !ids.includes(card.id));
+}
+
+export function findBestMeldGroups(cards: Card[]) {
+  const used = new Set<string>();
+  return possibleMelds(cards)
+    .sort((left, right) => right.length - left.length || points(right) - points(left))
+    .filter((group) => {
+      if (group.some((card) => used.has(card.id))) return false;
+      group.forEach((card) => used.add(card.id));
+      return true;
+    });
+}
+
+export function groupHandByMelds(cards: Card[]) {
+  const groups = findBestMeldGroups(cards);
+  const groupedIds = new Set(groups.flatMap((group) => group.map((card) => card.id)));
+  return [...groups.flatMap(sortBySuit), ...sortBySuit(cards.filter((card) => !groupedIds.has(card.id)))];
 }

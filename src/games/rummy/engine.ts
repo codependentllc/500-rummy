@@ -1,6 +1,8 @@
 import { AVATARS } from "../../data/avatars";
 import { canLay, combinations, meldType, points, removeCards, sortCards } from "./rules";
-import { RANKS, SUITS, type AvatarOption, type Card, type GameState, type Meld, type Player, type SeatConfig } from "../../types/rummy";
+import { RANKS, SUITS, type AvatarOption, type Card, type ComputerDifficulty, type GameState, type Meld, type Player, type SeatConfig } from "../../types/rummy";
+
+export const WINNING_SCORE = 500;
 
 function makeDeck() {
   const deck = SUITS.flatMap((suit) => RANKS.map((rank) => ({ id: `${rank}${suit}${crypto.randomUUID()}`, rank, suit })));
@@ -15,7 +17,7 @@ function playerFromAvatar(id: number, avatar: AvatarOption, name: string, score 
   return { id, name, avatarId: avatar.id, avatarName: avatar.name, avatarImage: avatar.image, avatarColor: avatar.color, score, hand: [], melds: [], isAI: id > 0 };
 }
 
-export function createGame(playerCount: number, seats: SeatConfig[], scores: number[] = []): GameState {
+export function createGame(playerCount: number, seats: SeatConfig[], scores: number[] = [], difficulty: ComputerDifficulty = "normal"): GameState {
   const stock = makeDeck();
   const players = Array.from({ length: playerCount }, (_, index) => {
     const config = seats[index];
@@ -24,7 +26,7 @@ export function createGame(playerCount: number, seats: SeatConfig[], scores: num
   });
   for (let round = 0; round < 7; round += 1) players.forEach((player) => player.hand.push(stock.pop()!));
   players.forEach((player) => (player.hand = sortCards(player.hand)));
-  return { stock, discard: [stock.pop()!], players, turn: 0, drawn: false, selected: [], message: "Drag stock to your hand or tap the discard pile.", handOver: false };
+  return { stock, discard: [stock.pop()!], players, turn: 0, drawn: false, selected: [], message: "Drag stock to your hand or tap the discard pile.", handOver: false, difficulty };
 }
 
 export function tableMelds(state: GameState) {
@@ -74,9 +76,16 @@ export function pickupDiscardAt(state: GameState, index: number): GameState {
   return { ...state, discard, players, drawn: true, selected: [], message: "Picked up discard." };
 }
 
+export function getGameWinner(players: Player[]) {
+  return players.filter((player) => player.score >= WINNING_SCORE).sort((left, right) => right.score - left.score)[0] ?? null;
+}
+
 export function scoreHand(state: GameState): GameState {
-  const players = state.players.map((player) => ({ ...player, score: player.score + points(player.melds.flatMap((meld) => meld.cards)) - points(player.hand) }));
-  return { ...state, players, handOver: true };
+  const handScores = Object.fromEntries(state.players.map((player) => [player.id, points(player.melds.flatMap((meld) => meld.cards)) - points(player.hand)]));
+  const players = state.players.map((player) => ({ ...player, score: player.score + handScores[player.id] }));
+  const winner = getGameWinner(players);
+  const totalScores = Object.fromEntries(players.map((player) => [player.id, player.score]));
+  return { ...state, players, handOver: true, scoreResult: { handScores, totalScores, winnerId: winner?.id, isGameOver: Boolean(winner) } };
 }
 
 export function playSelectedMeld(state: GameState): GameState {
